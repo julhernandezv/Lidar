@@ -106,9 +106,9 @@ class PlotBook():
         'user':'jhernandezv',
     }
 
-    def __init__(self, data, ax=None,fig=None,subplots=False,figsize=None,**kwargs):
+    def __init__(self, ax=None,fig=None,subplots=False,figsize=None,**kwargs):
 
-        self.data           = data
+
         self.ax             = ax
         self.fig            = fig
         self.subpltos       = subplots
@@ -178,8 +178,9 @@ class Lidar(PlotBook):
 
     Parameters
         output      = 'raw_data','P(r)', 'RCS','Ln(RCS)','fLn(RCS)','dLn(RCS)','fdLn(RCS)','dfLn(RCS)','fdfLn(RCS)'... - options for derived outputs
+        scan        = ['Zenith','Azimuth','3D','FixedPoint'] - kind of spacial measurement
         ascii       = bolean - if False read binary files
-        scan        = bolean - identify extra line for scanning measurements
+
     """
 
     # mpl.cm.gist_earth_r}
@@ -194,7 +195,7 @@ class Lidar(PlotBook):
     }
 
 
-    def __init__(self, Fechai=None, Fechaf=None, ascii=False, scan=True, output='P(r)', **kwargs):
+    def __init__(self, Fechai=None, Fechaf=None, ascii=False, scan='3D', output='P(r)', **kwargs):
 
         self.kwargs.update(kwargs)
         self.ascii      = ascii
@@ -244,7 +245,7 @@ class Lidar(PlotBook):
         print "***********************************************************************************************************************************************"
 
         # The third line contains information about the lidar’s offset from the North (En el file que descargue de FixedPoint no estaba esta linea - en Scan si)
-        if self.scan:
+        if self.scan not in ['FixedPoint']:
             lineaOffsetNorth = fileObj.readline ()
             lineaOffsetNorth = lineaOffsetNorth.strip ()
             print lineaOffsetNorth
@@ -310,7 +311,7 @@ class Lidar(PlotBook):
 
         if self.ascii:
             fileObj.close ()
-            dataset = pd.read_csv(filename,delimiter='\t',header=9 if self.scan else 8,usecols=[0,1,2,3] )
+            dataset = pd.read_csv(filename,delimiter='\t',header=9 if self.scan not in ['FixedPoint'] else 8,usecols=[0,1,2,3] )
             ejex = np.array(range(1,dataset.shape[0]+ 1))*dictDescripcionDataset[1]["datasetBinWidth"]
 
             dataset.index  = ejex
@@ -346,7 +347,7 @@ class Lidar(PlotBook):
 
         return dataset, description
 
-    def read(self,filenames,**kwargs):
+    def read_folder(self,filenames,**kwargs):
         """Function for reading lidar files (binary or ascii)
 
         Parameters
@@ -360,19 +361,20 @@ class Lidar(PlotBook):
         data_info = pd.DataFrame()
         data = {}
 
-        for file in filenames:
+        for idx, file in enumerate(filenames):
             print "{} \n {} \n {}".format("="*50,file,"="*50)
-            df1,df2 = self.read_file(file)
+            df1, df2 = self.read_file(file)
             # print df2.index.strftime('%Y-%m-%d %H:%M:%S')
             print df2
             data[df2.index[0].strftime('%Y-%m-%d %H:%M:%S')] = df1
             data_info = data_info.append(df2)
 
         data = pd.concat(data,axis=1)
-        data.columns.set_levels(pd.to_datetime(data.columns.levels[0].values), level=0, inplace=True)
-        data_info.sort_index(inplace=True)
+        print data.columns.levels[0].values
+        data.columns.set_levels( range(data.columns.levels[0].size), level=0, inplace=True) #pd.to_datetime(data.columns.levels[0].values), level=0, inplace=True)
+        data_info = data_info.sort_index().reset_index()
 
-        if kwargs.get('tresd',False):
+        if self.scan == '3D':
             if np.abs(data_info.Zenith.iloc[1] - data_info.Zenith.iloc[0]) > 10:
                 print data_info.index[0]
                 # data_info.loc[data_info.index[0],'Zenith'] = data_info.Zenith.iloc[1] + 5
@@ -382,26 +384,75 @@ class Lidar(PlotBook):
             data_info.loc[data_info.Azimuth != data_info.Azimuth.iloc[0],'Zenith'] += 180
             data_info.loc[data_info.Azimuth == data_info.Azimuth.iloc[0],'Zenith'] *= -1
 
-            duplicated = data_info.duplicated('Zenith',keep=False)
+            duplicated = data_info.Zenith == 90 #duplicated('Zenith',keep=False)
+            # print duplicated
             if duplicated.any():
+                print "\n Deleting duplicates"
                 data[ data_info.index[duplicated][0] ] = data[data_info.index[duplicated]].groupby(axis=1,level=1).mean()
 
             data.drop(data_info.index[data_info.duplicated('Zenith')],axis=1,level=0,inplace=True)
             data_info.drop(data_info.index[data_info.duplicated('Zenith')],inplace=True)
 
-        elif self.scan:
+        elif self.scan in ['Zenith','Azimuth']:
             data_info.loc[:,'Zenith']   *= -1
 
         data_info['Azimuth']        = (270-data_info['Azimuth'])%360
 
-        self.data       = data[data.index >=110]
-        self.data_info  = data_info
-        self.raw_data   = self.data.copy()
+        data       = data[data.index >= 110] #Filtro para mediciones inferiores a 110m de distacia al sensor
+        # self.data_info  = data_info
+        # self.raw_data   = self.data.copy()
 
-        self.derived_output()
+        # self.derived_output()
 
-        if not kwargs.get('inplace',True):
-            return {'data':self.data,'data_info':self.data_info}
+        # if not kwargs.get('inplace',True):
+        return data, data_info
+
+
+    def read(self, **kwargs):
+
+        kind_folder = {'3D':'3D','Zenith':'Z','Azimuth':'A','FixedPoint':'RM'}
+        os.system('rm Figuras/*')
+        os.system('mkdir Datos')
+        # dates = pd.date_range('20180624','20180717',freq='d')
+        dates = pd.date_range(self.Fechai,self.Fechaf,freq='d')
+
+        self.data       = {}
+        self.data_info  = {}
+
+        for d in dates:
+        # d = dates[0]
+            os.system('rm -r Datos/*')
+            os.system('scp -r jhernandezv@192.168.1.62:/mnt/ALMACENAMIENTO/LIDAR/{}/{}/* Datos/'.format('Scanning_Measurements' if self.scan != 'FixedPoint' else self.scan, d.strftime('%Y%m%d')))
+
+            folders = glob.glob('Datos/{}*'.format( kind_folder[self.scan]))
+            if len(folders) > 0 :
+                # os.system('ssh jhernandezv@siata.gov.co "mkdir /var/www/jhernandezv/Lidar/{}/{}/"'.format(self.scan, d.strftime('%Y%m%d')))
+
+                for folder in folders:
+                    archivos   = glob.glob('{}/RM*'.format(folder))
+                    print folder
+                    self.df3, self.df4 = self.read_folder(archivos)
+                    self.data[self.df4['Fecha'].iloc[0].strftime('%Y-%m-%d %H:%M:%S')] = self.df3
+                    self.data_info[self.df4['Fecha'].iloc[0].strftime('%Y-%m-%d %H:%M:%S')] = self.df3
+
+        self.data           = pd.concat(self.data,axis=1)
+        self.data_info      = pd.concat(self.data_info,axis=1)
+
+        self.data.columns.set_levels( pd.to_datetime(self.data.columns.levels[0].values), level=0, inplace=True)
+        self.data_info.columns.set_levels( pd.to_datetime(self.data_info.columns.levels[0].values), level=0, inplace=True)
+
+                    # try:
+                    #     self.plot(kind='Log', textsave ='_{}'.format(self.data_info.index[0].strftime('%H:%M')), \
+                    #             path= '{}3D/{}/'.format(self.kwargs['path'],d.strftime('%Y%m%d')), vlim=[6.7,9])
+                    # except:
+                    #     Error.append(folders)
+                    #     pass
+                # os.system('convert -delay 20 -loop 0 {}*.png {}.gif'.format())
+                # for col in self.data.columns.levels[1].values:
+                #     os.system( 'convert -delay 20 -loop 0 Figuras/Lidar_Scanning_RCS_{}_* Figuras/lidar_Scanning_RCS_{}_{}.gif'.format(col,col,d.strftime('%Y%m%d')))
+                #     os.system('scp Figuras/lidar_Scanning_RCS_{}_{}.gif jhernandezv@siata.gov.co:/var/www/jhernandezv/Lidar/3D/{}/ '.format(col,d.strftime('%Y%m%d'),d.strftime('%Y%m%d')) )
+
+
 
 
     def derived_output(self,**kwargs):
@@ -452,7 +503,7 @@ class Lidar(PlotBook):
 
         if 'ax' not in kwargs.keys():
             plt.close('all')
-            if self.scan:
+            if self.scan not in ['FixedPoint']:
                 rel         = (Y.max()-Y.min())/(X.max()-X.min())
                 figsize = ( 10,10*rel) if rel <=1 else (10*(1./rel),10)
             else: figsize = (15,8.5)
@@ -508,7 +559,7 @@ class Lidar(PlotBook):
                 # ax.yaxis.set_minor_locator(LogLocator(10,subs=np.arange(2,10)))
 
         ax.set_ylabel(r'Range $[m]$')
-        if self.scan:
+        if self.scan not in ['FixedPoint']:
             ax.set_xlabel(r'Range $[m]$',)# fontsize=fontsize)
         else:
             ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M \n%d-%b'))
@@ -558,7 +609,7 @@ class Lidar(PlotBook):
         kwargs['textsave']  = "_Scanning_{}_{}{}".format(self.output,parameter,kwargs.get('textsave',''))
         kwargs['title']     = "{} = {}".format(*title_args)
         kwargs['label']     =  self.label[self.output][parameter[:6]]
-        kwargs['add_text']      = data_info.index[0].strftime('%b-%d\n%H:%M')
+        kwargs['add_text']  = self.data_info['Fecha'].iloc[0].strftime('%b-%d\n%H:%M')
 
 
         self.plot_lidar(x, y, profile, **kwargs )
@@ -615,7 +666,7 @@ class Lidar(PlotBook):
 
         for parameter in kwargs.get('parameters',self.data.columns.levels[1].values):
             args = (zenith,height,parameter)
-            if self.scan:
+            if self.scan not in ['FixedPoint']:
                 print args
                 self.profiler(*args,**kwargs)
             else:
@@ -699,22 +750,22 @@ class Lidar(PlotBook):
 
 # files = glob.glob('InfoLidar/ZS0_180709-151714/RM*')      # test
 # files = glob.glob('InfoLidar/3Ds_180703-135028/RM*')        # test2
-files = glob.glob('InfoLidar/3Ds_180704-105519/RM*')        # test3
+# files = glob.glob('InfoLidar/3Ds_180704-105519/RM*')        # test3
 
-binario = Lidar(scan=True)
-binario.read(files,tresd=True)
+binario = Lidar(Fechai='2018-07-04',Fechaf='2018-07-05',scan='3D')
+binario.read()
 # '-75.5686', '6.2680'
 
-binario.plot(textsave='_test3',parameters=['photon-p'])
-binario.plot(textsave='_test3',parameters=['photon-p'],output='RCS')
-binario.plot(textsave='_log_test3',output='RCS',parameters=['photon-p'],kind='Log')
-binario.plot(textsave='_test3',output='Ln(RCS)',parameters=['photon-p'])
-binario.plot(textsave='_test3',output='dLn(RCS)',parameters=['photon-p'],kind='Anomaly')
-binario.plot(textsave='_test3',output='fLn(RCS)',parameters=['photon-p'])
-binario.plot(textsave='_test3',output='fdLn(RCS)',parameters=['photon-p'],kind='Anomaly')
-binario.plot(textsave='_test3',output='dfLn(RCS)',parameters=['photon-p'],kind='Anomaly')
-binario.plot(textsave='_test3',output='fdfLn(RCS)',parameters=['photon-p'],kind='Anomaly')
-
+# binario.plot(textsave='_test_4D',parameters=['photon-p'])
+# binario.plot(textsave='_test3',parameters=['photon-p'],output='RCS')
+# binario.plot(textsave='_log_test3',output='RCS',parameters=['photon-p'],kind='Log')
+# binario.plot(textsave='_test3',output='Ln(RCS)',parameters=['photon-p'])
+# binario.plot(textsave='_test3',output='dLn(RCS)',parameters=['photon-p'],kind='Anomaly')
+# binario.plot(textsave='_test3',output='fLn(RCS)',parameters=['photon-p'])
+# binario.plot(textsave='_test3',output='fdLn(RCS)',parameters=['photon-p'],kind='Anomaly')
+# binario.plot(textsave='_test3',output='dfLn(RCS)',parameters=['photon-p'],kind='Anomaly')
+# binario.plot(textsave='_test3',output='fdfLn(RCS)',parameters=['photon-p'],kind='Anomaly')
+#
 
 
 # binario.profiler(zenith=True,textsave='_RCS_log_test',parameter='analog-s',linear=False)
@@ -916,32 +967,32 @@ binario.plot(textsave='_test3',output='fdfLn(RCS)',parameters=['photon-p'],kind=
 #
 # print Zenith
 # ###############################################################################
-#3Ds
-os.system('rm Figuras/*')
-os.system('mkdir Datos')
-# dates = pd.date_range('20180624','20180717',freq='d')
-dates = pd.date_range('20180704','20180705',freq='d')
-
-for d in dates:
-# d = dates[0]
-    os.system('rm -r Datos/*')
-    os.system('scp -r jhernandezv@192.168.1.62:/mnt/ALMACENAMIENTO/LIDAR/Scanning_Measurements/{}/* Datos/'.format( d.strftime('%Y%m%d')))
-
-    folders = glob.glob('Datos/3D*')
-    if len(folders) > 0 :
-        os.system('ssh jhernandezv@siata.gov.co "mkdir /var/www/jhernandezv/Lidar/3D/{}/"'.format( d.strftime('%Y%m%d')))
-        for folder in folders:
-            files   = glob.glob('{}/RM*'.format(folder))
-            self    = Lidar(output='RCS',ascii=d.strftime('%Y-%m-%d') in ['2018-06-24','2018-06-25','2018-06-26'] )
-            print folder
-            self.read(files,tresd=True)
-            try:
-                self.plot(kind='Log', textsave ='_{}'.format(self.data_info.index[0].strftime('%H:%M')), \
-                        path= '{}3D/{}/'.format(self.kwargs['path'],d.strftime('%Y%m%d')), vlim=[6.7,9])
-            except:
-                Error.append(folders)
-                pass
-        # os.system('convert -delay 20 -loop 0 {}*.png {}.gif'.format())
-        for col in self.data.columns.levels[1].values:
-            os.system( 'convert -delay 20 -loop 0 Figuras/Lidar_Scanning_RCS_{}_* Figuras/lidar_Scanning_RCS_{}_{}.gif'.format(col,col,d.strftime('%Y%m%d')))
-            os.system('scp Figuras/lidar_Scanning_RCS_{}_{}.gif jhernandezv@siata.gov.co:/var/www/jhernandezv/Lidar/3D/{}/ '.format(col,d.strftime('%Y%m%d'),d.strftime('%Y%m%d')) )
+# #3Ds
+# os.system('rm Figuras/*')
+# os.system('mkdir Datos')
+# # dates = pd.date_range('20180624','20180717',freq='d')
+# dates = pd.date_range('20180704','20180705',freq='d')
+#
+# for d in dates:
+# # d = dates[0]
+#     os.system('rm -r Datos/*')
+#     os.system('scp -r jhernandezv@192.168.1.62:/mnt/ALMACENAMIENTO/LIDAR/Scanning_Measurements/{}/* Datos/'.format( d.strftime('%Y%m%d')))
+#
+#     folders = glob.glob('Datos/3D*')
+#     if len(folders) > 0 :
+#         os.system('ssh jhernandezv@siata.gov.co "mkdir /var/www/jhernandezv/Lidar/3D/{}/"'.format( d.strftime('%Y%m%d')))
+#         for folder in folders:
+#             files   = glob.glob('{}/RM*'.format(folder))
+#             self    = Lidar(output='RCS',ascii=d.strftime('%Y-%m-%d') in ['2018-06-24','2018-06-25','2018-06-26'] )
+#             print folder
+#             self.read(files,tresd=True)
+#             try:
+#                 self.plot(kind='Log', textsave ='_{}'.format(self.data_info.index[0].strftime('%H:%M')), \
+#                         path= '{}3D/{}/'.format(self.kwargs['path'],d.strftime('%Y%m%d')), vlim=[6.7,9])
+#             except:
+#                 Error.append(folders)
+#                 pass
+#         # os.system('convert -delay 20 -loop 0 {}*.png {}.gif'.format())
+#         for col in self.data.columns.levels[1].values:
+#             os.system( 'convert -delay 20 -loop 0 Figuras/Lidar_Scanning_RCS_{}_* Figuras/lidar_Scanning_RCS_{}_{}.gif'.format(col,col,d.strftime('%Y%m%d')))
+#             os.system('scp Figuras/lidar_Scanning_RCS_{}_{}.gif jhernandezv@siata.gov.co:/var/www/jhernandezv/Lidar/3D/{}/ '.format(col,d.strftime('%Y%m%d'),d.strftime('%Y%m%d')) )
