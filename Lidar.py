@@ -236,8 +236,8 @@ class Lidar(PlotBook):
         # valorHeight = float (lineaLocationArray[5])
         # valorLong = float (lineaLocationArray[6])
         # valorLat = float (lineaLocationArray[7])
-        description ['Zenith'] = float (lineaLocationArray[8])
-        description ['Azimuth'] = float (lineaLocationArray[9])
+        description ['Zenith'] = int( float (lineaLocationArray[8]) )
+        description ['Azimuth'] = int( float (lineaLocationArray[9]) )
         # description ['Temp'] = float (lineaLocationArray[10])
         # description ['Press'] = float (lineaLocationArray[11])
 #
@@ -340,7 +340,9 @@ class Lidar(PlotBook):
 
             print "***********************************************************************************************************************************************"
 
-            dataset     = pd.concat(dataset,axis=1)
+            dataset             = pd.concat(dataset,axis=1)
+            dataset.sort_index(axis=1,inplace=True)
+            dataset.index.name  = 'Heigth'
             fileObj.close ()
             description = pd.DataFrame(description,index=[1]).set_index('Fecha')
 
@@ -361,63 +363,66 @@ class Lidar(PlotBook):
         data_info = pd.DataFrame()
         data = {}
 
-        for idx, file in enumerate(filenames):
+        for file in sorted(filenames):
             print "{} \n {} \n {}".format("="*50,file,"="*50)
             df1, df2 = self.read_file(file)
             # print df2.index.strftime('%Y-%m-%d %H:%M:%S')
-            print df2
-            data[df2.index[0].strftime('%Y-%m-%d %H:%M:%S')] = df1
+            # print '\n index= {}'.format(df2['Zenith' if self.scan in ['FixedPoint','3D'] else self.scan].values[0])
+            data[ df2.index[0].strftime('%Y-%m-%d %H:%M:%S') ] = df1
             data_info = data_info.append(df2)
 
         data = pd.concat(data,axis=1)
-        print data.columns.levels[0].values
-        data.columns.set_levels( range(data.columns.levels[0].size), level=0, inplace=True) #pd.to_datetime(data.columns.levels[0].values), level=0, inplace=True)
-        data_info = data_info.sort_index().reset_index()
+        data_info = data_info.sort_index() #.reset_index()
+        data.columns.set_levels( pd.to_datetime(data.columns.levels[0].values), level=0, inplace=True) #range(data.columns.levels[0].size), level=0, inplace=True)
 
         if self.scan == '3D':
             if np.abs(data_info.Zenith.iloc[1] - data_info.Zenith.iloc[0]) > 10:
                 print data_info.index[0]
                 # data_info.loc[data_info.index[0],'Zenith'] = data_info.Zenith.iloc[1] + 5
-                data.drop(data_info.index.values[0],axis=1,level=0,inplace=True)
-                data_info.drop(data_info.index.values[0],inplace=True)
+                data.drop(data_info.index[0],axis=1,level=0,inplace=True)
+                data_info.drop(data_info.index[0],inplace=True)
 
-            data_info.loc[data_info.Azimuth != data_info.Azimuth.iloc[0],'Zenith'] += 180
+            data_info.loc[data_info.Azimuth != data_info.Azimuth.iloc[0],['Azimuth','Zenith']] += 180
             data_info.loc[data_info.Azimuth == data_info.Azimuth.iloc[0],'Zenith'] *= -1
 
-            duplicated = data_info.Zenith == 90 #duplicated('Zenith',keep=False)
-            # print duplicated
-            if duplicated.any():
-                print "\n Deleting duplicates"
-                data[ data_info.index[duplicated][0] ] = data[data_info.index[duplicated]].groupby(axis=1,level=1).mean()
+            #Filter by repeated measures at Zenith 90
+            duplicated =  data_info.index[data_info.Zenith == 90]
+            print duplicated#duplicated('Zenith',keep=False)
 
-            data.drop(data_info.index[data_info.duplicated('Zenith')],axis=1,level=0,inplace=True)
-            data_info.drop(data_info.index[data_info.duplicated('Zenith')],inplace=True)
+            if duplicated.size >1 :
+                print "\n Deleting duplicated"
+                data.loc[data.index, duplicated[0] ] = data[ duplicated ].groupby(axis=1, level=1).mean()
+                data.drop( duplicated[1:], axis=1, level=0, inplace=True)
+                print data.columns
+                data_info.drop( duplicated[1:], inplace=True)
 
         elif self.scan in ['Zenith','Azimuth']:
             data_info.loc[:,'Zenith']   *= -1
 
         data_info['Azimuth']        = (270-data_info['Azimuth'])%360
 
-        data       = data[data.index >= 110] #Filtro para mediciones inferiores a 110m de distacia al sensor
-        # self.data_info  = data_info
-        # self.raw_data   = self.data.copy()
+        print data.columns.levels[0]
+        print data_info.index
+        col_name = 'Zenith' if self.scan in ['FixedPoint','3D'] else self.scan
 
-        # self.derived_output()
+        data.columns = pd.MultiIndex.from_product( [data_info[ col_name ].values, data.columns.levels[1]], names = [col_name,'Parameters'] ) #.set_levels( data_info[ col_name ].values , level=0, inplace=True)
 
-        # if not kwargs.get('inplace',True):
+        #Filtro para mediciones inferiores a 110m de distacia al sensor
+        data       = data[data.index >= 110]
+
         return data, data_info
 
 
     def read(self, **kwargs):
 
         kind_folder = {'3D':'3D','Zenith':'Z','Azimuth':'A','FixedPoint':'RM'}
-        os.system('rm Figuras/*')
+        ## os.system('rm Figuras/*')
         os.system('mkdir Datos')
         # dates = pd.date_range('20180624','20180717',freq='d')
         dates = pd.date_range(self.Fechai,self.Fechaf,freq='d')
 
         self.data       = {}
-        self.data_info  = {}
+        self.data_info  = pd.DataFrame()
 
         for d in dates:
         # d = dates[0]
@@ -431,15 +436,22 @@ class Lidar(PlotBook):
                 for folder in folders:
                     archivos   = glob.glob('{}/RM*'.format(folder))
                     print folder
-                    self.df3, self.df4 = self.read_folder(archivos)
-                    self.data[self.df4['Fecha'].iloc[0].strftime('%Y-%m-%d %H:%M:%S')] = self.df3
-                    self.data_info[self.df4['Fecha'].iloc[0].strftime('%Y-%m-%d %H:%M:%S')] = self.df3
+                    df3, df4 = self.read_folder(archivos)
+                    self.data[df4.index[0].strftime('%Y-%m-%d %H:%M:%S')] = df3
+
+                    df4.loc[df4.index[0], 'Fecha_fin'] = df4.index[-1]
+                    self.data_info = self.data_info.append(df4.iloc[0])
 
         self.data           = pd.concat(self.data,axis=1)
-        self.data_info      = pd.concat(self.data_info,axis=1)
-
+        # self.data_info      = self.data_info.sort_index()
+        print self.data.columns.levels[0].values
         self.data.columns.set_levels( pd.to_datetime(self.data.columns.levels[0].values), level=0, inplace=True)
-        self.data_info.columns.set_levels( pd.to_datetime(self.data_info.columns.levels[0].values), level=0, inplace=True)
+
+        self.raw_data   = self.data.copy()
+
+        # self.derived_output()
+
+        # self.data_info.columns.set_levels( pd.to_datetime(self.data_info.columns.levels[0].values), level=0, inplace=True)
 
                     # try:
                     #     self.plot(kind='Log', textsave ='_{}'.format(self.data_info.index[0].strftime('%H:%M')), \
@@ -675,10 +687,17 @@ class Lidar(PlotBook):
 
     @property
     def Pr(self):
-        mvolts  = lambda x: x * self.data_info.loc[x.name[0],x.name[1]+'_InputRange'] * 1000 * (2. ** (-self.data_info.loc[x.name[0],x.name[1]+'_ADCBits'])) / self.data_info.loc[x.name[0],x.name[1]+'_ShotNumber']
-        mHz     = lambda x: x * ( 150 /  self.data_info.loc[x.name[0],x.name[1]+'_BinWidth']) / self.data_info.loc[x.name[0],x.name[1]+'_ShotNumber']
+        # def mvolts(x):
+        #     print x.name
+        #     print x.name[0]
+        #     return x * self.data_info.loc[x.name[0],x.name[2]+'_InputRange'] * 1000 * (2. ** (-self.data_info.loc[x.name[0],x.name[2]+'_ADCBits'])) / self.data_info.loc[x.name[0],x.name[2]+'_ShotNumber']
+        mvolts  = lambda x:  self.data_info.loc[x.name[0],x.name[2]+'_InputRange'] * 1000 * (2. ** (-self.data_info.loc[x.name[0],x.name[2]+'_ADCBits'])) / self.data_info.loc[x.name[0],x.name[2]+'_ShotNumber']
 
-        return self.data.apply( lambda x: mvolts(x) if 'analog' in x.name[1] else mHz(x) )
+        # def mHz(x):
+            # return x *  ( 150 /  self.data_info.loc[x.name[0],x.name[2]+'_BinWidth']) / self.data_info.loc[x.name[0],x.name[2]+'_ShotNumber']
+        mHz     = lambda x:  ( 150 /  self.data_info.loc[x.name[0],x.name[2]+'_BinWidth']) / self.data_info.loc[x.name[0],x.name[2]+'_ShotNumber']
+
+        return self.data.apply( lambda serie: mvolts(serie) if 'analog' in serie.name[2] else mHz(serie) )
 
     @property
     def RCS(self):
@@ -754,6 +773,13 @@ class Lidar(PlotBook):
 
 binario = Lidar(Fechai='2018-07-04',Fechaf='2018-07-05',scan='3D')
 binario.read()
+
+backup = [binario.data, binario.data_info]
+binario.data = backup[0]
+binario.data_info = backup[1]
+
+binario.Pr
+# dd, di = binario.read_folder(files)
 # '-75.5686', '6.2680'
 
 # binario.plot(textsave='_test_4D',parameters=['photon-p'])
