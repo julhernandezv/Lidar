@@ -197,12 +197,14 @@ class Lidar(PlotBook):
 
     def __init__(self, Fechai=None, Fechaf=None, ascii=False, scan='3D', output='P(r)', **kwargs):
 
-        self.kwargs.update(kwargs)
         self.ascii      = ascii
         self.scan       = scan
         self.output     = output
         self.Fechai     = (dt.datetime.now()-relativedelta(months=1)).strftime('%Y-%m-')+'01 01:00' if (Fechaf == None) else Fechai
         self.Fechaf     = (pd.to_datetime(self.Fechai)+ relativedelta(months=1)-dt.timedelta(hours=1)).strftime('%Y-%m-%d %H:%M') if (Fechaf == None) else Fechaf #
+
+        self.degree_variable = 'Zenith' if self.scan in ['FixedPoint','3D'] else self.scan
+        self.kwargs.update(kwargs)
         # super()
 
 
@@ -289,13 +291,13 @@ class Lidar(PlotBook):
 
             if lineaInfoDatasetArray[15][0:2] == 'BT': #dictDescripcionDataset[idxDataset + 1]["datasetModoAnalogo"]:
                 print int (lineaInfoDatasetArray[12]),dictDescripcionDataset[idxDataset + 1]["datasetPolarization"]
-                description [parameter+'_ADCBits']      = int (lineaInfoDatasetArray[12])
-                description [parameter+'_InputRange']   = float (lineaInfoDatasetArray[14])
-                description [parameter+'_ShotNumber']       = int (lineaInfoDatasetArray[13])
+                description ['ADCBits_'+parameter]      = int (lineaInfoDatasetArray[12])
+                description ['InputRange_'+parameter]   = float (lineaInfoDatasetArray[14])
+                description ['ShotNumber_'+parameter]   = int (lineaInfoDatasetArray[13])
 
             elif lineaInfoDatasetArray[15][0:2] == 'BC':
-                description [parameter+'_ShotNumber']       = int (lineaInfoDatasetArray[13])
-                description [parameter+'_BinWidth']     = float (lineaInfoDatasetArray[6])
+                description ['ShotNumber_'+parameter]   = int (lineaInfoDatasetArray[13])
+                description ['BinWidth_'+parameter]     = float (lineaInfoDatasetArray[6])
                 # dictDescripcionDataset[idxDataset + 1]["datsetInputRange"] = float (lineaInfoDatasetArray[14][:5])
         #         dictDescripcionDataset[idxDataset + 1]["datsetDiscriminatorlevel"] = int (lineaInfoDatasetArray[14][5:])
 
@@ -401,16 +403,24 @@ class Lidar(PlotBook):
 
         data_info['Azimuth']        = (270-data_info['Azimuth'])%360
 
-        print data.columns.levels[0]
         print data_info.index
-        col_name = 'Zenith' if self.scan in ['FixedPoint','3D'] else self.scan
 
-        data.columns = pd.MultiIndex.from_product( [data_info[ col_name ].values, data.columns.levels[1]], names = [col_name,'Parameters'] ) #.set_levels( data_info[ col_name ].values , level=0, inplace=True)
+        data.columns = pd.MultiIndex.from_product(
+            [ data_info[ self.degree_variable ].values, data.columns.levels[-1].values ],
+            names = [self.degree_variable,'Parameters'] )
 
         #Filtro para mediciones inferiores a 110m de distacia al sensor
         data       = data[data.index >= 110]
 
-        return data, data_info
+        if kwargs.get('inplace',True):
+            self.data       = data
+            self.data_info  = data_info
+            self.raw_data   = self.data.copy()
+            self.derived_output(**kwargs)
+
+        else:
+            return data, data_info
+
 
 
     def read(self, **kwargs):
@@ -420,6 +430,7 @@ class Lidar(PlotBook):
         os.system('mkdir Datos')
         # dates = pd.date_range('20180624','20180717',freq='d')
         dates = pd.date_range(self.Fechai,self.Fechaf,freq='d')
+        print dates
 
         self.data       = {}
         self.data_info  = pd.DataFrame()
@@ -436,22 +447,19 @@ class Lidar(PlotBook):
                 for folder in folders:
                     archivos   = glob.glob('{}/RM*'.format(folder))
                     print folder
-                    df3, df4 = self.read_folder(archivos)
+                    df3, df4 = self.read_folder(archivos, inplace=False)
                     self.data[df4.index[0].strftime('%Y-%m-%d %H:%M:%S')] = df3
 
                     df4.loc[df4.index[0], 'Fecha_fin'] = df4.index[-1]
                     self.data_info = self.data_info.append(df4.iloc[0])
 
         self.data           = pd.concat(self.data,axis=1)
-        # self.data_info      = self.data_info.sort_index()
-        print self.data.columns.levels[0].values
         self.data.columns.set_levels( pd.to_datetime(self.data.columns.levels[0].values), level=0, inplace=True)
 
         self.raw_data   = self.data.copy()
+        self.derived_output(**kwargs)
 
-        # self.derived_output()
 
-        # self.data_info.columns.set_levels( pd.to_datetime(self.data_info.columns.levels[0].values), level=0, inplace=True)
 
                     # try:
                     #     self.plot(kind='Log', textsave ='_{}'.format(self.data_info.index[0].strftime('%H:%M')), \
@@ -560,7 +568,7 @@ class Lidar(PlotBook):
         # cf		= ax.contourf(X,Y,Z,levels=levels, alpha=1,cmap =shrunk_cmap,  norm=mpl.colors.LogNorm())   #
         cf		= ax.contourf(X,Y,Z,**contour_kwd) #extend='both')
 
-        if ('ax' not in kwargs.keys()) | (kwargs.get('add_colorbar',False)):
+        if 'ax' not in kwargs.keys():
             cbar     = plt.colorbar(cf,cax=divider.append_axes("right", size="3%", pad='1%') if 'ax' in kwargs.keys() else ax2, **colorbar_kwd)
             cbar.set_label(kwargs.get('label',r'$[mVolts]$'))
 
@@ -589,11 +597,12 @@ class Lidar(PlotBook):
         #     os.system("scp Figuras/Lidar{textsave}.{format} jhernandezv@siata.gov.co:/var/www/{path}". format(kwargs.get('textsave',''),kwargs.get('format','png'),kwargs.get('path','jhernandezv/Lidar/') ))
 
 
-    def profiler(self, zenith=True, height=4500, parameter='photon-p',**kwargs):
+    def profiler(self, height=4500, parameter='photon-p',**kwargs):
         """Method for building scanning profiles with variations at Zenith or Azimuth
 
         Parameters
-            Sames as plot method"""
+            Sames as plot method
+            index_date = Datetime used to plot. optional for scanning time series"""
 
 
         if 'df' in kwargs.keys():
@@ -601,27 +610,31 @@ class Lidar(PlotBook):
         else:
             data, data_info    = self.data.copy(), self.data_info.copy()
 
+        index_date      = kwargs.get('index_date', data_info.index[0])
+        if 'index_date' not in kwargs.keys():
+            profile         = data[ data.index < height ].xs(parameter,level=-1,axis=1).T
+        else:
+            profile         = data[ data.index < height].xs( (kwargs['index_date'],parameter),level=[0,-1],axis=1).T
 
-        angulo      = 'Zenith' if zenith else 'Azimuth'
-        title_args  = ('Azimuth' ,self.degrees_to_cardinal(data_info['Azimuth'].values[0])) if zenith else ('Zenith', data_info['Zenith'].values[0])
-
-        profile         = data[ data.index < height ].xs(parameter,level=1,axis=1).T
-        profile.index   = map(lambda x: data_info.loc[x,angulo], profile.index.values)
+        print profile.index
 
         x = np.empty(profile.shape)
         y = np.empty(profile.shape)
 
         for ix, angle in enumerate(profile.index.values):
-            print "{}\n {} = {}".format('='*50,angulo,angle)
+            print "{}\n {} = {}".format('='*50,self.degree_variable,angle)
             x[ix,:] = profile.columns.values* np.cos(angle*np.pi/180.)
             y[ix,:] = profile.columns.values* np.sin(angle*np.pi/180.)
 
         print kwargs
 
+
+        title_args      = (self.degree_variable , self.degrees_to_cardinal( data_info.loc[index_date,self.degree_variable].values, self.degree_variable) )
+
         kwargs['textsave']  = "_Scanning_{}_{}{}".format(self.output,parameter,kwargs.get('textsave',''))
         kwargs['title']     = "{} = {}".format(*title_args)
-        kwargs['label']     =  self.label[self.output][parameter[:6]]
-        kwargs['add_text']  = self.data_info['Fecha'].iloc[0].strftime('%b-%d\n%H:%M')
+        kwargs['label']     = self.label[self.output][parameter[:6]]
+        kwargs['add_text']  = index_date.strftime('%b-%d\n%H:%M')
 
 
         self.plot_lidar(x, y, profile, **kwargs )
@@ -638,7 +651,7 @@ class Lidar(PlotBook):
         else:
             data, data_info    = self.data.copy(), self.data_info.copy()
 
-        angulo      = 'Zenith' if zenith else 'Azimuth'
+
         angulo_fijo = 'Azimuth' if zenith else 'Zenith'
 
 
@@ -646,11 +659,11 @@ class Lidar(PlotBook):
         kwargs['label']     = self.label[self.output][parameter[:6]]
         kwargs['add_text']      = data_info_index[0].strftime('%b-%d\n%H:%M')
 
-        for azi in  data_info[angulo].drop_duplicates().values:
-            print "{}\n {} = {}".format('='*50,angulo,azi)
-            idx = data_info[data_info[angulo]!=azi].index
+        for azi in  data_info[self.degree_variable].drop_duplicates().values:
+            print "{}\n {} = {}".format('='*50,self.degree_variable,azi)
+            idx = data_info[data_info[self.degree_variable]!=azi].index
 
-            kwargs['textsave']  = '%s_%s-%.f' %(_textsave,angulo,azi)
+            kwargs['textsave']  = '%s_%s-%.f' %(_textsave,self.degree_variable,azi)
             kwargs['title']     = "{} = {}".format(angulo_fijo, data_info[angulo_fijo].values[0])
             profile             = data[data.index < height].xs(parameter, axis=1,level=1)
 
@@ -660,7 +673,7 @@ class Lidar(PlotBook):
         #
         return data_info[angulo_fijo].drop_duplicates().values
 
-    def plot(self, zenith=True, height=4500, **kwargs):
+    def plot(self, height=4500, **kwargs):
         """Method for building scanning or fixed point profiles with variations at Zenith or Azimuth
 
         Parameters
@@ -676,8 +689,8 @@ class Lidar(PlotBook):
         if 'output' in kwargs.keys():
             self.derived_output(**kwargs)
 
-        for parameter in kwargs.get('parameters',self.data.columns.levels[1].values):
-            args = (zenith,height,parameter)
+        for parameter in kwargs.get('parameters',self.data.columns.levels[-1].values):
+            args = (height,parameter)
             if self.scan not in ['FixedPoint']:
                 print args
                 self.profiler(*args,**kwargs)
@@ -687,17 +700,16 @@ class Lidar(PlotBook):
 
     @property
     def Pr(self):
-        # def mvolts(x):
-        #     print x.name
-        #     print x.name[0]
-        #     return x * self.data_info.loc[x.name[0],x.name[2]+'_InputRange'] * 1000 * (2. ** (-self.data_info.loc[x.name[0],x.name[2]+'_ADCBits'])) / self.data_info.loc[x.name[0],x.name[2]+'_ShotNumber']
-        mvolts  = lambda x:  self.data_info.loc[x.name[0],x.name[2]+'_InputRange'] * 1000 * (2. ** (-self.data_info.loc[x.name[0],x.name[2]+'_ADCBits'])) / self.data_info.loc[x.name[0],x.name[2]+'_ShotNumber']
-
         # def mHz(x):
-            # return x *  ( 150 /  self.data_info.loc[x.name[0],x.name[2]+'_BinWidth']) / self.data_info.loc[x.name[0],x.name[2]+'_ShotNumber']
-        mHz     = lambda x:  ( 150 /  self.data_info.loc[x.name[0],x.name[2]+'_BinWidth']) / self.data_info.loc[x.name[0],x.name[2]+'_ShotNumber']
+            # return x *  ( 150 /  self.data_info.loc[x.name[0],x.name[-1]+'_BinWidth']) / self.data_info.loc[x.name[0],x.name[-1]+'_ShotNumber']
+        # def mvolts(x):
+        #     return x * self.data_info.loc[x.name[0],x.name[-1]+'_InputRange'] * 1000 * (2. ** (-self.data_info.loc[x.name[0],x.name[-1]+'_ADCBits'])) / self.data_info.loc[x.name[0],x.name[-1]+'_ShotNumber']
 
-        return self.data.apply( lambda serie: mvolts(serie) if 'analog' in serie.name[2] else mHz(serie) )
+        mvolts  = lambda x:  x * self.data_info.loc[x.name[0],'InputRange_'+x.name[-1]] * 1000 * (2. ** (-self.data_info.loc[x.name[0],'ADCBits_'+x.name[-1]])) / self.data_info.loc[x.name[0],'ShotNumber_'+x.name[-1]]
+
+        mHz     = lambda x:  x * ( 150 /  self.data_info.loc[x.name[0],'BinWidth_'+x.name[-1]]) / self.data_info.loc[x.name[0],'ShotNumber_'+x.name[-1]]
+
+        return self.data.apply( lambda serie: mvolts(serie) if 'analog' in serie.name[-1] else mHz(serie) )
 
     @property
     def RCS(self):
@@ -717,7 +729,7 @@ class Lidar(PlotBook):
         return obj.rolling(window,center=True,min_periods=1).median()
 
     @staticmethod
-    def degrees_to_cardinal(d):
+    def degrees_to_cardinal(d,degree='Azimuth'):
         '''
         note: this is highly approximate...
         '''
@@ -725,7 +737,11 @@ class Lidar(PlotBook):
         #         "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"]
         dirs = ["E", "ENE", "NE", "NNE", "N", "NNW", "NW", "WNW", "W", "WSW", "SW", "SSW", "S", "SSE", "SE","ESE"]
         ix = int((d + 11.25)/22.5)
-        return dirs[ix % 16]
+
+        if degree == 'Azimuth':
+            return dirs[ix % 16]
+        else:
+            return d
 # ################################################################################
 # ################################################################################
 # Test Lectura Lidar
@@ -771,14 +787,16 @@ class Lidar(PlotBook):
 # files = glob.glob('InfoLidar/3Ds_180703-135028/RM*')        # test2
 # files = glob.glob('InfoLidar/3Ds_180704-105519/RM*')        # test3
 
-binario = Lidar(Fechai='2018-07-04',Fechaf='2018-07-05',scan='3D')
-binario.read()
+binario = Lidar(Fechai='2018-07-04',Fechaf='2018-07-04',scan='3D')
+# binario.read()
 
-backup = [binario.data, binario.data_info]
+# backup = [binario.data, binario.data_info]
 binario.data = backup[0]
 binario.data_info = backup[1]
 
-binario.Pr
+binario.plot(textsave='_test_4D',parameters=['photon-p'])
+binario.plot(textsave='_test_4D',parameters=['photon-p'],output='RCS')
+
 # dd, di = binario.read_folder(files)
 # '-75.5686', '6.2680'
 
