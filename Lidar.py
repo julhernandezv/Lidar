@@ -29,6 +29,7 @@ reload (sys)
 sys.setdefaultencoding ("utf-8")
 locale.setlocale(locale.LC_TIME, ('es_co','utf-8'))
 
+
 from pandas.plotting._tools import (_subplots, _flatten, table,
                                     _handle_shared_axes, _get_all_lines,
                                     _get_xlim, _set_ticks_props,
@@ -104,6 +105,8 @@ class PlotBook():
         'scp':True,
         'textsave': '',
         'user':'jhernandezv',
+        'delay':20,
+        'textsave_gif':'',
     }
 
     def __init__(self, ax=None,fig=None,subplots=False,figsize=None,**kwargs):
@@ -123,6 +126,13 @@ class PlotBook():
         plt.savefig('{local_path}{textsave}.{format}'.format(**kwg) ,bbox_inches="tight")
         if self.kwargs['scp']:
             os.system('scp "{local_path}{textsave}.{format}" {user}@siata.gov.co:/var/www/{path}'. format(**kwg) )
+
+    def _make_gif(self,**kwargs):
+        kwg = self.kwargs.copy()
+        kwg.update(kwargs)
+        os.system( 'convert -delay {delay} -loop 0 {local_path}{textsave}* {local_path}{textsave}{textsave_gif}.gif'.format(**kwgs))
+        if self.kwargs['scp']:
+            os.system('scp "{local_path}{textsave}{textsave_gif}.gif {user}@siata.gov.co:/var/www/{path}'.format(**kwgs) )
 
     @property
     def nseries(self):
@@ -203,7 +213,8 @@ class Lidar(PlotBook):
         self.Fechai     = (dt.datetime.now()-relativedelta(months=1)).strftime('%Y-%m-')+'01 01:00' if (Fechaf == None) else Fechai
         self.Fechaf     = (pd.to_datetime(self.Fechai)+ relativedelta(months=1)-dt.timedelta(hours=1)).strftime('%Y-%m-%d %H:%M') if (Fechaf == None) else Fechaf #
 
-        self.degree_variable = 'Zenith' if self.scan in ['FixedPoint','3D'] else self.scan
+        self.degree_variable    = 'Zenith' if self.scan in ['FixedPoint','3D'] else self.scan
+        self.degree_fixed       = 'Azimuth' if self.scan in ['FixedPoint','3D','Zenith'] else 'Zenith'
         self.kwargs.update(kwargs)
         # super()
 
@@ -267,30 +278,30 @@ class Lidar(PlotBook):
 
         dictDescripcionDataset = {}
 
-        for idxDataset in xrange (valorNumDatasets):
+        for idiDataset in xrange (valorNumDatasets):
 
             lineaInfoDataset = fileObj.readline ()
             lineaInfoDatasetArray = lineaInfoDataset.strip ().split ()
             print lineaInfoDatasetArray
 
 
-            dictDescripcionDataset[idxDataset + 1] = {}
+            dictDescripcionDataset[idiDataset + 1] = {}
             #
-            # dictDescripcionDataset[idxDataset + 1]["datasetPresent"] = (int (lineaInfoDatasetArray[0]) == 1)
-            dictDescripcionDataset[idxDataset + 1]["datasetModoAnalogo"]    = (int (lineaInfoDatasetArray[1]) == 0)
-            # dictDescripcionDataset[idxDataset + 1]["datasetModoPhotonCount"] = (int (lineaInfoDatasetArray[1]) == 1)
-            # dictDescripcionDataset[idxDataset + 1]["datasetLaserNumber"] = int (lineaInfoDatasetArray[2])
-            dictDescripcionDataset[idxDataset + 1]["datasetBinNums"]        = int (lineaInfoDatasetArray[3])
-            # dictDescripcionDataset[idxDataset + 1]["datasetNaDigit"] = int (lineaInfoDatasetArray[4])
-            # dictDescripcionDataset[idxDataset + 1]["datasetPMTHighVoltage"] = float (lineaInfoDatasetArray[5])
-            dictDescripcionDataset[idxDataset + 1]["datasetBinWidth"]       = float (lineaInfoDatasetArray[6])
-            # dictDescripcionDataset[idxDataset + 1]["datasetLaserWavelength"] = lineaInfoDatasetArray[7][:5]
-            dictDescripcionDataset[idxDataset + 1]["datasetPolarization"]   = lineaInfoDatasetArray[7][6]
+            # dictDescripcionDataset[idiDataset + 1]["datasetPresent"] = (int (lineaInfoDatasetArray[0]) == 1)
+            dictDescripcionDataset[idiDataset + 1]["datasetModoAnalogo"]    = (int (lineaInfoDatasetArray[1]) == 0)
+            # dictDescripcionDataset[idiDataset + 1]["datasetModoPhotonCount"] = (int (lineaInfoDatasetArray[1]) == 1)
+            # dictDescripcionDataset[idiDataset + 1]["datasetLaserNumber"] = int (lineaInfoDatasetArray[2])
+            dictDescripcionDataset[idiDataset + 1]["datasetBinNums"]        = int (lineaInfoDatasetArray[3])
+            # dictDescripcionDataset[idiDataset + 1]["datasetNaDigit"] = int (lineaInfoDatasetArray[4])
+            # dictDescripcionDataset[idiDataset + 1]["datasetPMTHighVoltage"] = float (lineaInfoDatasetArray[5])
+            dictDescripcionDataset[idiDataset + 1]["datasetBinWidth"]       = float (lineaInfoDatasetArray[6])
+            # dictDescripcionDataset[idiDataset + 1]["datasetLaserWavelength"] = lineaInfoDatasetArray[7][:5]
+            dictDescripcionDataset[idiDataset + 1]["datasetPolarization"]   = lineaInfoDatasetArray[7][6]
 
-            parameter = "{}-{}".format('analog' if dictDescripcionDataset[idxDataset + 1]["datasetModoAnalogo"] else 'photon', dictDescripcionDataset[idxDataset + 1]["datasetPolarization"])
+            parameter = "{}-{}".format('analog' if dictDescripcionDataset[idiDataset + 1]["datasetModoAnalogo"] else 'photon', dictDescripcionDataset[idiDataset + 1]["datasetPolarization"])
 
-            if lineaInfoDatasetArray[15][0:2] == 'BT': #dictDescripcionDataset[idxDataset + 1]["datasetModoAnalogo"]:
-                print int (lineaInfoDatasetArray[12]),dictDescripcionDataset[idxDataset + 1]["datasetPolarization"]
+            if lineaInfoDatasetArray[15][0:2] == 'BT': #dictDescripcionDataset[idiDataset + 1]["datasetModoAnalogo"]:
+                print int (lineaInfoDatasetArray[12]),dictDescripcionDataset[idiDataset + 1]["datasetPolarization"]
                 description ['ADCBits_'+parameter]      = int (lineaInfoDatasetArray[12])
                 description ['InputRange_'+parameter]   = float (lineaInfoDatasetArray[14])
                 description ['ShotNumber_'+parameter]   = int (lineaInfoDatasetArray[13])
@@ -298,13 +309,13 @@ class Lidar(PlotBook):
             elif lineaInfoDatasetArray[15][0:2] == 'BC':
                 description ['ShotNumber_'+parameter]   = int (lineaInfoDatasetArray[13])
                 description ['BinWidth_'+parameter]     = float (lineaInfoDatasetArray[6])
-                # dictDescripcionDataset[idxDataset + 1]["datsetInputRange"] = float (lineaInfoDatasetArray[14][:5])
-        #         dictDescripcionDataset[idxDataset + 1]["datsetDiscriminatorlevel"] = int (lineaInfoDatasetArray[14][5:])
+                # dictDescripcionDataset[idiDataset + 1]["datsetInputRange"] = float (lineaInfoDatasetArray[14][:5])
+        #         dictDescripcionDataset[idiDataset + 1]["datsetDiscriminatorlevel"] = int (lineaInfoDatasetArray[14][5:])
 
-            dictDescripcionDataset[idxDataset + 1]["datasetDescriptor"] = lineaInfoDatasetArray[15][0:2]
-            # dictDescripcionDataset[idxDataset + 1]["datasetHexTransientRecNum"] = int (lineaInfoDatasetArray[15][-1], 16)
+            dictDescripcionDataset[idiDataset + 1]["datasetDescriptor"] = lineaInfoDatasetArray[15][0:2]
+            # dictDescripcionDataset[idiDataset + 1]["datasetHexTransientRecNum"] = int (lineaInfoDatasetArray[15][-1], 16)
 
-            print dictDescripcionDataset[idxDataset + 1]
+            print dictDescripcionDataset[idiDataset + 1]
 
         print "***********************************************************************************************************************************************"
 
@@ -329,7 +340,7 @@ class Lidar(PlotBook):
 
                     dictDescripcionDataset[ix]["datasetLista"] = []
 
-                    for idxBin in xrange (dictDescripcionDataset[ix]["datasetBinNums"]):
+                    for idiBin in xrange (dictDescripcionDataset[ix]["datasetBinNums"]):
 
                         dictDescripcionDataset[ix]["datasetLista"].append ((struct.unpack ('i', fileObj.read (4)))[0])
 
@@ -393,17 +404,14 @@ class Lidar(PlotBook):
 
             if duplicated.size >1 :
                 print "\n Deleting duplicated"
-                data.loc[data.index, duplicated[0] ] = data[ duplicated ].groupby(axis=1, level=1).mean()
+                data.loc[:, duplicated[0] ] = data[ duplicated ].groupby(axis=1, level=1).mean().values
                 data.drop( duplicated[1:], axis=1, level=0, inplace=True)
-                print data.columns
                 data_info.drop( duplicated[1:], inplace=True)
 
         elif self.scan in ['Zenith','Azimuth']:
             data_info.loc[:,'Zenith']   *= -1
 
         data_info['Azimuth']        = (270-data_info['Azimuth'])%360
-
-        print data_info.index
 
         data.columns = pd.MultiIndex.from_product(
             [ data_info[ self.degree_variable ].values, data.columns.levels[-1].values ],
@@ -455,24 +463,9 @@ class Lidar(PlotBook):
 
         self.data           = pd.concat(self.data,axis=1)
         self.data.columns.set_levels( pd.to_datetime(self.data.columns.levels[0].values), level=0, inplace=True)
-
+        self.data_info.sort_index(inplace=True)
         self.raw_data   = self.data.copy()
         self.derived_output(**kwargs)
-
-
-
-                    # try:
-                    #     self.plot(kind='Log', textsave ='_{}'.format(self.data_info.index[0].strftime('%H:%M')), \
-                    #             path= '{}3D/{}/'.format(self.kwargs['path'],d.strftime('%Y%m%d')), vlim=[6.7,9])
-                    # except:
-                    #     Error.append(folders)
-                    #     pass
-                # os.system('convert -delay 20 -loop 0 {}*.png {}.gif'.format())
-                # for col in self.data.columns.levels[1].values:
-                #     os.system( 'convert -delay 20 -loop 0 Figuras/Lidar_Scanning_RCS_{}_* Figuras/lidar_Scanning_RCS_{}_{}.gif'.format(col,col,d.strftime('%Y%m%d')))
-                #     os.system('scp Figuras/lidar_Scanning_RCS_{}_{}.gif jhernandezv@siata.gov.co:/var/www/jhernandezv/Lidar/3D/{}/ '.format(col,d.strftime('%Y%m%d'),d.strftime('%Y%m%d')) )
-
-
 
 
     def derived_output(self,**kwargs):
@@ -597,24 +590,14 @@ class Lidar(PlotBook):
         #     os.system("scp Figuras/Lidar{textsave}.{format} jhernandezv@siata.gov.co:/var/www/{path}". format(kwargs.get('textsave',''),kwargs.get('format','png'),kwargs.get('path','jhernandezv/Lidar/') ))
 
 
-    def profiler(self, height=4500, parameter='photon-p',**kwargs):
+    def profiler(self,df, **kwargs):
         """Method for building scanning profiles with variations at Zenith or Azimuth
 
         Parameters
-            Sames as plot method
-            index_date = Datetime used to plot. optional for scanning time series"""
+            df          = DataFrame object with Heigth as index and Degree variations as columns
+            """
 
-
-        if 'df' in kwargs.keys():
-            data, data_info    = df['data'], df['data_info']
-        else:
-            data, data_info    = self.data.copy(), self.data_info.copy()
-
-        index_date      = kwargs.get('index_date', data_info.index[0])
-        if 'index_date' not in kwargs.keys():
-            profile         = data[ data.index < height ].xs(parameter,level=-1,axis=1).T
-        else:
-            profile         = data[ data.index < height].xs( (kwargs['index_date'],parameter),level=[0,-1],axis=1).T
+        profile   = df.copy()
 
         print profile.index
 
@@ -625,17 +608,6 @@ class Lidar(PlotBook):
             print "{}\n {} = {}".format('='*50,self.degree_variable,angle)
             x[ix,:] = profile.columns.values* np.cos(angle*np.pi/180.)
             y[ix,:] = profile.columns.values* np.sin(angle*np.pi/180.)
-
-        print kwargs
-
-
-        title_args      = (self.degree_variable , self.degrees_to_cardinal( data_info.loc[index_date,self.degree_variable].values, self.degree_variable) )
-
-        kwargs['textsave']  = "_Scanning_{}_{}{}".format(self.output,parameter,kwargs.get('textsave',''))
-        kwargs['title']     = "{} = {}".format(*title_args)
-        kwargs['label']     = self.label[self.output][parameter[:6]]
-        kwargs['add_text']  = index_date.strftime('%b-%d\n%H:%M')
-
 
         self.plot_lidar(x, y, profile, **kwargs )
 
@@ -661,13 +633,13 @@ class Lidar(PlotBook):
 
         for azi in  data_info[self.degree_variable].drop_duplicates().values:
             print "{}\n {} = {}".format('='*50,self.degree_variable,azi)
-            idx = data_info[data_info[self.degree_variable]!=azi].index
+            idi = data_info[data_info[self.degree_variable]!=azi].index
 
             kwargs['textsave']  = '%s_%s-%.f' %(_textsave,self.degree_variable,azi)
             kwargs['title']     = "{} = {}".format(angulo_fijo, data_info[angulo_fijo].values[0])
             profile             = data[data.index < height].xs(parameter, axis=1,level=1)
 
-            profile.loc[:,idx]  = np.NaN
+            profile.loc[:,idi]  = np.NaN
 
             self.plot_lidar(profile.columns.values, profile.index.values, profile, **kwargs)
         #
@@ -677,26 +649,56 @@ class Lidar(PlotBook):
         """Method for building scanning or fixed point profiles with variations at Zenith or Azimuth
 
         Parameters
-            zenith  = bolean - True for drawing Zenith variations, else use Azimuth
             height  = int - For selecting heigth to plot
 
             **kwargs
-            kind        = contour choices  - 'Linear', 'Log', 'Anomaly' - default Linear
-            df          = Lidar object - allow to use data insted heritance
-            parameters   = List - choice  parameter to plot - default use all parameters in self.data
+            dates       = DatetimeIndex - Used to plot. Default .index[0]
+            kind        = Contour choices  - ['Linear', 'Log', 'Anomaly'] - Default Linear
+            df          = DataFrame object with Heigth as index and Degree variations as columns - Allow to use data insted heritance
+            parameters  = List like - Choice  parameter to plot - Default use all parameters in self.data
             output      = Allowed {} """.format(self.label.keys())
+
+        parameters          = kwargs.get('parameters',self.data.columns.levels[-1].values)
+        _textsave           = kwargs.get('textsave','')
+        kwargs['path']      = "{}{}/{}".format( self.kwargs['path'], self.scan, kwargs.get('path','') )
+        os.system('ssh {}@siata.gov.co "mkdir /var/www/{}"'.format( self.kwargs['user'], kwargs['path']  ))
 
         if 'output' in kwargs.keys():
             self.derived_output(**kwargs)
 
-        for parameter in kwargs.get('parameters',self.data.columns.levels[-1].values):
-            args = (height,parameter)
-            if self.scan not in ['FixedPoint']:
-                print args
-                self.profiler(*args,**kwargs)
-            else:
-                self.fixedpoint(*args,**kwargs)
+        for date in kwargs.get('dates', [self.data_info.index[0]]):
+            print date
+            kwargs['title']     = "{} = {}".format(self.degree_fixed ,
+            self.degrees_to_cardinal( self.data_info.loc[date, self.degree_fixed], self.degree_fixed))
 
+            for parameter in parameters:
+                kwargs['label']     = self.label[self.output][parameter[:6]]
+                kwargs['add_text']  = date.strftime('%b-%d\n%H:%M')
+                kwargs['textsave']  = "_{}_{}_{}{}_{}".format(self.scan,self.output,parameter,_textsave,date.strftime('%H:%M'))
+
+
+                dataframe   = kwargs.get('df', self.get_from(height,parameter,date))
+
+                if self.scan not in ['FixedPoint']:
+                    self.profiler(dataframe, **kwargs)
+                else:
+                    self.fixedpoint(dataframe, **kwargs)
+
+        if kwargs.get('make_gif',False):
+            gif_kwargs = {}
+            for col in parameters:
+                gif_kwargs['textsave']      = "_{}_{}_{}".format(self.scan,self.output,col)
+                gif_kwargs['textsave_gif']  = kwargs['dates'][0].strftime('%Y-%m-%d')
+                gif_kwargs['path']          = kwargs['path']
+                self._make_gif(**gif_kwargs)
+
+
+    def get_from(self, height, parameter, date=None):
+        if len(self.data.columns.names) == 2:
+            dataframe   = self.data[ self.data.index < height ].xs(parameter,level=-1,axis=1).T
+        else:
+            dataframe   = self.data[ self.data.index < height].xs( (date,parameter),level=[0,-1],axis=1).T
+        return dataframe
 
     @property
     def Pr(self):
@@ -788,29 +790,30 @@ class Lidar(PlotBook):
 # files = glob.glob('InfoLidar/3Ds_180704-105519/RM*')        # test3
 
 binario = Lidar(Fechai='2018-07-04',Fechaf='2018-07-04',scan='3D')
-# binario.read()
-
+binario.read()
+#
 # backup = [binario.data, binario.data_info]
-binario.data = backup[0]
-binario.data_info = backup[1]
-
+# # binario.data        = backup[0]
+# # binario.raw_data    = backup[0]
+# # binario.data_info   = backup[1]
+#
+# binario.plot(textsave='_test5_',parameters=['photon-p'])
+# binario.plot(textsave='_test5_log',parameters=['photon-p'],output='RCS',kind='Log')
+# binario.plot(textsave='_test_4D',parameters=['photon-p'],output='RCS')
+# # dd, di = binario.read_folder(files)
+# # '-75.5686', '6.2680'
+#
 binario.plot(textsave='_test_4D',parameters=['photon-p'])
 binario.plot(textsave='_test_4D',parameters=['photon-p'],output='RCS')
+binario.plot(textsave='_log_test_4D',output='RCS',parameters=['photon-p'],kind='Log')
+binario.plot(textsave='_test_4D',output='Ln(RCS)',parameters=['photon-p'])
+binario.plot(textsave='_test_4D',output='dLn(RCS)',parameters=['photon-p'],kind='Anomaly')
+binario.plot(textsave='_test_4D',output='fLn(RCS)',parameters=['photon-p'])
+binario.plot(textsave='_test_4D',output='fdLn(RCS)',parameters=['photon-p'],kind='Anomaly')
+binario.plot(textsave='_test_4D',output='dfLn(RCS)',parameters=['photon-p'],kind='Anomaly')
+binario.plot(textsave='_test_4D',output='fdfLn(RCS)',parameters=['photon-p'],kind='Anomaly')
 
-# dd, di = binario.read_folder(files)
-# '-75.5686', '6.2680'
-
-# binario.plot(textsave='_test_4D',parameters=['photon-p'])
-# binario.plot(textsave='_test3',parameters=['photon-p'],output='RCS')
-# binario.plot(textsave='_log_test3',output='RCS',parameters=['photon-p'],kind='Log')
-# binario.plot(textsave='_test3',output='Ln(RCS)',parameters=['photon-p'])
-# binario.plot(textsave='_test3',output='dLn(RCS)',parameters=['photon-p'],kind='Anomaly')
-# binario.plot(textsave='_test3',output='fLn(RCS)',parameters=['photon-p'])
-# binario.plot(textsave='_test3',output='fdLn(RCS)',parameters=['photon-p'],kind='Anomaly')
-# binario.plot(textsave='_test3',output='dfLn(RCS)',parameters=['photon-p'],kind='Anomaly')
-# binario.plot(textsave='_test3',output='fdfLn(RCS)',parameters=['photon-p'],kind='Anomaly')
-#
-
+binario.plot(textsave='_test_4D_log',parameters=['photon-p'],output='RCS',kind='Log',dates=binario.data_info.index[:3])
 
 # binario.profiler(zenith=True,textsave='_RCS_log_test',parameter='analog-s',linear=False)
 # binario.profiler(zenith=True,textsave='_RCS_log_test',parameter='analog-p',linear=False)
