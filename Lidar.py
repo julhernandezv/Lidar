@@ -124,14 +124,14 @@ class PlotBook():
         kwg = self.kwargs.copy()
         kwg.update(kwargs)
         plt.savefig('{local_path}{textsave}.{format}'.format(**kwg) ,bbox_inches="tight")
-        os.system('scp "{local_path}{textsave}.{format}" {user}@siata.gov.co:/var/www/{path}'. format(**kwg) )
+        if kwg['scp']:
+            os.system('scp "{local_path}{textsave}.{format}" {user}@siata.gov.co:/var/www/{path}'. format(**kwg) )
 
     def _make_gif(self,**kwargs):
         kwg = self.kwargs.copy()
         kwg.update(kwargs)
-        os.system( 'convert -delay {delay} -loop 0 {local_path}{textsave}* {local_path}{textsave}{textsave_gif}.gif'.format(**kwg))
-        if self.kwargs['scp']:
-            os.system('scp "{local_path}{textsave}{textsave_gif}.gif" {user}@siata.gov.co:/var/www/{path}'.format(**kwg) )
+        os.system( 'convert -delay {delay} -loop 0 "{local_path}{textsave}*" "{local_path}{textsave}{textsave_gif}.gif"'.format(**kwg))
+        os.system('scp "{local_path}{textsave}{textsave_gif}.gif" {user}@siata.gov.co:/var/www/{path}'.format(**kwg) )
 
     @property
     def nseries(self):
@@ -481,6 +481,9 @@ class Lidar(PlotBook):
 
         if self.output not in ['raw_data']:
             self.data       = self.Pr
+            if 'background' in kwargs.keys():
+                for col in self.data.columns.levels[0]:
+                    self.data.loc[:,col] = (self.data.loc[:,col] - kwargs['background']).values
 
         if self.output in ['RCS','Ln(RCS)','fLn(RCS)','dLn(RCS)','fdLn(RCS)','dfLn(RCS)','fdfLn(RCS)']:
             self.data       = self.RCS
@@ -544,7 +547,7 @@ class Lidar(PlotBook):
 
         elif kwargs['kind'] == 'Anomaly':
             contour_kwd['norm']     = MidpointNormalize(midpoint=0.,vmin=vmin, vmax=vmax)
-            colorbar_kwd['format']  = '%.2f'
+            colorbar_kwd['format']  = '%.f'
 
 
         elif kwargs['kind'] == 'Log':
@@ -590,7 +593,7 @@ class Lidar(PlotBook):
         if 'title' in kwargs.keys():
             ax.set_title(kwargs['title'],loc='right')
 
-        print kwargs
+        # print kwargs
         self._save_fig(**kwargs)
         # plt.savefig('Figuras/Lidar{textsave}.{format}'.format(**self.kwargs) %(kwargs.get('textsave',''),kwargs.get('format','png')),bbox_inches="tight")
         # if kwargs.get('scp',True):
@@ -665,25 +668,33 @@ class Lidar(PlotBook):
             parameters  = List like - Choice  parameter to plot - Default use all parameters in self.data
             output      = Allowed {} """.format(self.label.keys())
 
-        parameters          = kwargs.get('parameters',self.data.columns.levels[-1].values)
+        _parameters         = kwargs.get('parameters',self.data.columns.levels[-1].values)
         _textsave           = kwargs.get('textsave','')
         kwargs['path']      = "{}{}/{}".format( self.kwargs['path'], self.scan, kwargs.get('path','') )
         os.system('ssh {}@siata.gov.co "mkdir /var/www/{}"'.format( self.kwargs['user'], kwargs['path']  ))
         os.system('rm Figuras/*')
 
+        _dates = kwargs.get('dates', [self.data_info.index[0]])
+
+        if len(self.data.columns.names) > 2 and len(_dates) > 2:
+            _vlim = self.data[self.data.index < height].stack([0,1] ).quantile([.01,.99])
+            if kwargs.get('kind','Linear') == 'Log':
+                _vlim = np.log10(_vlim)
+                _vlim [ _vlim == -np.inf ] = -2
+
         if 'output' in kwargs.keys():
             self.derived_output(**kwargs)
 
-        for date in kwargs.get('dates', [self.data_info.index[0]]):
+        for date in _dates:
             print date
             kwargs['title']     = "{} = {}".format(self.degree_fixed ,
             self.degrees_to_cardinal( self.data_info.loc[date, self.degree_fixed], self.degree_fixed))
 
-            for parameter in parameters:
+            for parameter in _parameters:
                 kwargs['label']     = self.label[self.output][parameter[:6]]
                 kwargs['add_text']  = date.strftime('%b-%d\n%H:%M')
                 kwargs['textsave']  = "_{}_{}_{}{}_{}".format(self.scan,self.output,parameter,_textsave,date.strftime('%H:%M'))
-
+                kwargs['vlim']      = kwargs.get('vlim',_vlim[ parameter ].values)
 
                 dataframe   = kwargs.get('df', self.get_from(height,parameter,date))
 
@@ -694,9 +705,9 @@ class Lidar(PlotBook):
 
         if kwargs.get('make_gif',False):
             gif_kwargs = {}
-            for col in parameters:
+            for col in _parameters:
                 gif_kwargs['textsave']      = "_{}_{}_{}".format(self.scan,self.output,col)
-                gif_kwargs['textsave_gif']  = '_' + kwargs['dates'][0].strftime('%Y-%m-%d')
+                gif_kwargs['textsave_gif']  = '{}_{}'.format( _textsave, kwargs['dates'][0].strftime('%Y-%m-%d'))
                 gif_kwargs['path']          = kwargs['path']
                 self._make_gif(**gif_kwargs)
 
@@ -821,23 +832,41 @@ class Lidar(PlotBook):
 # binario.plot(textsave='_test_1',output='dfLn(RCS)',parameters=['photon-p'],kind='Anomaly')
 # binario.plot(textsave='_test_1',output='fdfLn(RCS)',parameters=['photon-p'],kind='Anomaly')
 
-for date in pd.date_range('2018-06-27','2018-07-14'):
-    try:
-        binario = Lidar(Fechai=date.strftime('%Y-%m-%d'),Fechaf=date.strftime('%Y-%m-%d'),scan='3D')
-        binario.read()
+# backgroud = '2018-06-30 19:07'
+bkg = pd.read_csv('Background_test.csv',index_col=0,header=[0,1])
+bkg.columns.set_levels(map(lambda x: int(x),bkg.columns.levels[0].values), level=0,inplace=True)
+bkg = bkg.rolling(30,center=True,min_periods=1).mean()
 
-        binario.plot(textsave='',parameters=['photon-p'], dates=binario.data_info.index, make_gif=True, path= '2018-07-04',scp=False)
-        binario.plot(textsave='',parameters=['photon-p'],output='RCS', dates=binario.data_info.index, make_gif=True, path= '2018-07-04',scp=False)
-        binario.plot(textsave='_log',output='RCS',parameters=['photon-p'],kind='Log', dates=binario.data_info.index, make_gif=True, path= '2018-07-04',scp=True)
-        binario.plot(textsave='',output='Ln(RCS)',parameters=['photon-p'], dates=binario.data_info.index, make_gif=True, path= '2018-07-04',scp=False)
-        binario.plot(textsave='',output='dLn(RCS)',parameters=['photon-p'],kind='Anomaly', dates=binario.data_info.index, make_gif=True, path= '2018-07-04',scp=False)
-        binario.plot(textsave='',output='fLn(RCS)',parameters=['photon-p'], dates=binario.data_info.index, make_gif=True, path= '2018-07-04',scp=False)
-        binario.plot(textsave='',output='fdLn(RCS)',parameters=['photon-p'],kind='Anomaly', dates=binario.data_info.index, make_gif=True, path= '2018-07-04',scp=False)
-        binario.plot(textsave='',output='dfLn(RCS)',parameters=['photon-p'],kind='Anomaly', dates=binario.data_info.index, make_gif=True, path= '2018-07-04',scp=False)
-        binario.plot(textsave='',output='fdfLn(RCS)',parameters=['photon-p'],kind='Anomaly', dates=binario.data_info.index, make_gif=True, path= '2018-07-04',scp=False)
+altura = 4.5
+for date in pd.date_range('2018-06-30','2018-07-01',freq='d'): #'2018-06-27','2018-07-14',freq='d'):
+    # try:
+    binario = Lidar(Fechai=date.strftime('%Y-%m-%d'),Fechaf=date.strftime('%Y-%m-%d'),scan='3D')
+    binario.read()
 
-    except:
-        pass
+    kwgs = dict(parameters=['photon-p'], dates=binario.data_info.index, make_gif=True, path= date.strftime('%Y-%m-%d_test'),height=altura, backgroud= bkg)
+
+    binario.plot(scp=False, **kwgs )
+
+    binario.plot(scp=False, output='RCS', **kwgs )
+
+    binario.plot(textsave='_log', kind='Log', scp=False, **kwgs)
+
+    # binario.plot(scp=False, output='Ln(RCS)', **kwgs )
+    #
+    # binario.plot(textsave='_log', scp=False, kind='Log', **kwgs )
+    #
+    # binario.plot(output='dLn(RCS)',kind='Anomaly', scp=False, **kwgs)
+    #
+    # binario.plot(scp=False,output='fLn(RCS)', **kwgs)
+    #
+    # binario.plot(output='fdLn(RCS)',kind='Anomaly', scp=False, **kwgs)
+    #
+    # binario.plot(output='dfLn(RCS)', kind='Anomaly',scp=False, **kwgs)
+    #
+    # binario.plot(output='fdfLn(RCS)', kind='Anomaly', scp=False, **kwgs)
+
+    # except:
+    #     pass
 # binario.plot(textsave='_test', parameters=['photon-p'], output='RCS', kind='Log', dates=binario.data_info.index, make_gif=True, path= '2018-07-04',scp=False)
 # binario.plot(textsave='_test', parameters=['photon-p'], output='fdfLn(RCS)', kind='Anomaly', dates=binario.data_info.index, make_gif=True, path= '2018-07-04') #,vlim=[-2,4]
 # binario.profiler(zenith=True,textsave='_RCS_log_test',parameter='analog-s',linear=False)
