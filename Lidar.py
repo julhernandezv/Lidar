@@ -42,31 +42,31 @@ from pandas.plotting._tools import (_subplots, _flatten, table,
 
 
 #
-# def shiftedColorMap(cmap, start=0, midpoint=0.5, stop=1.0, name='shiftedcmap'):
-#
-#     cdict = {'red': [],'green': [],'blue': [],'alpha': []}
-#
-#     reg_index = np.linspace(start, stop, 257)
-#
-#     shift_index = np.hstack([
-#
-#         np.linspace(0.0, midpoint, 128, endpoint=False),
-#         np.linspace(midpoint, 1.0, 129, endpoint=True)])
-#
-#     for ri, si in zip(reg_index, shift_index):
-#         r, g, b, a = cmap(ri)
-#
-#         cdict['red'].append((si, r, r))
-#         cdict['green'].append((si, g, g))
-#         cdict['blue'].append((si, b, b))
-#         cdict['alpha'].append((si, a, a))
-#
-#     newcmap = mpl.colors.LinearSegmentedColormap(name, cdict)
-#
-#     plt.register_cmap(cmap=newcmap)
-#     return newcmap
-#
-# shrunk_cmap = shiftedColorMap(mpl.cm.gist_earth_r, start=0.0,midpoint=0.65, stop=0.85, name='shrunk')
+def shiftedColorMap(cmap, start=0, midpoint=0.5, stop=1.0, name='shiftedcmap'):
+
+    cdict = {'red': [],'green': [],'blue': [],'alpha': []}
+
+    reg_index = np.linspace(start, stop, 257)
+
+    shift_index = np.hstack([
+
+        np.linspace(0.0, midpoint, 128, endpoint=False),
+        np.linspace(midpoint, 1.0, 129, endpoint=True)])
+
+    for ri, si in zip(reg_index, shift_index):
+        r, g, b, a = cmap(ri)
+
+        cdict['red'].append((si, r, r))
+        cdict['green'].append((si, g, g))
+        cdict['blue'].append((si, b, b))
+        cdict['alpha'].append((si, a, a))
+
+    newcmap = mpl.colors.LinearSegmentedColormap(name, cdict)
+
+    plt.register_cmap(cmap=newcmap)
+    return newcmap
+
+shrunk_cmap = shiftedColorMap(mpl.cm.jet, start=0.0,midpoint=0.65, stop=0.85, name='shrunk')
 
 class MidpointNormalize(mpl.colors.Normalize):
 	"""
@@ -124,15 +124,14 @@ class PlotBook():
         kwg = self.kwargs.copy()
         kwg.update(kwargs)
         plt.savefig('{local_path}{textsave}.{format}'.format(**kwg) ,bbox_inches="tight")
-        if self.kwargs['scp']:
-            os.system('scp "{local_path}{textsave}.{format}" {user}@siata.gov.co:/var/www/{path}'. format(**kwg) )
+        os.system('scp "{local_path}{textsave}.{format}" {user}@siata.gov.co:/var/www/{path}'. format(**kwg) )
 
     def _make_gif(self,**kwargs):
         kwg = self.kwargs.copy()
         kwg.update(kwargs)
-        os.system( 'convert -delay {delay} -loop 0 {local_path}{textsave}* {local_path}{textsave}{textsave_gif}.gif'.format(**kwgs))
+        os.system( 'convert -delay {delay} -loop 0 {local_path}{textsave}* {local_path}{textsave}{textsave_gif}.gif'.format(**kwg))
         if self.kwargs['scp']:
-            os.system('scp "{local_path}{textsave}{textsave_gif}.gif {user}@siata.gov.co:/var/www/{path}'.format(**kwgs) )
+            os.system('scp "{local_path}{textsave}{textsave_gif}.gif" {user}@siata.gov.co:/var/www/{path}'.format(**kwg) )
 
     @property
     def nseries(self):
@@ -194,11 +193,11 @@ class Lidar(PlotBook):
     """
 
     # mpl.cm.gist_earth_r}
-    label   = {'raw_data':{'analog':'','photon':'','cmap':mpl.cm.gist_earth_r},
-                'P(r)':{'analog':r'$[mV]$','photon':r'$[MHz]$','cmap':mpl.cm.gist_earth_r},
-                'RCS':{'analog':r'RCS $[mV*m^2]$','photon':r'RCS $[MHz*m^2]$','cmap':mpl.cm.gist_earth_r},
-                'Ln(RCS)':{'analog':r'Ln(RCS) $[Ln(mV*m^2)]$','photon':r'Ln(RCS) $[Ln(MHz*m^2)]$','cmap':mpl.cm.gist_earth_r},
-                'fLn(RCS)':{'analog':r'fLn(RCS) $[Ln(mV*m^2)]$','photon':r'fLn(RCS) $[Ln(MHz*m^2)]$','cmap':mpl.cm.gist_earth_r}, 'dLn(RCS)':{'analog':r'dLn(RCS)','photon':r'dLn(RCS)','cmap':mpl.cm.seismic},
+    label   = {'raw_data':{'analog':'','photon':'','cmap':shrunk_cmap},
+                'P(r)':{'analog':r'$[mV]$','photon':r'$[MHz]$','cmap':shrunk_cmap},
+                'RCS':{'analog':r'RCS $[mV*Km^2]$','photon':r'RCS $[MHz*Km^2]$','cmap':shrunk_cmap},
+                'Ln(RCS)':{'analog':r'Ln(RCS) $[Ln(mV*Km^2)]$','photon':r'Ln(RCS) $[Ln(MHz*Km^2)]$','cmap':shrunk_cmap},
+                'fLn(RCS)':{'analog':r'fLn(RCS) $[Ln(mV*Km^2)]$','photon':r'fLn(RCS) $[Ln(MHz*Km^2)]$','cmap':shrunk_cmap}, 'dLn(RCS)':{'analog':r'dLn(RCS)','photon':r'dLn(RCS)','cmap':mpl.cm.seismic},
                 'fdLn(RCS)':{'analog':r'fdLn(RCS)','photon':r'fdLn(RCS)','cmap':mpl.cm.seismic},
                 'dfLn(RCS)':{'analog':r'dfLn(RCS)','photon':r'dfLn(RCS)','cmap':mpl.cm.seismic},
                 'fdfLn(RCS)':{'analog':r'fdfLn(RCS)','photon':r'fdfLn(RCS)','cmap':mpl.cm.seismic},
@@ -325,7 +324,7 @@ class Lidar(PlotBook):
         if self.ascii:
             fileObj.close ()
             dataset = pd.read_csv(filename,delimiter='\t',header=9 if self.scan not in ['FixedPoint'] else 8,usecols=[0,1,2,3] )
-            ejex = np.array(range(1,dataset.shape[0]+ 1))*dictDescripcionDataset[1]["datasetBinWidth"]
+            ejex = np.array(range(1,dataset.shape[0]+ 1))*dictDescripcionDataset[1]["datasetBinWidth"] / 1000.
 
             dataset.index  = ejex
             dataset.columns = dataset.columns.str.strip('355.000 .').str.strip(' 0 ').str.strip(' 1 ').str.replace(' ','-')
@@ -346,7 +345,7 @@ class Lidar(PlotBook):
 
                     print 'CRLF integrity {} = {}'.format(dictDescripcionDataset[ix]["datasetDescriptor"],fileObj.readline ())
 
-                    ejex = np.array(range(1,dictDescripcionDataset[ix]["datasetBinNums"]-17)) * dictDescripcionDataset[ix]["datasetBinWidth"]
+                    ejex = np.array(range(1,dictDescripcionDataset[ix]["datasetBinNums"]-17)) * dictDescripcionDataset[ix]["datasetBinWidth"] / 1000.
                     dataset.append( pd.DataFrame(dictDescripcionDataset[ix]['datasetLista'][18:] if dictDescripcionDataset[ix]["datasetDescriptor"] == 'BT' else dictDescripcionDataset[ix]['datasetLista'][:-18], index=ejex, columns=[ "{}-{}".format('analog' if dictDescripcionDataset[ix]["datasetModoAnalogo"] else 'photon', dictDescripcionDataset[ix]["datasetPolarization"])] ))
 
                     # print dictDescripcionDataset[ix]
@@ -418,7 +417,7 @@ class Lidar(PlotBook):
             names = [self.degree_variable,'Parameters'] )
 
         #Filtro para mediciones inferiores a 110m de distacia al sensor
-        data       = data[data.index >= 110]
+        data       = data[data.index >= 0.110]
 
         if kwargs.get('inplace',True):
             self.data       = data
@@ -517,13 +516,15 @@ class Lidar(PlotBook):
         if 'ax' not in kwargs.keys():
             plt.close('all')
             if self.scan not in ['FixedPoint']:
-                rel         = (Y.max()-Y.min())/(X.max()-X.min())
+                x =
+                rel         = (Y.max()-Y.min())/(np.abs(X).max()-X.min())
                 figsize = ( 10,10*rel) if rel <=1 else (10*(1./rel),10)
             else: figsize = (15,8.5)
 
             fig 		= plt.figure(figsize=figsize,facecolor=(.7,.7,.7))
-            ax			= fig.add_axes((0,0.,1,1)) #self.fig.add_subplot(111)
             ax2      	= fig.add_axes((1.02,.2,0.02,0.59))
+            ax			= fig.add_axes((0,0.,1,1)) #self.fig.add_subplot(111)
+
 
         else:
             ax 		= kwargs['ax']
@@ -548,9 +549,10 @@ class Lidar(PlotBook):
 
         elif kwargs['kind'] == 'Log':
             Z.mask(Z<=0,inplace=True)
-            vmin, vmax                 = kwargs.get('vlim',np.log10(np.nanpercentile(Z,[1,99.9])))
-            # contour_kwd.pop('extend',None)
+            vmin, vmax                 = kwargs.get('vlim', np.log10( [Z.min().min(),Z.max().max()] )) # np.nanpercentile(Z,[1,99])))
             contour_kwd['levels']      = np.logspace(vmin,vmax,100)
+            # Z[Z < contour_kwd['levels'][0]] = contour_kwd['levels'][0]
+            # Z[Z > contour_kwd['levels'][-1]] = contour_kwd['levels'][-1]
             contour_kwd['norm']        = mpl.colors.LogNorm(contour_kwd['levels'][0],contour_kwd['levels'][-1])
             print contour_kwd['levels'][0],contour_kwd['levels'][-1]
 
@@ -559,7 +561,12 @@ class Lidar(PlotBook):
             colorbar_kwd.update(dict(format = LogFormatterMathtext(10) ,ticks=LogLocator(10) ))
 
         # cf		= ax.contourf(X,Y,Z,levels=levels, alpha=1,cmap =shrunk_cmap,  norm=mpl.colors.LogNorm())   #
-        cf		= ax.contourf(X,Y,Z,**contour_kwd) #extend='both')
+        contour_kwd.pop('levels')
+        cf      = ax.pcolormesh(X,Y,Z,**contour_kwd)
+        ax.set_xlim(-np.abs(X).max(),np.abs(X).max()),
+
+        # cf		= ax.contourf(X,Y,Z,**contour_kwd) #extend='both')
+
 
         if 'ax' not in kwargs.keys():
             cbar     = plt.colorbar(cf,cax=divider.append_axes("right", size="3%", pad='1%') if 'ax' in kwargs.keys() else ax2, **colorbar_kwd)
@@ -571,9 +578,9 @@ class Lidar(PlotBook):
                 cbar.ax.tick_params(which='major',width=1,length=6)
                 # ax.yaxis.set_minor_locator(LogLocator(10,subs=np.arange(2,10)))
 
-        ax.set_ylabel(r'Range $[m]$')
+        ax.set_ylabel(r'Range $[Km]$')
         if self.scan not in ['FixedPoint']:
-            ax.set_xlabel(r'Range $[m]$',)# fontsize=fontsize)
+            ax.set_xlabel(r'Range $[Km]$',)# fontsize=fontsize)
         else:
             ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M \n%d-%b'))
 
@@ -611,7 +618,7 @@ class Lidar(PlotBook):
 
         self.plot_lidar(x, y, profile, **kwargs )
 
-    def fixedpoint(self, zenith=False, height=4500, parameter='photon-p' ,**kwargs):
+    def fixedpoint(self, zenith=False, height=4.5, parameter='photon-p' ,**kwargs):
         """Method for building fixed point profiles with variations at Zenith or Azimuth
 
         Parameters
@@ -645,7 +652,7 @@ class Lidar(PlotBook):
         #
         return data_info[angulo_fijo].drop_duplicates().values
 
-    def plot(self, height=4500, **kwargs):
+    def plot(self, height=4.5, **kwargs):
         """Method for building scanning or fixed point profiles with variations at Zenith or Azimuth
 
         Parameters
@@ -662,6 +669,7 @@ class Lidar(PlotBook):
         _textsave           = kwargs.get('textsave','')
         kwargs['path']      = "{}{}/{}".format( self.kwargs['path'], self.scan, kwargs.get('path','') )
         os.system('ssh {}@siata.gov.co "mkdir /var/www/{}"'.format( self.kwargs['user'], kwargs['path']  ))
+        os.system('rm Figuras/*')
 
         if 'output' in kwargs.keys():
             self.derived_output(**kwargs)
@@ -688,7 +696,7 @@ class Lidar(PlotBook):
             gif_kwargs = {}
             for col in parameters:
                 gif_kwargs['textsave']      = "_{}_{}_{}".format(self.scan,self.output,col)
-                gif_kwargs['textsave_gif']  = kwargs['dates'][0].strftime('%Y-%m-%d')
+                gif_kwargs['textsave_gif']  = '_' + kwargs['dates'][0].strftime('%Y-%m-%d')
                 gif_kwargs['path']          = kwargs['path']
                 self._make_gif(**gif_kwargs)
 
@@ -789,13 +797,13 @@ class Lidar(PlotBook):
 # files = glob.glob('InfoLidar/3Ds_180703-135028/RM*')        # test2
 # files = glob.glob('InfoLidar/3Ds_180704-105519/RM*')        # test3
 
-binario = Lidar(Fechai='2018-07-04',Fechaf='2018-07-04',scan='3D')
-binario.read()
-#
+# binario = Lidar(Fechai='2018-07-04',Fechaf='2018-07-04',scan='3D')
+# binario.read()
+
 # backup = [binario.data, binario.data_info]
-# # binario.data        = backup[0]
-# # binario.raw_data    = backup[0]
-# # binario.data_info   = backup[1]
+# binario.data        = backup[0]
+# binario.raw_data    = backup[0]
+# binario.data_info   = backup[1]
 #
 # binario.plot(textsave='_test5_',parameters=['photon-p'])
 # binario.plot(textsave='_test5_log',parameters=['photon-p'],output='RCS',kind='Log')
@@ -803,18 +811,35 @@ binario.read()
 # # dd, di = binario.read_folder(files)
 # # '-75.5686', '6.2680'
 #
-binario.plot(textsave='_test_4D',parameters=['photon-p'])
-binario.plot(textsave='_test_4D',parameters=['photon-p'],output='RCS')
-binario.plot(textsave='_log_test_4D',output='RCS',parameters=['photon-p'],kind='Log')
-binario.plot(textsave='_test_4D',output='Ln(RCS)',parameters=['photon-p'])
-binario.plot(textsave='_test_4D',output='dLn(RCS)',parameters=['photon-p'],kind='Anomaly')
-binario.plot(textsave='_test_4D',output='fLn(RCS)',parameters=['photon-p'])
-binario.plot(textsave='_test_4D',output='fdLn(RCS)',parameters=['photon-p'],kind='Anomaly')
-binario.plot(textsave='_test_4D',output='dfLn(RCS)',parameters=['photon-p'],kind='Anomaly')
-binario.plot(textsave='_test_4D',output='fdfLn(RCS)',parameters=['photon-p'],kind='Anomaly')
+# binario.plot(textsave='_test_1',parameters=['photon-p'])
+# binario.plot(textsave='_test_1',parameters=['photon-p'],output='RCS')
+# binario.plot(textsave='_log_test_1',output='RCS',parameters=['photon-p'],kind='Log')
+# binario.plot(textsave='_test_1',output='Ln(RCS)',parameters=['photon-p'])
+# binario.plot(textsave='_test_1',output='dLn(RCS)',parameters=['photon-p'],kind='Anomaly')
+# binario.plot(textsave='_test_1',output='fLn(RCS)',parameters=['photon-p'])
+# binario.plot(textsave='_test_1',output='fdLn(RCS)',parameters=['photon-p'],kind='Anomaly')
+# binario.plot(textsave='_test_1',output='dfLn(RCS)',parameters=['photon-p'],kind='Anomaly')
+# binario.plot(textsave='_test_1',output='fdfLn(RCS)',parameters=['photon-p'],kind='Anomaly')
 
-binario.plot(textsave='_test_4D_log',parameters=['photon-p'],output='RCS',kind='Log',dates=binario.data_info.index[:3])
+for date in p.date_range('2018-06-27','2018-07-14')
+    try:
+        binario = Lidar(Fechai=date.strftime('%Y-%m-%d'),Fechaf=date.strftime('%Y-%m-%d'),scan='3D')
+        binario.read()
 
+        binario.plot(textsave='',parameters=['photon-p'], dates=binario.data_info.index, make_gif=True, path= '2018-07-04',scp=False)
+        binario.plot(textsave='',parameters=['photon-p'],output='RCS', dates=binario.data_info.index, make_gif=True, path= '2018-07-04',scp=False)
+        binario.plot(textsave='_log',output='RCS',parameters=['photon-p'],kind='Log', dates=binario.data_info.index, make_gif=True, path= '2018-07-04',scp=True)
+        binario.plot(textsave='',output='Ln(RCS)',parameters=['photon-p'], dates=binario.data_info.index, make_gif=True, path= '2018-07-04',scp=False)
+        binario.plot(textsave='',output='dLn(RCS)',parameters=['photon-p'],kind='Anomaly', dates=binario.data_info.index, make_gif=True, path= '2018-07-04',scp=False)
+        binario.plot(textsave='',output='fLn(RCS)',parameters=['photon-p'], dates=binario.data_info.index, make_gif=True, path= '2018-07-04',scp=False)
+        binario.plot(textsave='',output='fdLn(RCS)',parameters=['photon-p'],kind='Anomaly', dates=binario.data_info.index, make_gif=True, path= '2018-07-04',scp=False)
+        binario.plot(textsave='',output='dfLn(RCS)',parameters=['photon-p'],kind='Anomaly', dates=binario.data_info.index, make_gif=True, path= '2018-07-04',scp=False)
+        binario.plot(textsave='',output='fdfLn(RCS)',parameters=['photon-p'],kind='Anomaly', dates=binario.data_info.index, make_gif=True, path= '2018-07-04',scp=False)
+
+    except:
+        pass
+# binario.plot(textsave='_test', parameters=['photon-p'], output='RCS', kind='Log', dates=binario.data_info.index, make_gif=True, path= '2018-07-04',scp=False)
+# binario.plot(textsave='_test', parameters=['photon-p'], output='fdfLn(RCS)', kind='Anomaly', dates=binario.data_info.index, make_gif=True, path= '2018-07-04') #,vlim=[-2,4]
 # binario.profiler(zenith=True,textsave='_RCS_log_test',parameter='analog-s',linear=False)
 # binario.profiler(zenith=True,textsave='_RCS_log_test',parameter='analog-p',linear=False)
 # binario.profiler(zenith=True,textsave='_RCS_log_test',parameter='photon-s',linear=False)
