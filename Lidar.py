@@ -516,7 +516,7 @@ class Lidar(PlotBook):
         if 'ax' not in kwargs.keys():
             plt.close('all')
             if self.scan not in ['FixedPoint']:
-                x =
+
                 rel         = (Y.max()-Y.min())/(np.abs(X).max()-X.min())
                 figsize = ( 10,10*rel) if rel <=1 else (10*(1./rel),10)
             else: figsize = (15,8.5)
@@ -821,7 +821,7 @@ class Lidar(PlotBook):
 # binario.plot(textsave='_test_1',output='dfLn(RCS)',parameters=['photon-p'],kind='Anomaly')
 # binario.plot(textsave='_test_1',output='fdfLn(RCS)',parameters=['photon-p'],kind='Anomaly')
 
-for date in p.date_range('2018-06-27','2018-07-14')
+for date in pd.date_range('2018-06-27','2018-07-14'):
     try:
         binario = Lidar(Fechai=date.strftime('%Y-%m-%d'),Fechaf=date.strftime('%Y-%m-%d'),scan='3D')
         binario.read()
