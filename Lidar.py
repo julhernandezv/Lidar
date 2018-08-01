@@ -193,11 +193,11 @@ class Lidar(PlotBook):
     """
 
     # mpl.cm.gist_earth_r}
-    label   = {'raw_data':{'analog':'','photon':'','cmap':shrunk_cmap},
-                'P(r)':{'analog':r'$[mV]$','photon':r'$[MHz]$','cmap':shrunk_cmap},
-                'RCS':{'analog':r'RCS $[mV*Km^2]$','photon':r'RCS $[MHz*Km^2]$','cmap':shrunk_cmap},
-                'Ln(RCS)':{'analog':r'Ln(RCS) $[Ln(mV*Km^2)]$','photon':r'Ln(RCS) $[Ln(MHz*Km^2)]$','cmap':shrunk_cmap},
-                'fLn(RCS)':{'analog':r'fLn(RCS) $[Ln(mV*Km^2)]$','photon':r'fLn(RCS) $[Ln(MHz*Km^2)]$','cmap':shrunk_cmap}, 'dLn(RCS)':{'analog':r'dLn(RCS)','photon':r'dLn(RCS)','cmap':mpl.cm.seismic},
+    label   = {'raw_data':{'analog':'','photon':'','cmap':mpl.cm.jet},
+                'P(r)':{'analog':r'$[mV]$','photon':r'$[MHz]$','cmap':mpl.cm.jet},
+                'RCS':{'analog':r'RCS $[mV*Km^2]$','photon':r'RCS $[MHz*Km^2]$','cmap':mpl.cm.jet},
+                'Ln(RCS)':{'analog':r'Ln(RCS) $[Ln(mV*Km^2)]$','photon':r'Ln(RCS) $[Ln(MHz*Km^2)]$','cmap':mpl.cm.jet},
+                'fLn(RCS)':{'analog':r'fLn(RCS) $[Ln(mV*Km^2)]$','photon':r'fLn(RCS) $[Ln(MHz*Km^2)]$','cmap':mpl.cm.jet}, 'dLn(RCS)':{'analog':r'dLn(RCS)','photon':r'dLn(RCS)','cmap':mpl.cm.seismic},
                 'fdLn(RCS)':{'analog':r'fdLn(RCS)','photon':r'fdLn(RCS)','cmap':mpl.cm.seismic},
                 'dfLn(RCS)':{'analog':r'dfLn(RCS)','photon':r'dfLn(RCS)','cmap':mpl.cm.seismic},
                 'fdfLn(RCS)':{'analog':r'fdfLn(RCS)','photon':r'fdfLn(RCS)','cmap':mpl.cm.seismic},
@@ -559,7 +559,7 @@ class Lidar(PlotBook):
             contour_kwd['norm']        = mpl.colors.LogNorm(contour_kwd['levels'][0],contour_kwd['levels'][-1])
             print contour_kwd['levels'][0],contour_kwd['levels'][-1]
 
-            minorticks = np.hstack([np.arange(1,10,1)*log for log in np.logspace(0,16,17)])
+            minorticks = np.hstack([np.arange(1,10,1)*log for log in np.logspace(-2,16,19)])
             minorticks = minorticks[(minorticks >=contour_kwd['levels'] [0]) & (minorticks <=contour_kwd['levels'] [-1])]
             colorbar_kwd.update(dict(format = LogFormatterMathtext(10) ,ticks=LogLocator(10) ))
 
@@ -680,7 +680,7 @@ class Lidar(PlotBook):
             _vlim = self.data[self.data.index < height].stack([0,1] ).quantile([.01,.99])
             if kwargs.get('kind','Linear') == 'Log':
                 _vlim = np.log10(_vlim)
-                _vlim [ _vlim == -np.inf ] = -2
+                _vlim [ _vlim == -np.inf ] = 0
 
         if 'output' in kwargs.keys():
             self.derived_output(**kwargs)
@@ -843,7 +843,7 @@ for date in pd.date_range('2018-06-30','2018-07-01',freq='d'): #'2018-06-27','20
     binario = Lidar(Fechai=date.strftime('%Y-%m-%d'),Fechaf=date.strftime('%Y-%m-%d'),scan='3D')
     binario.read()
 
-    kwgs = dict(parameters=['photon-p'], dates=binario.data_info.index, make_gif=True, path= date.strftime('%Y-%m-%d_test'),height=altura, backgroud= bkg)
+    kwgs = dict(parameters=['photon-p'], dates=binario.data_info.index, make_gif=True, path= date.strftime('%Y-%m-%d'),height=altura,)# backgroud= bkg)
 
     binario.plot(scp=False, **kwgs )
 
@@ -851,19 +851,19 @@ for date in pd.date_range('2018-06-30','2018-07-01',freq='d'): #'2018-06-27','20
 
     binario.plot(textsave='_log', kind='Log', scp=False, **kwgs)
 
-    # binario.plot(scp=False, output='Ln(RCS)', **kwgs )
-    #
-    # binario.plot(textsave='_log', scp=False, kind='Log', **kwgs )
-    #
-    # binario.plot(output='dLn(RCS)',kind='Anomaly', scp=False, **kwgs)
-    #
-    # binario.plot(scp=False,output='fLn(RCS)', **kwgs)
-    #
-    # binario.plot(output='fdLn(RCS)',kind='Anomaly', scp=False, **kwgs)
-    #
-    # binario.plot(output='dfLn(RCS)', kind='Anomaly',scp=False, **kwgs)
-    #
-    # binario.plot(output='fdfLn(RCS)', kind='Anomaly', scp=False, **kwgs)
+    binario.plot(scp=False, output='Ln(RCS)', **kwgs )
+
+    binario.plot(textsave='_log', scp=False, kind='Log', **kwgs )
+
+    binario.plot(output='dLn(RCS)',kind='Anomaly', scp=False, **kwgs)
+
+    binario.plot(scp=False,output='fLn(RCS)', **kwgs)
+
+    binario.plot(output='fdLn(RCS)',kind='Anomaly', scp=False, **kwgs)
+
+    binario.plot(output='dfLn(RCS)', kind='Anomaly',scp=False, **kwgs)
+
+    binario.plot(output='fdfLn(RCS)', kind='Anomaly', scp=False, **kwgs)
 
     # except:
     #     pass
