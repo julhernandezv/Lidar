@@ -105,7 +105,7 @@ class PlotBook():
         'scp':True,
         'textsave': '',
         'user':'jhernandezv',
-        'delay':20,
+        'delay':30,
         'textsave_gif':'',
     }
 
@@ -119,7 +119,7 @@ class PlotBook():
         self.kwargs.update(kwargs)
 
     def _save_fig(self,**kwargs):
-        print 'Kwargs PlotBook.method \n {}'.format(kwargs)
+        # print 'Kwargs PlotBook.method \n {}'.format(kwargs)
         # self.kwargs.update(kwargs)
         kwg = self.kwargs.copy()
         kwg.update(kwargs)
@@ -477,30 +477,32 @@ class Lidar(PlotBook):
             # if kwargs['output'] not in self.label.keys():
             self.output     = kwargs['output']
 
-        self.data       = self.raw_data.copy()
+        if self.output in self.label.keys():
+            self.data       = self.raw_data.copy()
 
-        if self.output not in ['raw_data']:
-            self.data       = self.Pr
-            if 'background' in kwargs.keys():
-                for col in self.data.columns.levels[0]:
-                    self.data.loc[:,col] = (self.data.loc[:,col] - kwargs['background']).values
+            if self.output not in ['raw_data']:
+                self.data       = self.Pr
+                if 'background' in kwargs.keys():
+                    self.data = self.data.groupby(axis=1,level=0).apply(lambda x: x -  pd.concat([kwargs['background']], axis=1,keys=[x.name]) )
 
-        if self.output in ['RCS','Ln(RCS)','fLn(RCS)','dLn(RCS)','fdLn(RCS)','dfLn(RCS)','fdfLn(RCS)']:
-            self.data       = self.RCS
+            if self.output in ['RCS','Ln(RCS)','fLn(RCS)','dLn(RCS)','fdLn(RCS)','dfLn(RCS)','fdfLn(RCS)']:
+                self.data       = self.RCS
 
-            if self.output not in ['RCS']:
-                self.data.mask(self.data<=0,inplace=True)
-                self.data       = np.log(self.data)
+                if self.output not in ['RCS']:
+                    self.data.mask(self.data<=0,inplace=True)
+                    self.data       = np.log(self.data)
 
-            if self.output in ['fLn(RCS)','dfLn(RCS)','fdfLn(RCS)']:
-                self.data       = self.average_filter(self.data)
+                if self.output in ['fLn(RCS)','dfLn(RCS)','fdfLn(RCS)']:
+                    self.data       = self.average_filter(self.data)
 
-            if self.output in ['dLn(RCS)','fdLn(RCS)','fdfLn(RCS)','dfLn(RCS)']:
-                self.data       = self.derived(self.data)
+                if self.output in ['dLn(RCS)','fdLn(RCS)','fdfLn(RCS)','dfLn(RCS)']:
+                    self.data       = self.derived(self.data)
 
-            if self.output in ['fdLn(RCS)','fdfLn(RCS)']:
-                self.data       = self.average_filter(self.data)
+                if self.output in ['fdLn(RCS)','fdfLn(RCS)']:
+                    self.data       = self.average_filter(self.data)
 
+        else:
+            print "Output not allowed, check other"
 
     def plot_lidar(self,X,Y,Z,**kwargs):
         """Function for ploting lidar profiles
@@ -549,14 +551,14 @@ class Lidar(PlotBook):
             contour_kwd['norm']     = MidpointNormalize(midpoint=0.,vmin=vmin, vmax=vmax)
             colorbar_kwd['format']  = '%.f'
 
-
         elif kwargs['kind'] == 'Log':
             Z.mask(Z<=0,inplace=True)
             vmin, vmax                 = kwargs.get('vlim', np.log10( [Z.min().min(),Z.max().max()] )) # np.nanpercentile(Z,[1,99])))
-            contour_kwd['levels']      = np.logspace(vmin,vmax,100)
-            # Z[Z < contour_kwd['levels'][0]] = contour_kwd['levels'][0]
-            # Z[Z > contour_kwd['levels'][-1]] = contour_kwd['levels'][-1]
-            contour_kwd['norm']        = mpl.colors.LogNorm(contour_kwd['levels'][0],contour_kwd['levels'][-1])
+            contour_kwd['levels']               = np.logspace(vmin,vmax,100)
+            Z[Z < contour_kwd['levels'][0]]     = contour_kwd['levels'][0]
+            Z[Z > contour_kwd['levels'][-1]]    = contour_kwd['levels'][-1]
+            contour_kwd['norm']                 = mpl.colors.LogNorm(
+                    contour_kwd['levels'][0],contour_kwd['levels'][-1] )
             print contour_kwd['levels'][0],contour_kwd['levels'][-1]
 
             minorticks = np.hstack([np.arange(1,10,1)*log for log in np.logspace(-2,16,19)])
@@ -668,22 +670,26 @@ class Lidar(PlotBook):
             parameters  = List like - Choice  parameter to plot - Default use all parameters in self.data
             output      = Allowed {} """.format(self.label.keys())
 
+        if 'output' in kwargs.keys():
+            self.derived_output(**kwargs)
+
         _parameters         = kwargs.get('parameters',self.data.columns.levels[-1].values)
         _textsave           = kwargs.get('textsave','')
-        kwargs['path']      = "{}{}/{}".format( self.kwargs['path'], self.scan, kwargs.get('path','') )
+        kwargs['path']      = "{}{}/{}/".format( self.kwargs['path'], self.scan, kwargs.get('path','') )
         os.system('ssh {}@siata.gov.co "mkdir /var/www/{}"'.format( self.kwargs['user'], kwargs['path']  ))
         os.system('rm Figuras/*')
 
         _dates = kwargs.get('dates', [self.data_info.index[0]])
 
-        if len(self.data.columns.names) > 2 and len(_dates) > 2:
-            _vlim = self.data[self.data.index < height].stack([0,1] ).quantile([.01,.99])
-            if kwargs.get('kind','Linear') == 'Log':
-                _vlim = np.log10(_vlim)
-                _vlim [ _vlim == -np.inf ] = 0
+        _vlim = self.data[self.data.index < height] \
+                    .stack( [0,1] if len(self.data.columns.names) > 2 else 0) \
+                    .apply(lambda x: np.nanpercentile(x,[1,99])) #.quantile([.01,.99])
 
-        if 'output' in kwargs.keys():
-            self.derived_output(**kwargs)
+        if kwargs.get('kind','Linear') == 'Log':
+            _vlim = np.log10(_vlim)
+            _vlim [ _vlim == -np.inf ]  = 0
+            _vlim [ _vlim == np.NaN]    = 0
+            print _vlim
 
         for date in _dates:
             print date
@@ -838,32 +844,44 @@ bkg.columns.set_levels(map(lambda x: int(x),bkg.columns.levels[0].values), level
 bkg = bkg.rolling(30,center=True,min_periods=1).mean()
 
 altura = 4.5
-for date in pd.date_range('2018-06-30','2018-07-01',freq='d'): #'2018-06-27','2018-07-14',freq='d'):
-    # try:
-    binario = Lidar(Fechai=date.strftime('%Y-%m-%d'),Fechaf=date.strftime('%Y-%m-%d'),scan='3D')
-    binario.read()
+# for date in pd.date_range('2018-06-30','2018-06-30',freq='d'): #'2018-06-27','2018-07-14',freq='d'):
+# try:
+date = pd.date_range('2018-06-30','2018-06-30',freq='d')[0] #'2018-06-27','2018-07-14',freq='d'):
 
-    kwgs = dict(parameters=['photon-p'], dates=binario.data_info.index, make_gif=True, path= date.strftime('%Y-%m-%d-bkg'),height=altura, background= bkg)
+binario = Lidar(Fechai=date.strftime('%Y-%m-%d'),Fechaf=date.strftime('%Y-%m-%d'),scan='3D')
+binario.read()
+backup = [binario.raw_data, binario.data_info]
+# binario.data        = backup[0]
+# binario.raw_data    = backup[0]
+# binario.data_info   = backup[1]
 
-    binario.plot(scp=False, **kwgs )
 
-    binario.plot(scp=False, output='RCS', **kwgs )
+kwgs = dict(parameters=['photon-p'], dates=binario.data_info.index, make_gif=True, path= date.strftime('%Y-%m-%d-bkg'),height=altura, background= bkg)
 
-    binario.plot(textsave='_log', kind='Log', scp=False, **kwgs)
 
-    binario.plot(scp=False, output='Ln(RCS)', **kwgs )
 
-    binario.plot(textsave='_log', scp=False, kind='Log', **kwgs )
+# binario.plot(textsave='_log', kind='Log',output='RCS',path= date.strftime('%Y-%m-%d'), background= bkg)
 
-    binario.plot(output='dLn(RCS)',kind='Anomaly', scp=False, **kwgs)
+# binario.plot(scp=False, output='P(r)',**kwgs )
+#
+# binario.plot(scp=False, output='RCS', **kwgs )
 
-    binario.plot(scp=False,output='fLn(RCS)', **kwgs)
+binario.plot(textsave='_log', output='RCS',kind='Log', scp=False, **kwgs)
 
-    binario.plot(output='fdLn(RCS)',kind='Anomaly', scp=False, **kwgs)
 
-    binario.plot(output='dfLn(RCS)', kind='Anomaly',scp=False, **kwgs)
-
-    binario.plot(output='fdfLn(RCS)', kind='Anomaly', scp=False, **kwgs)
+# binario.plot(scp=False, output='Ln(RCS)', **kwgs )
+# #
+# binario.plot(textsave='_log', output='Ln(RCS)', scp=False, kind='Log', **kwgs )
+#
+# binario.plot(output='dLn(RCS)',kind='Anomaly', scp=False, **kwgs)
+#
+# binario.plot(scp=False,output='fLn(RCS)', **kwgs)
+#
+# binario.plot(output='fdLn(RCS)',kind='Anomaly', scp=False, **kwgs)
+#
+# binario.plot(output='dfLn(RCS)', kind='Anomaly',scp=False, **kwgs)
+#
+# binario.plot(output='fdfLn(RCS)', kind='Anomaly', scp=False, **kwgs)
 
     # except:
     #     pass
