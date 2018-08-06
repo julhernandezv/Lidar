@@ -489,7 +489,8 @@ class Lidar(PlotBook):
                 self.data       = self.RCS
 
                 if self.output not in ['RCS']:
-                    self.data.mask(self.data<=0,inplace=True)
+                    # self.data.mask(self.data<=0,inplace=True)
+                    self.data[ self.data <=0 ] = 0.01
                     self.data       = np.log(self.data)
 
                 if self.output in ['fLn(RCS)','dfLn(RCS)','fdfLn(RCS)']:
@@ -502,7 +503,7 @@ class Lidar(PlotBook):
                     self.data       = self.average_filter(self.data)
 
         else:
-            print "Output not allowed, check other"
+            print "Output {} not allowed, check other".format(self.output)
 
     def plot_lidar(self,X,Y,Z,**kwargs):
         """Function for ploting lidar profiles
@@ -552,14 +553,19 @@ class Lidar(PlotBook):
             colorbar_kwd['format']  = '%.f'
 
         elif kwargs['kind'] == 'Log':
-            Z.mask(Z<=0,inplace=True)
-            vmin, vmax                 = kwargs.get('vlim', np.log10( [Z.min().min(),Z.max().max()] )) # np.nanpercentile(Z,[1,99])))
+            #
+            if 'vlim' in kwargs.keys():
+                vmin, vmax                 = kwargs['vlim']
+            else:
+                Z.mask(Z<=0,inplace=True)
+                vmin, vmax =  np.log10( [Z.min().min(),Z.max().max()] ) # np.nanpercentile(Z,[1,99])))
             contour_kwd['levels']               = np.logspace(vmin,vmax,100)
             Z[Z < contour_kwd['levels'][0]]     = contour_kwd['levels'][0]
             Z[Z > contour_kwd['levels'][-1]]    = contour_kwd['levels'][-1]
             contour_kwd['norm']                 = mpl.colors.LogNorm(
                     contour_kwd['levels'][0],contour_kwd['levels'][-1] )
             print contour_kwd['levels'][0],contour_kwd['levels'][-1]
+            print Z
 
             minorticks = np.hstack([np.arange(1,10,1)*log for log in np.logspace(-2,16,19)])
             minorticks = minorticks[(minorticks >=contour_kwd['levels'] [0]) & (minorticks <=contour_kwd['levels'] [-1])]
@@ -686,9 +692,9 @@ class Lidar(PlotBook):
                     .apply(lambda x: np.nanpercentile(x,[1,99])) #.quantile([.01,.99])
 
         if kwargs.get('kind','Linear') == 'Log':
-            _vlim = np.log10(_vlim)
+            _vlim [ _vlim<0 ]           = 0
+            _vlim                       = np.log10(_vlim)
             _vlim [ _vlim == -np.inf ]  = 0
-            _vlim [ _vlim == np.NaN]    = 0
             print _vlim
 
         for date in _dates:
@@ -856,32 +862,31 @@ backup = [binario.raw_data, binario.data_info]
 # binario.data_info   = backup[1]
 
 
-kwgs = dict(parameters=['photon-p'], dates=binario.data_info.index, make_gif=True, path= date.strftime('%Y-%m-%d-bkg'),height=altura, background= bkg)
+kwgs = dict(parameters=['photon-p'], dates=binario.data_info.index, make_gif=True, path= date.strftime('%Y-%m-%d-bkg-nonan'),height=altura, background= bkg)
 
 
 
-# binario.plot(textsave='_log', kind='Log',output='RCS',path= date.strftime('%Y-%m-%d'), background= bkg)
 
-# binario.plot(scp=False, output='P(r)',**kwgs )
-#
-# binario.plot(scp=False, output='RCS', **kwgs )
+
+binario.plot(scp=False, output='P(r)',**kwgs )
+
+binario.plot(scp=False, output='RCS', **kwgs )
 
 binario.plot(textsave='_log', output='RCS',kind='Log', scp=False, **kwgs)
 
 
-# binario.plot(scp=False, output='Ln(RCS)', **kwgs )
+binario.plot(scp=False, output='Ln(RCS)', **kwgs )
 # #
-# binario.plot(textsave='_log', output='Ln(RCS)', scp=False, kind='Log', **kwgs )
-#
-# binario.plot(output='dLn(RCS)',kind='Anomaly', scp=False, **kwgs)
-#
-# binario.plot(scp=False,output='fLn(RCS)', **kwgs)
-#
-# binario.plot(output='fdLn(RCS)',kind='Anomaly', scp=False, **kwgs)
-#
-# binario.plot(output='dfLn(RCS)', kind='Anomaly',scp=False, **kwgs)
-#
-# binario.plot(output='fdfLn(RCS)', kind='Anomaly', scp=False, **kwgs)
+
+binario.plot(output='dLn(RCS)',kind='Anomaly', scp=False, **kwgs)
+
+binario.plot(scp=False,output='fLn(RCS)', **kwgs)
+
+binario.plot(output='fdLn(RCS)',kind='Anomaly', scp=False, **kwgs)
+
+binario.plot(output='dfLn(RCS)', kind='Anomaly',scp=False, **kwgs)
+
+binario.plot(output='fdfLn(RCS)', kind='Anomaly', scp=False, **kwgs)
 
     # except:
     #     pass
