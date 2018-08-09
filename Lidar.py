@@ -407,7 +407,7 @@ class Lidar(PlotBook):
                 data.drop( duplicated[1:], axis=1, level=0, inplace=True)
                 data_info.drop( duplicated[1:], inplace=True)
 
-        elif self.scan in ['Zenith','Azimuth']:
+        elif self.scan in ['Zenith','Azimuth','FixedPoint']:
             data_info.loc[:,'Zenith']   *= -1
 
         data_info['Azimuth']        = (270-data_info['Azimuth'])%360
@@ -445,14 +445,14 @@ class Lidar(PlotBook):
         for d in dates:
         # d = dates[0]
             os.system('rm -r Datos/*')
-            os.system('scp -r jhernandezv@192.168.1.62:/mnt/ALMACENAMIENTO/LIDAR/{}/{}/* Datos/'.format('Scanning_Measurements' if self.scan != 'FixedPoint' else self.scan, d.strftime('%Y%m%d')))
+            os.system('scp -r jhernandezv@192.168.1.62:/mnt/ALMACENAMIENTO/LIDAR/{}/{}/* Datos/'.format('Scanning_Measurements' if self.scan != 'FixedPoint' else 'Fixed_Point', d.strftime('%Y%m%d')))
 
             folders = glob.glob('Datos/{}*'.format( kind_folder[self.scan]))
             if len(folders) > 0 :
                 # os.system('ssh jhernandezv@siata.gov.co "mkdir /var/www/jhernandezv/Lidar/{}/{}/"'.format(self.scan, d.strftime('%Y%m%d')))
 
                 for folder in folders:
-                    archivos   = glob.glob('{}/RM*'.format(folder))
+                    archivos   = glob.glob('{}{}*'.format(folder, '/RM' if self.scan != 'FixedPoint' else ''))
                     print folder
                     df3, df4 = self.read_folder(archivos, inplace=False)
                     self.data[df4.index[0].strftime('%Y-%m-%d %H:%M:%S')] = df3
@@ -525,7 +525,7 @@ class Lidar(PlotBook):
 
                 rel         = (Y.max()-Y.min())/(np.abs(X).max()-X.min())
                 figsize = ( 10,10*rel) if rel <=1 else (10*(1./rel),10)
-            else: figsize = (15,8.5)
+            else: figsize = (10,5.6)
 
             fig 		= plt.figure(figsize=figsize,facecolor=(.7,.7,.7))
             ax2      	= fig.add_axes((1.02,.2,0.02,0.59))
@@ -574,7 +574,6 @@ class Lidar(PlotBook):
         # cf		= ax.contourf(X,Y,Z,levels=levels, alpha=1,cmap =shrunk_cmap,  norm=mpl.colors.LogNorm())   #
         contour_kwd.pop('levels')
         cf      = ax.pcolormesh(X,Y,Z,**contour_kwd)
-        ax.set_xlim(-np.abs(X).max(),np.abs(X).max()),
 
         # cf		= ax.contourf(X,Y,Z,**contour_kwd) #extend='both')
 
@@ -591,6 +590,7 @@ class Lidar(PlotBook):
 
         ax.set_ylabel(r'Range $[Km]$')
         if self.scan not in ['FixedPoint']:
+            ax.set_xlim(-np.abs(X).max(),np.abs(X).max())
             ax.set_xlabel(r'Range $[Km]$',)# fontsize=fontsize)
         else:
             ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M \n%d-%b'))
@@ -629,39 +629,29 @@ class Lidar(PlotBook):
 
         self.plot_lidar(x, y, profile, **kwargs )
 
-    def fixedpoint(self, zenith=False, height=4.5, parameter='photon-p' ,**kwargs):
-        """Method for building fixed point profiles with variations at Zenith or Azimuth
-
-        Parameters
-            Same as plot method
-        """
-
-        if 'df' in kwargs.keys():
-            data, data_info    = df['data'], df['data_info']
-        else:
-            data, data_info    = self.data.copy(), self.data_info.copy()
-
-
-        angulo_fijo = 'Azimuth' if zenith else 'Zenith'
-
-
-        _textsave = '_FixedPoint_{}_{}{}'.format(self.output,parameter,kwargs.get('textsave',''))
-        kwargs['label']     = self.label[self.output][parameter[:6]]
-        kwargs['add_text']      = data_info_index[0].strftime('%b-%d\n%H:%M')
-
-        for azi in  data_info[self.degree_variable].drop_duplicates().values:
-            print "{}\n {} = {}".format('='*50,self.degree_variable,azi)
-            idi = data_info[data_info[self.degree_variable]!=azi].index
-
-            kwargs['textsave']  = '%s_%s-%.f' %(_textsave,self.degree_variable,azi)
-            kwargs['title']     = "{} = {}".format(angulo_fijo, data_info[angulo_fijo].values[0])
-            profile             = data[data.index < height].xs(parameter, axis=1,level=1)
-
-            profile.loc[:,idi]  = np.NaN
-
-            self.plot_lidar(profile.columns.values, profile.index.values, profile, **kwargs)
-        #
-        return data_info[angulo_fijo].drop_duplicates().values
+    # def fixedpoint(self, df,**kwargs):
+    #     """Method for building fixed point profiles with variations at Zenith or Azimuth
+    #
+    #     Parameters
+    #         Same as plot method
+    #     """
+    #
+    #     if 'df' in kwargs.keys():
+    #         data, data_info    = df['data'], df['data_info']
+    #     else:
+    #         data, data_info    = self.data.copy(), self.data_info.copy()
+    #
+    #     for azi in  data_info[self.degree_variable].drop_duplicates().values:
+    #         print "{}\n {} = {}".format('='*50,self.degree_variable,azi)
+    #         idi = data_info[data_info[self.degree_variable]!=azi].index
+    #
+    #         profile             = data[data.index < height].xs(parameter, axis=1,level=1)
+    #
+    #         profile.loc[:,idi]  = np.NaN
+    #
+    #         self.plot_lidar(profile.columns.values, profile.index.values, profile, **kwargs)
+    #     #
+    #     return data_info[angulo_fijo].drop_duplicates().values
 
     def plot(self, height=4.5, **kwargs):
         """Method for building scanning or fixed point profiles with variations at Zenith or Azimuth
@@ -697,25 +687,26 @@ class Lidar(PlotBook):
             _vlim [ _vlim == -np.inf ]  = 0
             print _vlim
 
-        for date in _dates:
+        for date in _dates if self.scan != 'FixedPoint' else [_dates[0]] :
             print date
             kwargs['title']     = "{} = {}".format(self.degree_fixed ,
             self.degrees_to_cardinal( self.data_info.loc[date, self.degree_fixed], self.degree_fixed))
 
             for parameter in _parameters:
                 kwargs['label']     = self.label[self.output][parameter[:6]]
-                kwargs['add_text']  = date.strftime('%b-%d\n%H:%M')
-                kwargs['textsave']  = "_{}_{}_{}{}_{}".format(self.scan,self.output,parameter,_textsave,date.strftime('%H:%M'))
+                kwargs['textsave']  = "_{}_{}_{}{}_{}".format( self.scan,self.output,parameter,_textsave,date.strftime('%H:%M' if self.scan != 'FixedPoint' else '%m-%d') )
                 kwargs['vlim']      = kwargs.get('vlim',_vlim[ parameter ].values)
 
-                dataframe   = kwargs.get('df', self.get_from(height,parameter,date))
+                dataframe   = kwargs.get('df', self.get_from(height,parameter, _dates if len(_dates) > 1 and self.scan == 'FixedPoint' else date))
 
                 if self.scan not in ['FixedPoint']:
+                    kwargs['add_text']  = date.strftime('%b-%d\n%H:%M')
                     self.profiler(dataframe, **kwargs)
                 else:
-                    self.fixedpoint(dataframe, **kwargs)
+                    kwargs.pop('title')
+                    self.plot_lidar(dataframe.columns.values, dataframe.index.values, dataframe, **kwargs)
 
-        if kwargs.get('make_gif',False):
+        if kwargs.get('make_gif',False) and self.scan != 'FixedPoint':
             gif_kwargs = {}
             for col in _parameters:
                 gif_kwargs['textsave']      = "_{}_{}_{}".format(self.scan,self.output,col)
@@ -725,8 +716,10 @@ class Lidar(PlotBook):
 
 
     def get_from(self, height, parameter, date=None):
-        if len(self.data.columns.names) == 2:
-            dataframe   = self.data[ self.data.index < height ].xs(parameter,level=-1,axis=1).T
+        if self.scan == 'FixedPoint':
+            dataframe   = self.data[ self.data.index < height][date].xs( (90,parameter),level=[1,2],axis=1)
+        # if len(self.data.columns.names) == 2:
+        #     dataframe   = self.data[ self.data.index < height ].xs(parameter,level=-1,axis=1).T
         else:
             dataframe   = self.data[ self.data.index < height].xs( (date,parameter),level=[0,-1],axis=1).T
         return dataframe
@@ -844,49 +837,120 @@ class Lidar(PlotBook):
 # binario.plot(textsave='_test_1',output='dfLn(RCS)',parameters=['photon-p'],kind='Anomaly')
 # binario.plot(textsave='_test_1',output='fdfLn(RCS)',parameters=['photon-p'],kind='Anomaly')
 
-# backgroud = '2018-06-30 19:07'
-bkg = pd.read_csv('Background_test.csv',index_col=0,header=[0,1])
-bkg.columns.set_levels(map(lambda x: int(x),bkg.columns.levels[0].values), level=0,inplace=True)
-bkg = bkg.rolling(30,center=True,min_periods=1).mean()
-
+################################################################################
+# FixedPoint
 altura = 4.5
-# for date in pd.date_range('2018-06-30','2018-06-30',freq='d'): #'2018-06-27','2018-07-14',freq='d'):
-# try:
-date = pd.date_range('2018-06-30','2018-06-30',freq='d')[0] #'2018-06-27','2018-07-14',freq='d'):
+for date in pd.date_range('2018-07-30','2018-08-08',freq='d'): #'2018-06-27','2018-07-14',freq='d'):
+    try:
+# date = pd.date_range('2018-07-30','2018-07-30',freq='d')[0] #'2018-06-27','2018-07-14',freq='d'):
 
-binario = Lidar(Fechai=date.strftime('%Y-%m-%d'),Fechaf=date.strftime('%Y-%m-%d'),scan='3D')
-binario.read()
-backup = [binario.raw_data, binario.data_info]
-# binario.data        = backup[0]
-# binario.raw_data    = backup[0]
-# binario.data_info   = backup[1]
+        binario = Lidar(Fechai=date.strftime('%Y-%m-%d'),Fechaf=date.strftime('%Y-%m-%d'),scan='FixedPoint')
+        binario.read()
 
+        kwgs = dict(parameters=['photon-p'], dates=binario.data_info.index, height=altura,)# background= bkg)
+        binario.plot(**kwgs )
 
-kwgs = dict(parameters=['photon-p'], dates=binario.data_info.index, make_gif=True, path= date.strftime('%Y-%m-%d-bkg-nonan'),height=altura, background= bkg)
+        binario.plot( output='RCS', **kwgs )
 
-
+        binario.plot(textsave='_log', output='RCS',kind='Log',  **kwgs)
 
 
+        binario.plot( output='Ln(RCS)', **kwgs )
+        # #
 
-binario.plot(scp=False, output='P(r)',**kwgs )
+        binario.plot(output='dLn(RCS)',kind='Anomaly',  **kwgs)
 
-binario.plot(scp=False, output='RCS', **kwgs )
+        binario.plot(output='fLn(RCS)', **kwgs)
 
-binario.plot(textsave='_log', output='RCS',kind='Log', scp=False, **kwgs)
+        binario.plot(output='fdLn(RCS)',kind='Anomaly',  **kwgs)
+
+        binario.plot(output='dfLn(RCS)', kind='Anomaly', **kwgs)
+
+        binario.plot(output='fdfLn(RCS)', kind='Anomaly',  **kwgs)
+
+    except:
+        pass
 
 
-binario.plot(scp=False, output='Ln(RCS)', **kwgs )
-# #
+altura = 10
+for date in pd.date_range('2018-07-30','2018-08-08',freq='d'): #'2018-06-27','2018-07-14',freq='d'):
+    try:
+# date = pd.date_range('2018-07-30','2018-07-30',freq='d')[0] #'2018-06-27','2018-07-14',freq='d'):
 
-binario.plot(output='dLn(RCS)',kind='Anomaly', scp=False, **kwgs)
+        binario = Lidar(Fechai=date.strftime('%Y-%m-%d'),Fechaf=date.strftime('%Y-%m-%d'),scan='FixedPoint')
+        binario.read()
 
-binario.plot(scp=False,output='fLn(RCS)', **kwgs)
+        kwgs = dict(parameters=['photon-p'], dates=binario.data_info.index, height=altura,textsave='_10km')# background= bkg)
 
-binario.plot(output='fdLn(RCS)',kind='Anomaly', scp=False, **kwgs)
+        binario.plot(**kwgs )
 
-binario.plot(output='dfLn(RCS)', kind='Anomaly',scp=False, **kwgs)
+        binario.plot( output='RCS', **kwgs )
 
-binario.plot(output='fdfLn(RCS)', kind='Anomaly', scp=False, **kwgs)
+
+        binario.plot( output='Ln(RCS)', **kwgs )
+        # #
+
+        binario.plot(output='dLn(RCS)',kind='Anomaly',  **kwgs)
+
+        binario.plot(output='fLn(RCS)', **kwgs)
+
+        binario.plot(output='fdLn(RCS)',kind='Anomaly',  **kwgs)
+
+        binario.plot(output='dfLn(RCS)', kind='Anomaly', **kwgs)
+
+        binario.plot(output='fdfLn(RCS)', kind='Anomaly',  **kwgs)
+
+        kwgs.pop('textsave')
+        binario.plot(textsave='_log_10km', output='RCS',kind='Log',  **kwgs)
+
+    except:
+        pass
+
+# ################################################################################
+# # backgroud = '2018-06-30 19:07'
+# bkg = pd.read_csv('Background_test.csv',index_col=0,header=[0,1])
+# bkg.columns.set_levels(map(lambda x: int(x),bkg.columns.levels[0].values), level=0,inplace=True)
+# bkg = bkg.rolling(30,center=True,min_periods=1).mean()
+# ################################################################################
+#
+# altura = 4.5
+# # for date in pd.date_range('2018-06-30','2018-06-30',freq='d'): #'2018-06-27','2018-07-14',freq='d'):
+# # try:
+# date = pd.date_range('2018-06-30','2018-06-30',freq='d')[0] #'2018-06-27','2018-07-14',freq='d'):
+#
+# binario = Lidar(Fechai=date.strftime('%Y-%m-%d'),Fechaf=date.strftime('%Y-%m-%d'),scan='3D')
+# binario.read()
+# backup = [binario.raw_data, binario.data_info]
+# # binario.data        = backup[0]
+# # binario.raw_data    = backup[0]
+# # binario.data_info   = backup[1]
+#
+#
+# kwgs = dict(parameters=['photon-p'], dates=binario.data_info.index, make_gif=True, path= date.strftime('%Y-%m-%d-bkg-nonan'),height=altura, background= bkg)
+
+
+
+
+
+# binario.plot(scp=False, output='P(r)',**kwgs )
+#
+# binario.plot(scp=False, output='RCS', **kwgs )
+#
+# binario.plot(textsave='_log', output='RCS',kind='Log', scp=False, **kwgs)
+#
+#
+# binario.plot(scp=False, output='Ln(RCS)', **kwgs )
+# # #
+#
+# binario.plot(output='dLn(RCS)',kind='Anomaly', scp=False, **kwgs)
+#
+# binario.plot(scp=False,output='fLn(RCS)', **kwgs)
+#
+# binario.plot(output='fdLn(RCS)',kind='Anomaly', scp=False, **kwgs)
+#
+# binario.plot(output='dfLn(RCS)', kind='Anomaly',scp=False, **kwgs)
+#
+# binario.plot(output='fdfLn(RCS)', kind='Anomaly', scp=False, **kwgs)
 
     # except:
     #     pass
