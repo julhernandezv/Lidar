@@ -461,7 +461,7 @@ class Lidar(PlotBook):
                     self.data_info = self.data_info.append(df4.iloc[0])
 
         self.data           = pd.concat(self.data,axis=1)
-        self.data.columns.set_levels( pd.to_datetime(self.data.columns.levels[0].values), level=0, inplace=True)
+        self.data.columns.set_levels( pd.to_datetime(self.data.columns.levels[0]), level=0, inplace=True)
         self.data_info.sort_index(inplace=True)
         self.raw_data   = self.data.copy()
         self.derived_output(**kwargs)
@@ -539,7 +539,7 @@ class Lidar(PlotBook):
         ax.patch.set_facecolor((.75,.75,.75))
         divider 	= make_axes_locatable(ax)
 
-        vmin, vmax          = kwargs.get('vlim',[Z.min().min(),Z.max().max()]) #np.nanpercentile(Z,[2.5,97.5]) #
+        vmin, vmax          = kwargs.pop('vlim',[Z.min().min(),Z.max().max()]) #np.nanpercentile(Z,[2.5,97.5]) #
         print vmin, vmax
         colorbar_kwd        = {}
         contour_kwd         = { 'cmap':self.label[self.output]['cmap'], \
@@ -555,7 +555,7 @@ class Lidar(PlotBook):
         elif kwargs['kind'] == 'Log':
             #
             if 'vlim' in kwargs.keys():
-                vmin, vmax                 = kwargs['vlim']
+                vmin, vmax                 = kwargs.pop('vlim')
             else:
                 Z.mask(Z<=0,inplace=True)
                 vmin, vmax =  np.log10( [Z.min().min(),Z.max().max()] ) # np.nanpercentile(Z,[1,99])))
@@ -565,7 +565,7 @@ class Lidar(PlotBook):
             contour_kwd['norm']                 = mpl.colors.LogNorm(
                     contour_kwd['levels'][0],contour_kwd['levels'][-1] )
             print contour_kwd['levels'][0],contour_kwd['levels'][-1]
-            print Z
+            # print Z
 
             minorticks = np.hstack([np.arange(1,10,1)*log for log in np.logspace(-2,16,19)])
             minorticks = minorticks[(minorticks >=contour_kwd['levels'] [0]) & (minorticks <=contour_kwd['levels'] [-1])]
@@ -617,7 +617,7 @@ class Lidar(PlotBook):
 
         profile   = df.copy()
 
-        print profile.index
+        # print profile.index
 
         x = np.empty(profile.shape)
         y = np.empty(profile.shape)
@@ -675,17 +675,10 @@ class Lidar(PlotBook):
         os.system('ssh {}@siata.gov.co "mkdir /var/www/{}"'.format( self.kwargs['user'], kwargs['path']  ))
         os.system('rm Figuras/*')
 
-        _dates = kwargs.get('dates', [self.data_info.index[0]])
+        _dates = kwargs.get('dates', [self.data_info.index[0]] if self.scan != 'FixedPoint' else self.data_info.index)
 
-        _vlim = self.data[self.data.index < height] \
-                    .stack( [0,1] if len(self.data.columns.names) > 2 else 0) \
-                    .apply(lambda x: np.nanpercentile(x,[1,99])) #.quantile([.01,.99])
-
-        if kwargs.get('kind','Linear') == 'Log':
-            _vlim [ _vlim<0 ]           = 0
-            _vlim                       = np.log10(_vlim)
-            _vlim [ _vlim == -np.inf ]  = 0
-            print _vlim
+        _vlim = self.get_vlim(height, **kwargs)
+        print _vlim
 
         for date in _dates if self.scan != 'FixedPoint' else [_dates[0]] :
             print date
@@ -695,16 +688,15 @@ class Lidar(PlotBook):
             for parameter in _parameters:
                 kwargs['label']     = self.label[self.output][parameter[:6]]
                 kwargs['textsave']  = "_{}_{}_{}{}_{}".format( self.scan,self.output,parameter,_textsave,date.strftime('%H:%M' if self.scan != 'FixedPoint' else '%m-%d') )
-                kwargs['vlim']      = kwargs.get('vlim',_vlim[ parameter ].values)
-
-                dataframe   = kwargs.get('df', self.get_from(height,parameter, _dates if len(_dates) > 1 and self.scan == 'FixedPoint' else date))
+                vlim                = kwargs.get('vlim',_vlim[ parameter ].values)
+                dataframe           = kwargs.get('df', self.get_from(height,parameter, _dates if len(_dates) > 1 and self.scan == 'FixedPoint' else date))
 
                 if self.scan not in ['FixedPoint']:
                     kwargs['add_text']  = date.strftime('%b-%d\n%H:%M')
-                    self.profiler(dataframe, **kwargs)
+                    self.profiler(dataframe, vlim=vlim, **kwargs)
                 else:
-                    kwargs.pop('title')
-                    self.plot_lidar(dataframe.columns.values, dataframe.index.values, dataframe, **kwargs)
+                    kwargs.pop('title',None)
+                    self.plot_lidar(dataframe.columns.values, dataframe.index.values, dataframe, vlim=vlim, **kwargs)
 
         if kwargs.get('make_gif',False) and self.scan != 'FixedPoint':
             gif_kwargs = {}
@@ -715,14 +707,29 @@ class Lidar(PlotBook):
                 self._make_gif(**gif_kwargs)
 
 
-    def get_from(self, height, parameter, date=None):
+    def get_from(self, height, parameter, date):
         if self.scan == 'FixedPoint':
-            dataframe   = self.data[ self.data.index < height][date].xs( (90,parameter),level=[1,2],axis=1)
+            dataframe   = self.data[ self.data.index < height][date] \
+                            .xs( (90,parameter),level=[1,2],axis=1)
+                            # .resample('30s', axis=1, level=0 ).mean()
         # if len(self.data.columns.names) == 2:
         #     dataframe   = self.data[ self.data.index < height ].xs(parameter,level=-1,axis=1).T
         else:
             dataframe   = self.data[ self.data.index < height].xs( (date,parameter),level=[0,-1],axis=1).T
         return dataframe
+
+    def get_vlim(self, height, **kwrgs):
+        vlim = self.data[self.data.index < height] \
+                    .stack( [0,1] if len(self.data.columns.names) > 2 else 0) \
+                    .apply(lambda x: np.nanpercentile(x,[1,99])) #.quantile([.01,.99])
+
+        if kwrgs.get('kind','Linear') == 'Log':
+            vlim [ vlim<0 ]           = 0
+            vlim                       = np.log10(vlim)
+            vlim [ vlim == -np.inf ]  = 0
+            print vlim
+
+        return vlim
 
     @property
     def Pr(self):
@@ -838,17 +845,34 @@ class Lidar(PlotBook):
 # binario.plot(textsave='_test_1',output='fdfLn(RCS)',parameters=['photon-p'],kind='Anomaly')
 
 ################################################################################
-# FixedPoint
-altura = 4.5
-for date in pd.date_range('2018-07-30','2018-08-08',freq='d'): #'2018-06-27','2018-07-14',freq='d'):
+# FixedPoint#
+# date = pd.date_range('2018-08-06','2018-08-06',freq='d')[0] #'2018-06-27','2018-07-14',freq='d'):
+# altura = 4.5
+# binario = Lidar(Fechai=date.strftime('%Y-%m-%d'),Fechaf=date.strftime('%Y-%m-%d'),scan='FixedPoint')
+# binario.read()
+# binario.data = binario.data.stack([1,2]).resample('30s', axis=1, level=0 ).mean().unstack([1,2])
+# binario.raw_data = binario.data
+# binario.data_info = binario.data_info.resample('30s').mean()
+# binario.data_info = binario.data_info.reindex( pd.date_range(binario.data.columns.levels[0][0],binario.data.columns.levels[0][-1],freq='30s'))
+# kwgs = dict( height=altura,)# background= bkg)
+# binario.plot(**kwgs )
+
+# binario.data.reindex( pd.date_range(binario.data.columns[0],binario.data.columns[-1],freq='30s'), axis=1)
+# binario.data.reindex(pd.date_range(binario.data.columns.levels[0][0],binario.data.columns.levels[0][-1],freq='30s'))
+#
+
+for date in pd.date_range('2018-08-01','2018-08-08',freq='d'): #'2018-06-27','2018-07-14',freq='d'):
     try:
 # date = pd.date_range('2018-07-30','2018-07-30',freq='d')[0] #'2018-06-27','2018-07-14',freq='d'):
 
         binario = Lidar(Fechai=date.strftime('%Y-%m-%d'),Fechaf=date.strftime('%Y-%m-%d'),scan='FixedPoint')
         binario.read()
+        binario.data = binario.data.stack([1,2]).resample('30s', axis=1, level=0 ).mean().unstack([1,2])
+        binario.raw_data = binario.data
+        binario.data_info = binario.data_info.resample('30s').mean()
 
-        kwgs = dict(parameters=['photon-p'], dates=binario.data_info.index, height=altura,)# background= bkg)
-        binario.plot(**kwgs )
+        kwgs = dict( height=4.5,)# background= bkg)
+        binario.plot(output = 'P(r)',**kwgs )
 
         binario.plot( output='RCS', **kwgs )
 
@@ -858,31 +882,19 @@ for date in pd.date_range('2018-07-30','2018-08-08',freq='d'): #'2018-06-27','20
         binario.plot( output='Ln(RCS)', **kwgs )
         # #
 
-        binario.plot(output='dLn(RCS)',kind='Anomaly',  **kwgs)
+        # binario.plot(output='dLn(RCS)',kind='Anomaly',  **kwgs)
 
         binario.plot(output='fLn(RCS)', **kwgs)
 
-        binario.plot(output='fdLn(RCS)',kind='Anomaly',  **kwgs)
+        # binario.plot(output='fdLn(RCS)',kind='Anomaly',  **kwgs)
 
-        binario.plot(output='dfLn(RCS)', kind='Anomaly', **kwgs)
+        # binario.plot(output='dfLn(RCS)', kind='Anomaly', **kwgs)
 
         binario.plot(output='fdfLn(RCS)', kind='Anomaly',  **kwgs)
 
-    except:
-        pass
+        kwgs = dict(  height=10,textsave='_10km',path='10km')# background= bkg)
 
-
-altura = 10
-for date in pd.date_range('2018-07-30','2018-08-08',freq='d'): #'2018-06-27','2018-07-14',freq='d'):
-    try:
-# date = pd.date_range('2018-07-30','2018-07-30',freq='d')[0] #'2018-06-27','2018-07-14',freq='d'):
-
-        binario = Lidar(Fechai=date.strftime('%Y-%m-%d'),Fechaf=date.strftime('%Y-%m-%d'),scan='FixedPoint')
-        binario.read()
-
-        kwgs = dict(parameters=['photon-p'], dates=binario.data_info.index, height=altura,textsave='_10km')# background= bkg)
-
-        binario.plot(**kwgs )
+        binario.plot(output = 'P(r)', **kwgs )
 
         binario.plot( output='RCS', **kwgs )
 
@@ -890,23 +902,25 @@ for date in pd.date_range('2018-07-30','2018-08-08',freq='d'): #'2018-06-27','20
         binario.plot( output='Ln(RCS)', **kwgs )
         # #
 
-        binario.plot(output='dLn(RCS)',kind='Anomaly',  **kwgs)
+        # binario.plot(output='dLn(RCS)',kind='Anomaly',  **kwgs)
 
         binario.plot(output='fLn(RCS)', **kwgs)
 
-        binario.plot(output='fdLn(RCS)',kind='Anomaly',  **kwgs)
+        # binario.plot(output='fdLn(RCS)',kind='Anomaly',  **kwgs)
 
-        binario.plot(output='dfLn(RCS)', kind='Anomaly', **kwgs)
+        # binario.plot(output='dfLn(RCS)', kind='Anomaly', **kwgs)
 
         binario.plot(output='fdfLn(RCS)', kind='Anomaly',  **kwgs)
 
         kwgs.pop('textsave')
         binario.plot(textsave='_log_10km', output='RCS',kind='Log',  **kwgs)
 
+
     except:
         pass
 
-# ################################################################################
+
+# # ################################################################################
 # # backgroud = '2018-06-30 19:07'
 # bkg = pd.read_csv('Background_test.csv',index_col=0,header=[0,1])
 # bkg.columns.set_levels(map(lambda x: int(x),bkg.columns.levels[0].values), level=0,inplace=True)
