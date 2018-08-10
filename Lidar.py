@@ -203,6 +203,8 @@ class Lidar(PlotBook):
                 'fdfLn(RCS)':{'analog':r'fdfLn(RCS)','photon':r'fdfLn(RCS)','cmap':mpl.cm.seismic},
     }
 
+    bkg = {'analog-p':5.307, 'analog-s':4.9846, 'photon-p':0.26578, 'photon-s':0.26578}
+
 
     def __init__(self, Fechai=None, Fechaf=None, ascii=False, scan='3D', output='P(r)', **kwargs):
 
@@ -473,6 +475,7 @@ class Lidar(PlotBook):
             **kwargs
             output = Allowed {} """.format(self.label.keys())
 
+
         if 'output' in kwargs.keys():
             # if kwargs['output'] not in self.label.keys():
             self.output     = kwargs['output']
@@ -482,10 +485,11 @@ class Lidar(PlotBook):
 
             if self.output not in ['raw_data']:
                 self.data       = self.Pr
-                if 'background' in kwargs.keys():
-                    self.data = self.data.groupby(axis=1,level=0).apply(lambda x: x -  pd.concat([kwargs['background']], axis=1,keys=[x.name]) )
+
+                    # self.data = self.data.groupby(axis=1,level=0).apply(lambda x: x -  pd.concat([kwargs['background']], axis=1,keys=[x.name]) )
 
             if self.output in ['RCS','Ln(RCS)','fLn(RCS)','dLn(RCS)','fdLn(RCS)','dfLn(RCS)','fdfLn(RCS)']:
+                # if 'background' in kwargs.keys():
                 self.data       = self.RCS
 
                 if self.output not in ['RCS']:
@@ -675,7 +679,7 @@ class Lidar(PlotBook):
         os.system('ssh {}@siata.gov.co "mkdir /var/www/{}"'.format( self.kwargs['user'], kwargs['path']  ))
         os.system('rm Figuras/*')
 
-        _dates = kwargs.get('dates', [self.data_info.index[0]] if self.scan != 'FixedPoint' else self.data_info.index)
+        _dates = kwargs.get('dates', [self.data_info.index[0]] )
 
         _vlim = self.get_vlim(height, **kwargs)
         print _vlim
@@ -689,7 +693,7 @@ class Lidar(PlotBook):
                 kwargs['label']     = self.label[self.output][parameter[:6]]
                 kwargs['textsave']  = "_{}_{}_{}{}_{}".format( self.scan,self.output,parameter,_textsave,date.strftime('%H:%M' if self.scan != 'FixedPoint' else '%m-%d') )
                 vlim                = kwargs.get('vlim',_vlim[ parameter ].values)
-                dataframe           = kwargs.get('df', self.get_from(height,parameter, _dates if len(_dates) > 1 and self.scan == 'FixedPoint' else date))
+                dataframe           = kwargs.get('df', self.get_from(height,parameter, date, **kwargs))
 
                 if self.scan not in ['FixedPoint']:
                     kwargs['add_text']  = date.strftime('%b-%d\n%H:%M')
@@ -707,9 +711,13 @@ class Lidar(PlotBook):
                 self._make_gif(**gif_kwargs)
 
 
-    def get_from(self, height, parameter, date):
+    def get_from(self, height, parameter,date, **kwargs):
         if self.scan == 'FixedPoint':
-            dataframe   = self.data[ self.data.index < height][date] \
+            if 'dates' in kwargs.keys():
+                dataframe   = self.data[ self.data.index < height ][kwargs['dates']] \
+                            .xs( (90,parameter),level=[1,2],axis=1)
+            else:
+                dataframe   = self.data[ self.data.index < height ][self.data_info.index] \
                             .xs( (90,parameter),level=[1,2],axis=1)
                             # .resample('30s', axis=1, level=0 ).mean()
         # if len(self.data.columns.names) == 2:
@@ -746,6 +754,8 @@ class Lidar(PlotBook):
 
     @property
     def RCS(self):
+        self.data       = self.data.stack([0,1]).apply(lambda x: x - self.bkg[x.name]).stack(0).unstack([1,2,3])
+        print self.data.shape
         return self.data.apply(lambda x: x*x.index.values**2)
 
     @staticmethod
@@ -861,70 +871,88 @@ class Lidar(PlotBook):
 # binario.data.reindex(pd.date_range(binario.data.columns.levels[0][0],binario.data.columns.levels[0][-1],freq='30s'))
 #
 
-for date in pd.date_range('2018-08-01','2018-08-08',freq='d'): #'2018-06-27','2018-07-14',freq='d'):
-    try:
-# date = pd.date_range('2018-07-30','2018-07-30',freq='d')[0] #'2018-06-27','2018-07-14',freq='d'):
+# for date in pd.date_range('2018-08-01','2018-08-07',freq='d'): #'2018-06-27','2018-07-14',freq='d'):
+    # try:
+date = pd.date_range('2018-08-03','2018-08-03',freq='d')[0] #'2018-06-27','2018-07-14',freq='d'):
 
-        binario = Lidar(Fechai=date.strftime('%Y-%m-%d'),Fechaf=date.strftime('%Y-%m-%d'),scan='FixedPoint')
-        binario.read()
-        binario.data = binario.data.stack([1,2]).resample('30s', axis=1, level=0 ).mean().unstack([1,2])
-        binario.raw_data = binario.data
-        binario.data_info = binario.data_info.resample('30s').mean()
+binario = Lidar(Fechai=date.strftime('%Y-%m-%d'),Fechaf=date.strftime('%Y-%m-%d'),scan='FixedPoint',output='raw_data')
+binario.read()
+binario.data = binario.data.stack([1,2]).resample('30s', axis=1, level=0 ).mean().unstack([1,2])
+binario.raw_data = binario.data.copy()
+binario.data_info = binario.data_info.resample('30s').mean()
 
-        kwgs = dict( height=4.5,)# background= bkg)
-        binario.plot(output = 'P(r)',**kwgs )
+# backup = [binario.data, binario.data_info]
+# binario.data        = backup[0]
+# binario.raw_data    = backup[0].copy()
+# binario.data_info   = backup[1]
+#
+#
+kwgs = dict( height=10, background= True,path='bkg',textsave='_10km')
+binario.plot(output = 'P(r)',**kwgs )
 
-        binario.plot( output='RCS', **kwgs )
+binario.plot( output='RCS', **kwgs )
 
-        binario.plot(textsave='_log', output='RCS',kind='Log',  **kwgs)
+binario.plot(textsave='_log' + kwgs.pop('textsave'), output='RCS',kind='Log',  **kwgs)
 
 
-        binario.plot( output='Ln(RCS)', **kwgs )
-        # #
+binario.plot( output='Ln(RCS)', **kwgs )
+        #
 
         # binario.plot(output='dLn(RCS)',kind='Anomaly',  **kwgs)
 
-        binario.plot(output='fLn(RCS)', **kwgs)
+        # binario.plot(output='fLn(RCS)', **kwgs)
 
         # binario.plot(output='fdLn(RCS)',kind='Anomaly',  **kwgs)
 
         # binario.plot(output='dfLn(RCS)', kind='Anomaly', **kwgs)
 
-        binario.plot(output='fdfLn(RCS)', kind='Anomaly',  **kwgs)
+        # binario.plot(output='fdfLn(RCS)', kind='Anomaly',  **kwgs)
 
-        kwgs = dict(  height=10,textsave='_10km',path='10km')# background= bkg)
+        #10 km
+        # kwgs = dict(  height=10,textsave='_10km',path='10km')# background= bkg)
+        #
+        # binario.plot(output = 'P(r)', **kwgs )
+        #
+        # binario.plot( output='RCS', **kwgs )
+        #
+        #
+        # binario.plot( output='Ln(RCS)', **kwgs )
+        # # #
+        #
+        # # binario.plot(output='dLn(RCS)',kind='Anomaly',  **kwgs)
+        #
+        # binario.plot(output='fLn(RCS)', **kwgs)
+        #
+        # # binario.plot(output='fdLn(RCS)',kind='Anomaly',  **kwgs)
+        #
+        # # binario.plot(output='dfLn(RCS)', kind='Anomaly', **kwgs)
+        #
+        # binario.plot(output='fdfLn(RCS)', kind='Anomaly',  **kwgs)
+        #
+        # kwgs.pop('textsave')
+        # binario.plot(textsave='_log_10km', output='RCS',kind='Log',  **kwgs)
 
-        binario.plot(output = 'P(r)', **kwgs )
 
-        binario.plot( output='RCS', **kwgs )
-
-
-        binario.plot( output='Ln(RCS)', **kwgs )
-        # #
-
-        # binario.plot(output='dLn(RCS)',kind='Anomaly',  **kwgs)
-
-        binario.plot(output='fLn(RCS)', **kwgs)
-
-        # binario.plot(output='fdLn(RCS)',kind='Anomaly',  **kwgs)
-
-        # binario.plot(output='dfLn(RCS)', kind='Anomaly', **kwgs)
-
-        binario.plot(output='fdfLn(RCS)', kind='Anomaly',  **kwgs)
-
-        kwgs.pop('textsave')
-        binario.plot(textsave='_log_10km', output='RCS',kind='Log',  **kwgs)
-
-
-    except:
-        pass
+    # except:
+    #     pass
 
 
 # # ################################################################################
-# # backgroud = '2018-06-30 19:07'
+# backgroud = '2018-06-30 19:07'
 # bkg = pd.read_csv('Background_test.csv',index_col=0,header=[0,1])
+# bkg = pd.read_csv('Background.csv',index_col=0,header=[0,1])
 # bkg.columns.set_levels(map(lambda x: int(x),bkg.columns.levels[0].values), level=0,inplace=True)
-# bkg = bkg.rolling(30,center=True,min_periods=1).mean()
+# # bkg = bkg.rolling(30,center=True,min_periods=1).mean()
+# bkg = {'analog-p':5.307, 'analog-s':4.9846, 'photon-p':0.26578, 'photon-s':0.26578}
+
+# x = bkg.loc[bkg.index>15,pd.IndexSlice[:,'photon-s']]
+# x[x>0].min() - x[x>0].min().min() *18**2
+
+# bkg.loc[:,pd.IndexSlice[:,'analog-s']]  = 4.9846
+# bkg.loc[:,pd.IndexSlice[:,'analog-p']]  = 5.307
+# bkg.loc[:,pd.IndexSlice[:,['photon-p','photon-s']] ]  = 0.26578#0.13289
+
+# bkg.loc[:,pd.IndexSlice[:,'analog-p']]  =
 # ################################################################################
 #
 # altura = 4.5
