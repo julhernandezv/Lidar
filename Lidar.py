@@ -17,27 +17,24 @@ import matplotlib.font_manager as fm
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 plt.rc('font', family=fm.FontProperties(fname='/home/jhernandezv/Tools/AvenirLTStd-Book.ttf',).get_name(), size = 16)
+plt.rc('font', family=fm.FontProperties(fname='/home/jhernandezv/Tools/AvenirLTStd-Book.ttf',).get_name(), size = 16)
 typColor = '#%02x%02x%02x' % (115,115,115)
-plt.rc('axes',labelcolor=typColor,edgecolor=typColor,)
-plt.rc('axes.spines',right=False,top=False,left=True)
+plt.rc('axes',labelcolor=typColor, edgecolor=typColor,)#facecolor=typColor)
+plt.rc('axes.spines',right=False, top=False, left=True)
 plt.rc('text',color= typColor)
 plt.rc('xtick',color=typColor)
 plt.rc('ytick',color=typColor)
-
+plt.rc('figure.subplot', left=0, right=1, bottom=0, top=1)
+#figure.subplot.left    : 0.125  # the left side of the subplots of the figure
+#figure.subplot.right   : 0.9    # the right side of the subplots of the figure
+#figure.subplot.bottom  : 0.11    # the bottom of the subplots of the figure
+#figure.subplot.top
 
 reload (sys)
 sys.setdefaultencoding ("utf-8")
 locale.setlocale(locale.LC_TIME, ('es_co','utf-8'))
 
-
-from pandas.plotting._tools import (_subplots, _flatten, table,
-                                    _handle_shared_axes, _get_all_lines,
-                                    _get_xlim, _set_ticks_props,
-                                    format_date_labels)
-
-
-
-
+from pandas.plotting._core import MPLPlot
 
 
 
@@ -84,13 +81,14 @@ class MidpointNormalize(mpl.colors.Normalize):
 		x, y = [self.vmin, self.midpoint, self.vmax], [0, 0.5, 1]
 		return np.ma.masked_array(np.interp(value, x, y), np.isnan(value))
 
-class PlotBook():
+class PlotBook(MPLPlot):
+
     """Subclass for ploting kwargs, properties and decorators
 
     **Kwargs
         ax          = Matplotlib axes object, optional
         textsave    = string - file name saved.
-        format      = string - file format type saved. default 'png'
+        formato      = string - file format type saved. default 'png'
         title       = string - title plot.
         path        = link to save files in /var/www/. default 'jhernandezv/Lidar/'
         add_text    = string - add text.
@@ -99,7 +97,7 @@ class PlotBook():
 
     os.system('mkdir Figuras')
     kwargs         = {
-        'format': 'png',
+        'formato': 'png',
         'local_path':'Figuras/Lidar',
         'path': 'jhernandezv/Lidar/',
         'scp':True,
@@ -107,78 +105,112 @@ class PlotBook():
         'user':'jhernandezv',
         'delay':30,
         'textsave_gif':'',
+        'colorbar_kind': 'Linear',
+        'ylabel': '',
+        'xlabel':'',
+        'cbarlabel':'',
+        'format': '%.f',
+        'vlim': None,
+
     }
 
-    def __init__(self, ax=None,fig=None,subplots=False,figsize=None,**kwargs):
+    def __init__(self, data, x, y, *args, **kwargs):
 
+        for kw in self.kwargs.keys():
+            if kw in kwargs.keys():
+                self.kwargs[kw] = kwargs.pop(kw)
 
-        self.ax             = ax
-        self.fig            = fig
-        self.subpltos       = subplots
+        super(PlotBook, self).__init__(data,*args,**kwargs)
+        self.x = x
+        self.y = y
 
-        self.kwargs.update(kwargs)
 
     def _save_fig(self,**kwargs):
+
         # print 'Kwargs PlotBook.method \n {}'.format(kwargs)
         # self.kwargs.update(kwargs)
         kwg = self.kwargs.copy()
         kwg.update(kwargs)
-        plt.savefig('{local_path}{textsave}.{format}'.format(**kwg) ,bbox_inches="tight")
+        plt.savefig('{local_path}{textsave}.{formato}'.format(**kwg) ,bbox_inches="tight")
         if kwg['scp']:
-            os.system('scp "{local_path}{textsave}.{format}" {user}@siata.gov.co:/var/www/{path}'. format(**kwg) )
+            os.system('scp "{local_path}{textsave}.{formato}" {user}@siata.gov.co:/var/www/{path}'. format(**kwg) )
+        plt.close('all')
 
     def _make_gif(self,**kwargs):
+
         kwg = self.kwargs.copy()
         kwg.update(kwargs)
         os.system( 'convert -delay {delay} -loop 0 "{local_path}{textsave}*" "{local_path}{textsave}{textsave_gif}.gif"'.format(**kwg))
         os.system('scp "{local_path}{textsave}{textsave_gif}.gif" {user}@siata.gov.co:/var/www/{path}'.format(**kwg) )
 
-    @property
-    def nseries(self):
-        if self.data.ndim == 1:
-            return 1
+    def _make_contour(self, **kwargs):
+
+        Z = self.data.copy()
+
+        if self.kwargs['vlim'] is not None:
+            vmin, vmax      = self.kwargs['vlim']
         else:
-            return self.data.shape[1]
+            vmin, vmax      = [Z.min().min(),Z.max().max()] #np.nanpercentile(Z,[2.5,97.5]) #
+        print vmin, vmax
+        colorbar_kwd        = {}
+        contour_kwd         = { 'levels':np.linspace(vmin,vmax,100), \
+                                'cmap':self.colormap} #,'extend':'both'}
 
-    def generate(self):
-        self._args_adjust()
-        self._compute_plot_data()
-        self._setup_subplots()
-        self._make_plot()
-        self._add_table()
-        self._make_legend()
-        self._adorn_subplots()
+        if self.kwargs['colorbar_kind'] == 'Linear':
+            contour_kwd['norm']    = mpl.colors.Normalize(vmin,vmax)
 
-        for ax in self.axes:
-            self._post_plot_logic_common(ax, self.data)
-            self._post_plot_logic(ax, self.data)
+        elif self.kwargs['colorbar_kind'] == 'Anomaly':
+            contour_kwd['norm']     = MidpointNormalize(midpoint=0.,vmin=vmin, vmax=vmax)
+            colorbar_kwd['format']  = self.kwargs['format']
 
-    def _setup_subplots(self):
-        if self.subplots:
-            fig, axes = _subplots(naxes=self.nseries,
-                                  sharex=self.sharex, sharey=self.sharey,
-                                  figsize=self.figsize, ax=self.ax,
-                                  layout=self.layout,
-                                  layout_type=self._layout_type)
+        elif self.kwargs['colorbar_kind'] == 'Log':
+            #
+            if  self.kwargs['vlim'] is None:
+                Z.mask(Z<=0,inplace=True)
+                vmin, vmax =  np.log10( [Z.min().min(),Z.max().max()] ) # np.nanpercentile(Z,[1,99])))
+
+            contour_kwd['levels']               = np.logspace(vmin,vmax,100)
+            Z[Z < contour_kwd['levels'][0]]     = contour_kwd['levels'][0]
+            Z[Z > contour_kwd['levels'][-1]]    = contour_kwd['levels'][-1]
+            contour_kwd['norm']                 = mpl.colors.LogNorm(
+                                        contour_kwd['levels'][0], contour_kwd['levels'][-1] )
+            print contour_kwd['levels'][0],contour_kwd['levels'][-1]
+            # print Z
+
+            minorticks = np.hstack([np.arange(1,10,1)*log for log in np.logspace(-2,16,19)])
+            minorticks = minorticks[(minorticks >=contour_kwd['levels'] [0]) & (minorticks <=contour_kwd['levels'] [-1])]
+            colorbar_kwd.update(dict(format = LogFormatterMathtext(10) ,ticks=LogLocator(10) ))
+
+        # cf		= ax.contourf(X,Y,Z,levels=levels, alpha=1,cmap =shrunk_cmap,  norm=mpl.colors.LogNorm())   #
+        contour_kwd.pop('levels')
+        args    = (self.x, self.y, Z)
+        cf      = self.axes[0].pcolormesh(*args, **contour_kwd)
+
+        # cf		= ax.contourf(X,Y,Z,**contour_kwd) #extend='both')
+        if 'cax' not in kwargs.keys():
+            divider 	= make_axes_locatable(self.axes[0])
+            cax         = divider.append_axes("right", size="3%", pad='1%')
         else:
-            if self.ax is None:
-                fig = self.plt.figure(figsize=self.figsize)
-                axes = fig.add_subplot(111)
-            else:
-                fig = self.ax.get_figure()
-                if self.figsize is not None:
-                    fig.set_size_inches(self.figsize)
-                axes = self.ax
+            cax = kwargs['cax']
 
-        axes = _flatten(axes)
+        cbar     = plt.colorbar(cf, cax = cax , **colorbar_kwd)
+        cbar.set_label(self.kwargs['cbarlabel'])
 
-        if self.logx or self.loglog:
-            [a.set_xscale('log') for a in axes]
-        if self.logy or self.loglog:
-            [a.set_yscale('log') for a in axes]
+        if self.kwargs['colorbar_kind']  == 'Log':
+            cbar.ax.yaxis.set_ticks(cf.norm(minorticks), minor=True)
+            cbar.ax.tick_params(which='minor',width=1,length=4)
+            cbar.ax.tick_params(which='major',width=1,length=6)
+            # ax.yaxis.set_minor_locator(LogLocator(10,subs=np.arange(2,10)))
 
-        self.fig = fig
-        self.axes = axes
+        return cf, cbar
+
+    def _make_plot(self):
+        print 'Overwrite method in child Classes'
+        pass
+
+    def _post_plot_logic(self, ax, data):
+        ax.set_ylabel(self.kwargs['ylabel'])
+        ax.set_xlabel(self.kwargs['xlabel'])
 
 
 class Lidar(PlotBook):
@@ -193,7 +225,9 @@ class Lidar(PlotBook):
     """
 
     # mpl.cm.gist_earth_r}
-    label   = {'raw_data':{'analog':'','photon':'','cmap':shrunk_cmap},
+    __metaclass__ = type
+
+    lidar_props   = {'raw_data':{'analog':'','photon':'','cmap':shrunk_cmap},
                 'P(r)':{'analog':r'$[mV]$','photon':r'$[MHz]$','cmap':shrunk_cmap},
                 'RCS':{'analog':r'RCS $[mV*Km^2]$','photon':r'RCS $[MHz*Km^2]$','cmap':shrunk_cmap},
                 'Ln(RCS)':{'analog':r'Ln(RCS) $[Ln(mV*Km^2)]$','photon':r'Ln(RCS) $[Ln(MHz*Km^2)]$','cmap':shrunk_cmap},
@@ -422,10 +456,10 @@ class Lidar(PlotBook):
         data       = data[data.index >= 0.110]
 
         if kwargs.get('inplace',True):
-            self.data       = data
-            self.data_info  = data_info
-            self.raw_data   = self.data.copy()
-            self.derived_output(**kwargs)
+            self.datos       = data
+            self.datos_info  = data_info
+            self.raw_data   = self.datos.copy()
+            self.derived_output(output=kwargs.pop('output',None))
 
         else:
             return data, data_info
@@ -441,8 +475,8 @@ class Lidar(PlotBook):
         dates = pd.date_range(self.Fechai,self.Fechaf,freq='d')
         print dates
 
-        self.data       = {}
-        self.data_info  = pd.DataFrame()
+        self.datos       = {}
+        self.datos_info  = pd.DataFrame()
 
         for d in dates:
         # d = dates[0]
@@ -457,57 +491,64 @@ class Lidar(PlotBook):
                     archivos   = glob.glob('{}{}*'.format(folder, '/RM' if self.scan != 'FixedPoint' else ''))
                     print folder
                     df3, df4 = self.read_folder(archivos, inplace=False)
-                    self.data[df4.index[0].strftime('%Y-%m-%d %H:%M:%S')] = df3
+                    self.datos[df4.index[0].strftime('%Y-%m-%d %H:%M:%S')] = df3
 
                     df4.loc[df4.index[0], 'Fecha_fin'] = df4.index[-1]
-                    self.data_info = self.data_info.append(df4.iloc[0])
+                    self.datos_info = self.datos_info.append(df4.iloc[0])
 
-        self.data           = pd.concat(self.data,axis=1)
-        self.data.columns.set_levels( pd.to_datetime(self.data.columns.levels[0]), level=0, inplace=True)
-        self.data_info.sort_index(inplace=True)
-        self.raw_data   = self.data.copy()
-        self.derived_output(**kwargs)
+        self.datos           = pd.concat(self.datos,axis=1)
+        self.datos.columns.set_levels( pd.to_datetime(self.datos.columns.levels[0]), level=0, inplace=True)
+        self.datos_info.sort_index(inplace=True)
+        self.raw_data   = self.datos.copy()
+        self.derived_output(output=kwargs.pop('output',None))
 
 
-    def derived_output(self,**kwargs):
+    def derived_output(self,output=None):
         """Method for derived values
 
-            **kwargs
-            output = Allowed {} """.format(self.label.keys())
+            output = Allowed {} """.format(self.lidar_props.keys())
 
 
-        if 'output' in kwargs.keys():
-            # if kwargs['output'] not in self.label.keys():
-            self.output     = kwargs['output']
+        if output is not None:
+            # if kwargs['output'] not in self.lidar_props.keys():
+            self.output     = output
 
-        if self.output in self.label.keys():
-            self.data       = self.raw_data.copy()
+        if self.output in self.lidar_props.keys():
+            self.datos       = self.raw_data.copy()
 
             if self.output not in ['raw_data']:
-                self.data       = self.Pr
+                self.datos       = self.Pr
 
-                    # self.data = self.data.groupby(axis=1,level=0).apply(lambda x: x -  pd.concat([kwargs['background']], axis=1,keys=[x.name]) )
+                    # self.datos = self.datos.groupby(axis=1,level=0).apply(lambda x: x -  pd.concat([kwargs['background']], axis=1,keys=[x.name]) )
 
             if self.output in ['RCS','Ln(RCS)','fLn(RCS)','dLn(RCS)','fdLn(RCS)','dfLn(RCS)','fdfLn(RCS)']:
                 # if 'background' in kwargs.keys():
-                self.data       = self.RCS
+                self.datos       = self.RCS
 
                 if self.output not in ['RCS']:
-                    # self.data.mask(self.data<=0,inplace=True)
-                    self.data[ self.data <=0 ] = 0.01
-                    self.data       = np.log(self.data)
+                    # self.datos.mask(self.datos<=0,inplace=True)
+                    self.datos[ self.datos <=0 ] = 0.01
+                    self.datos       = np.log(self.datos)
 
                 if self.output in ['fLn(RCS)','dfLn(RCS)','fdfLn(RCS)']:
-                    self.data       = self.average_filter(self.data)
+                    self.datos       = self.average_filter(self.datos)
 
                 if self.output in ['dLn(RCS)','fdLn(RCS)','fdfLn(RCS)','dfLn(RCS)']:
-                    self.data       = self.derived(self.data)
+                    self.datos       = self.derived(self.datos)
 
                 if self.output in ['fdLn(RCS)','fdfLn(RCS)']:
-                    self.data       = self.average_filter(self.data)
+                    self.datos       = self.average_filter(self.datos)
 
         else:
             print "Output {} not allowed, check other".format(self.output)
+
+
+    def _make_plot(self):
+        cax     = self.fig.add_axes((1.02,.2,0.02,0.59))
+        self.axes[0].patch.set_facecolor((.75,.75,.75))
+        self._make_contour(cax = cax)
+
+
 
     def plot_lidar(self,X,Y,Z,**kwargs):
         """Function for ploting lidar profiles
@@ -515,101 +556,38 @@ class Lidar(PlotBook):
         Parameters
             X,Y     = one or two dimensional array for grid plot
             Z       = DataFrame object for contour
-            kind    = contour choices  - Linear, Log, Anomaly
+            colorbar_kind    = contour choices  - Linear, Log, Anomaly
             **PlotBook kwargs allowed
         """
         # plt.rc('font', size= kwargs.get('fontsize',16))
-        Z  = Z.copy()
-        kwargs['kind'] =  kwargs.get('kind','Linear')
 
-
-        if 'ax' not in kwargs.keys():
-            plt.close('all')
-            if self.scan not in ['FixedPoint']:
-
-                rel         = (Y.max()-Y.min())/(np.abs(X).max()-X.min())
-                figsize = ( 10,10*rel) if rel <=1 else (10*(1./rel),10)
-            else: figsize = (10,5.6)
-
-            fig 		= plt.figure(figsize=figsize,facecolor=(.7,.7,.7))
-            ax2      	= fig.add_axes((1.02,.2,0.02,0.59))
-            ax			= fig.add_axes((0,0.,1,1)) #self.fig.add_subplot(111)
-
-
-        else:
-            ax 		= kwargs['ax']
-
-
-        ax.patch.set_facecolor((.75,.75,.75))
-        divider 	= make_axes_locatable(ax)
-
-        vmin, vmax          = kwargs.pop('vlim',[Z.min().min(),Z.max().max()]) #np.nanpercentile(Z,[2.5,97.5]) #
-        print vmin, vmax
-        colorbar_kwd        = {}
-        contour_kwd         = { 'cmap':self.label[self.output]['cmap'], \
-                                'levels':np.linspace(vmin,vmax,100)} #,'extend':'both'}
-
-        if kwargs['kind'] == 'Linear':
-            contour_kwd['norm']    = mpl.colors.Normalize(vmin,vmax)
-
-        elif kwargs['kind'] == 'Anomaly':
-            contour_kwd['norm']     = MidpointNormalize(midpoint=0.,vmin=vmin, vmax=vmax)
-            colorbar_kwd['format']  = '%.f'
-
-        elif kwargs['kind'] == 'Log':
-            #
-            if 'vlim' in kwargs.keys():
-                vmin, vmax                 = kwargs.pop('vlim')
-            else:
-                Z.mask(Z<=0,inplace=True)
-                vmin, vmax =  np.log10( [Z.min().min(),Z.max().max()] ) # np.nanpercentile(Z,[1,99])))
-            contour_kwd['levels']               = np.logspace(vmin,vmax,100)
-            Z[Z < contour_kwd['levels'][0]]     = contour_kwd['levels'][0]
-            Z[Z > contour_kwd['levels'][-1]]    = contour_kwd['levels'][-1]
-            contour_kwd['norm']                 = mpl.colors.LogNorm(
-                    contour_kwd['levels'][0],contour_kwd['levels'][-1] )
-            print contour_kwd['levels'][0],contour_kwd['levels'][-1]
-            # print Z
-
-            minorticks = np.hstack([np.arange(1,10,1)*log for log in np.logspace(-2,16,19)])
-            minorticks = minorticks[(minorticks >=contour_kwd['levels'] [0]) & (minorticks <=contour_kwd['levels'] [-1])]
-            colorbar_kwd.update(dict(format = LogFormatterMathtext(10) ,ticks=LogLocator(10) ))
-
-        # cf		= ax.contourf(X,Y,Z,levels=levels, alpha=1,cmap =shrunk_cmap,  norm=mpl.colors.LogNorm())   #
-        contour_kwd.pop('levels')
-        cf      = ax.pcolormesh(X,Y,Z,**contour_kwd)
-
-        # cf		= ax.contourf(X,Y,Z,**contour_kwd) #extend='both')
-
-
-        if 'ax' not in kwargs.keys():
-            cbar     = plt.colorbar(cf,cax=divider.append_axes("right", size="3%", pad='1%') if 'ax' in kwargs.keys() else ax2, **colorbar_kwd)
-            cbar.set_label(kwargs.get('label',r'$[mVolts]$'))
-
-            if kwargs['kind']  == 'Log':
-                cbar.ax.yaxis.set_ticks(cf.norm(minorticks), minor=True)
-                cbar.ax.tick_params(which='minor',width=1,length=4)
-                cbar.ax.tick_params(which='major',width=1,length=6)
-                # ax.yaxis.set_minor_locator(LogLocator(10,subs=np.arange(2,10)))
-
-        ax.set_ylabel(r'Range $[Km]$')
         if self.scan not in ['FixedPoint']:
-            ax.set_xlim(-np.abs(X).max(),np.abs(X).max())
-            ax.set_xlabel(r'Range $[Km]$',)# fontsize=fontsize)
+            rel                 = (Y.max()-Y.min())/(np.abs(X).max()-X.min())
+            kwargs['figsize']   = ( 10,10*rel) if rel <=1 else (10*(1./rel),10)
+            kwargs['xlim']      = [-np.abs(X).max(), np.abs(X).max()]
+            kwargs['xlabel']    = r'Range $[Km]$'
         else:
-            ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M \n%d-%b'))
+            kwargs['figsize']   = (10,5.6)
+
+        kwargs['ylabel']        = r'Range $[Km]$'
+        kwargs['colormap']      = self.lidar_props[self.output]['cmap']
+
+
+        # PlotBook(Z, figsize=figsize, **kwargs )
+        super(Lidar, self).__init__(data=Z, x=X, y=Y, **kwargs )
+        self.generate()
+        # kwargs.pop('vlim', None)
+
+        if self.scan  in ['FixedPoint']:
+            self.axes[0].xaxis.set_major_formatter(mdates.DateFormatter('%H:%M \n%d-%b'))
 
         if 'add_text' in kwargs.keys():
-            ax.text(1.01,0.,kwargs['add_text'],ha='left',va='bottom',transform=ax.transAxes)
+            self.axes[0].text(1.01,0.,kwargs['add_text'],ha='left',va='bottom',transform=self.axes[0].transAxes)
 
-        if 'title' in kwargs.keys():
-            ax.set_title(kwargs['title'],loc='right')
+        # if 'title' in kwargs.keys():
+        #     self.axes[0].set_title(kwargs['title'],loc='right')
 
-        # print kwargs
         self._save_fig(**kwargs)
-        # plt.savefig('Figuras/Lidar{textsave}.{format}'.format(**self.kwargs) %(kwargs.get('textsave',''),kwargs.get('format','png')),bbox_inches="tight")
-        # if kwargs.get('scp',True):
-        #     os.system("scp Figuras/Lidar{textsave}.{format} jhernandezv@siata.gov.co:/var/www/{path}". format(kwargs.get('textsave',''),kwargs.get('format','png'),kwargs.get('path','jhernandezv/Lidar/') ))
 
 
     def profiler(self,df, **kwargs):
@@ -643,7 +621,7 @@ class Lidar(PlotBook):
     #     if 'df' in kwargs.keys():
     #         data, data_info    = df['data'], df['data_info']
     #     else:
-    #         data, data_info    = self.data.copy(), self.data_info.copy()
+    #         data, data_info    = self.datos.copy(), self.datos_info.copy()
     #
     #     for azi in  data_info[self.degree_variable].drop_duplicates().values:
     #         print "{}\n {} = {}".format('='*50,self.degree_variable,azi)
@@ -665,21 +643,20 @@ class Lidar(PlotBook):
 
             **kwargs
             dates       = DatetimeIndex - Used to plot. Default .index[0]
-            kind        = Contour choices  - ['Linear', 'Log', 'Anomaly'] - Default Linear
+            colorbar_kind        = Contour choices  - ['Linear', 'Log', 'Anomaly'] - Default Linear
             df          = DataFrame object with Heigth as index and Degree variations as columns - Allow to use data insted heritance
-            parameters  = List like - Choice  parameter to plot - Default use all parameters in self.data
-            output      = Allowed {} """.format(self.label.keys())
+            parameters  = List like - Choice  parameter to plot - Default use all parameters in self.datos
+            output      = Allowed {} """.format(self.lidar_props.keys())
 
-        if 'output' in kwargs.keys():
-            self.derived_output(**kwargs)
+        self.derived_output(output=kwargs.pop('output',None))
 
-        _parameters         = kwargs.get('parameters',self.data.columns.levels[-1].values)
+        _parameters         = kwargs.get('parameters',self.datos.columns.levels[-1].values)
         _textsave           = kwargs.get('textsave','')
         kwargs['path']      = "{}{}/{}/".format( self.kwargs['path'], self.scan, kwargs.get('path','') )
         os.system('ssh {}@siata.gov.co "mkdir /var/www/{}"'.format( self.kwargs['user'], kwargs['path']  ))
         os.system('rm Figuras/*')
 
-        _dates = kwargs.get('dates', [self.data_info.index[0]] )
+        _dates = kwargs.get('dates', [self.datos_info.index[0]] )
 
         _vlim = self.get_vlim(height, **kwargs)
         print _vlim
@@ -687,10 +664,10 @@ class Lidar(PlotBook):
         for date in _dates if self.scan != 'FixedPoint' else [_dates[0]] :
             print date
             kwargs['title']     = "{} = {}".format(self.degree_fixed ,
-            self.degrees_to_cardinal( self.data_info.loc[date, self.degree_fixed], self.degree_fixed))
+            self.degrees_to_cardinal( self.datos_info.loc[date, self.degree_fixed], self.degree_fixed))
 
             for parameter in _parameters:
-                kwargs['label']     = self.label[self.output][parameter[:6]]
+                kwargs['cbarlabel']     = self.lidar_props[self.output][parameter[:6]]
                 kwargs['textsave']  = "_{}_{}_{}{}_{}".format( self.scan,self.output,parameter,_textsave,date.strftime('%H:%M' if self.scan != 'FixedPoint' else '%m-%d') )
                 vlim                = kwargs.get('vlim',_vlim[ parameter ].values)
                 dataframe           = kwargs.get('df', self.get_from(height,parameter, date, **kwargs))
@@ -714,24 +691,24 @@ class Lidar(PlotBook):
     def get_from(self, height, parameter,date, **kwargs):
         if self.scan == 'FixedPoint':
             if 'dates' in kwargs.keys():
-                dataframe   = self.data[ self.data.index < height ][kwargs['dates']] \
+                dataframe   = self.datos[ self.datos.index < height ][kwargs['dates']] \
                             .xs( (90,parameter),level=[1,2],axis=1)
             else:
-                dataframe   = self.data[ self.data.index < height ][self.data_info.index] \
+                dataframe   = self.datos[ self.datos.index < height ][self.datos_info.index] \
                             .xs( (90,parameter),level=[1,2],axis=1)
                             # .resample('30s', axis=1, level=0 ).mean()
-        # if len(self.data.columns.names) == 2:
-        #     dataframe   = self.data[ self.data.index < height ].xs(parameter,level=-1,axis=1).T
+        # if len(self.datos.columns.names) == 2:
+        #     dataframe   = self.datos[ self.datos.index < height ].xs(parameter,level=-1,axis=1).T
         else:
-            dataframe   = self.data[ self.data.index < height].xs( (date,parameter),level=[0,-1],axis=1).T
+            dataframe   = self.datos[ self.datos.index < height].xs( (date,parameter),level=[0,-1],axis=1).T
         return dataframe
 
     def get_vlim(self, height, **kwrgs):
-        vlim = self.data[self.data.index < height] \
-                    .stack( [0,1] if len(self.data.columns.names) > 2 else 0) \
+        vlim = self.datos[self.datos.index < height] \
+                    .stack( [0,1] if len(self.datos.columns.names) > 2 else 0) \
                     .apply(lambda x: np.nanpercentile(x,[1,99])) #.quantile([.01,.99])
 
-        if kwrgs.get('kind','Linear') == 'Log':
+        if kwrgs.get('colorbar_kind','Linear') == 'Log':
             vlim [ vlim<0 ]           = 0
             vlim                       = np.log10(vlim)
             vlim [ vlim == -np.inf ]  = 0
@@ -742,21 +719,21 @@ class Lidar(PlotBook):
     @property
     def Pr(self):
         # def mHz(x):
-            # return x *  ( 150 /  self.data_info.loc[x.name[0],x.name[-1]+'_BinWidth']) / self.data_info.loc[x.name[0],x.name[-1]+'_ShotNumber']
+            # return x *  ( 150 /  self.datos_info.loc[x.name[0],x.name[-1]+'_BinWidth']) / self.datos_info.loc[x.name[0],x.name[-1]+'_ShotNumber']
         # def mvolts(x):
-        #     return x * self.data_info.loc[x.name[0],x.name[-1]+'_InputRange'] * 1000 * (2. ** (-self.data_info.loc[x.name[0],x.name[-1]+'_ADCBits'])) / self.data_info.loc[x.name[0],x.name[-1]+'_ShotNumber']
+        #     return x * self.datos_info.loc[x.name[0],x.name[-1]+'_InputRange'] * 1000 * (2. ** (-self.datos_info.loc[x.name[0],x.name[-1]+'_ADCBits'])) / self.datos_info.loc[x.name[0],x.name[-1]+'_ShotNumber']
 
-        mvolts  = lambda x:  x * self.data_info.loc[x.name[0],'InputRange_'+x.name[-1]] * 1000 * (2. ** (-self.data_info.loc[x.name[0],'ADCBits_'+x.name[-1]])) / self.data_info.loc[x.name[0],'ShotNumber_'+x.name[-1]]
+        mvolts  = lambda x:  x * self.datos_info.loc[x.name[0],'InputRange_'+x.name[-1]] * 1000 * (2. ** (-self.datos_info.loc[x.name[0],'ADCBits_'+x.name[-1]])) / self.datos_info.loc[x.name[0],'ShotNumber_'+x.name[-1]]
 
-        mHz     = lambda x:  x * ( 150 /  self.data_info.loc[x.name[0],'BinWidth_'+x.name[-1]]) / self.data_info.loc[x.name[0],'ShotNumber_'+x.name[-1]]
+        mHz     = lambda x:  x * ( 150 /  self.datos_info.loc[x.name[0],'BinWidth_'+x.name[-1]]) / self.datos_info.loc[x.name[0],'ShotNumber_'+x.name[-1]]
 
-        return self.data.apply( lambda serie: mvolts(serie) if 'analog' in serie.name[-1] else mHz(serie) )
+        return self.datos.apply( lambda serie: mvolts(serie) if 'analog' in serie.name[-1] else mHz(serie) )
 
     @property
     def RCS(self):
-        self.data       = self.data.stack([0,1]).apply(lambda x: x - self.bkg[x.name]).stack(0).unstack([1,2,3])
-        print self.data.shape
-        return self.data.apply(lambda x: x*x.index.values**2)
+        # self.datos       = self.datos.stack([0,1]).apply(lambda x: x - self.bkg[x.name]).stack(0).unstack([1,2,3])
+        print self.datos.shape
+        return self.datos.apply(lambda x: x*x.index.values**2)
 
     @staticmethod
     def derived(obj):
@@ -785,444 +762,89 @@ class Lidar(PlotBook):
             return dirs[ix % 16]
         else:
             return d
-# ################################################################################
-# ################################################################################
-# Test Lectura Lidar
 
-# filename = '/home/jhernandezv/Lidar/InfoLidar/AS0_180307-035517/RM1830703.553871'
-# fileObj = open (filename, "rb")
+# def ceilometro(Fecha_Inicio, Fecha_Fin,ceilometro='amva'): #'siata', 'itagui'
+#     locale.setlocale(locale.LC_TIME, ('en_us','utf-8'))
 #
-# for i in range(8):
-# 	print fileObj.readline()
-
-
+#     Fecha_1 = datetime.strptime(Fecha_Inicio,'%Y-%m-%d %H:%M:%S') + timedelta(hours=5)
+#     Fecha_2 = datetime.strptime(Fecha_Fin,'%Y-%m-%d %H:%M:%S') + timedelta(hours=5) + timedelta(days=1)
 #
+#     File_List = pd.date_range(Fecha_1, Fecha_2, freq='1D')
 #
-# # # ################################################################################
-# # # # ASCII
-# files = glob.glob('InfoLidar/ASCII/20180310/*')
-# ascii = Lidar(ascii=True,scan=False,output='raw_data')
-# ascii.read(files,inplace=False)
-# # #
-# #
-# # # ################################################################################
-# # # Binario
-# files = glob.glob('InfoLidar/AS0_180307-035517/RM*')
-# files = glob.glob('InfoLidar/ZS0_180223-131945/RM*')
-# files = glob.glob('InfoLidar/ZS0_180709-151714/RM*')
+#     Backs  = pd.DataFrame()
+#     Fechas = []
 #
+#     for idd, Fecha in enumerate(File_List):
+#        fname  = Fecha.strftime( 'jhernandezv@192.168.1.62:/mnt/ALMACENAMIENTO/ceilometro/datos/ceilometro{}/%Y/%b/CEILOMETER_1_LEVEL_2_%d.his'.format(ceilometro))
 #
-# binario = Lidar(scan=True,output='RCS')
-# binario.read(files)
+#        os.system ("scp {} Datos/".format(fname))
+#        try:
 #
-# plt.close('all')
-# binario.data.groupby(axis=1,level=1).median().boxplot(column=['analog-p','analog-s'])
-# binario._save_fig(textsave='_boxplot_median_analog')
-# plt.close('all')
-# binario.data.groupby(axis=1,level=1).median().boxplot(column=['photon-p','photon-s'])
-# binario._save_fig(textsave='_boxplot_median_photon')
-
-# binario.data.quantile(np.arange(0,1,0.01)).groupby(axis=1,level=1).median()
-
-
-
-# files = glob.glob('InfoLidar/ZS0_180709-151714/RM*')      # test
-# files = glob.glob('InfoLidar/3Ds_180703-135028/RM*')        # test2
-# files = glob.glob('InfoLidar/3Ds_180704-105519/RM*')        # test3
-
-# binario = Lidar(Fechai='2018-07-04',Fechaf='2018-07-04',scan='3D')
-# binario.read()
-
-# backup = [binario.data, binario.data_info]
-# binario.data        = backup[0]
-# binario.raw_data    = backup[0]
-# binario.data_info   = backup[1]
-#
-# binario.plot(textsave='_test5_',parameters=['photon-p'])
-# binario.plot(textsave='_test5_log',parameters=['photon-p'],output='RCS',kind='Log')
-# binario.plot(textsave='_test_4D',parameters=['photon-p'],output='RCS')
-# # dd, di = binario.read_folder(files)
-# # '-75.5686', '6.2680'
-#
-# binario.plot(textsave='_test_1',parameters=['photon-p'])
-# binario.plot(textsave='_test_1',parameters=['photon-p'],output='RCS')
-# binario.plot(textsave='_log_test_1',output='RCS',parameters=['photon-p'],kind='Log')
-# binario.plot(textsave='_test_1',output='Ln(RCS)',parameters=['photon-p'])
-# binario.plot(textsave='_test_1',output='dLn(RCS)',parameters=['photon-p'],kind='Anomaly')
-# binario.plot(textsave='_test_1',output='fLn(RCS)',parameters=['photon-p'])
-# binario.plot(textsave='_test_1',output='fdLn(RCS)',parameters=['photon-p'],kind='Anomaly')
-# binario.plot(textsave='_test_1',output='dfLn(RCS)',parameters=['photon-p'],kind='Anomaly')
-# binario.plot(textsave='_test_1',output='fdfLn(RCS)',parameters=['photon-p'],kind='Anomaly')
-
-################################################################################
-# FixedPoint#
-# date = pd.date_range('2018-08-06','2018-08-06',freq='d')[0] #'2018-06-27','2018-07-14',freq='d'):
-# altura = 4.5
-# binario = Lidar(Fechai=date.strftime('%Y-%m-%d'),Fechaf=date.strftime('%Y-%m-%d'),scan='FixedPoint')
-# binario.read()
-# binario.data = binario.data.stack([1,2]).resample('30s', axis=1, level=0 ).mean().unstack([1,2])
-# binario.raw_data = binario.data
-# binario.data_info = binario.data_info.resample('30s').mean()
-# binario.data_info = binario.data_info.reindex( pd.date_range(binario.data.columns.levels[0][0],binario.data.columns.levels[0][-1],freq='30s'))
-# kwgs = dict( height=altura,)# background= bkg)
-# binario.plot(**kwgs )
-
-# binario.data.reindex( pd.date_range(binario.data.columns[0],binario.data.columns[-1],freq='30s'), axis=1)
-# binario.data.reindex(pd.date_range(binario.data.columns.levels[0][0],binario.data.columns.levels[0][-1],freq='30s'))
-#
-
-# for date in pd.date_range('2018-08-01','2018-08-07',freq='d'): #'2018-06-27','2018-07-14',freq='d'):
-    # try:
-date = pd.date_range('2018-08-03','2018-08-03',freq='d')[0] #'2018-06-27','2018-07-14',freq='d'):
-
-binario = Lidar(Fechai=date.strftime('%Y-%m-%d'),Fechaf=date.strftime('%Y-%m-%d'),scan='FixedPoint',output='raw_data')
-binario.read()
-binario.data = binario.data.stack([1,2]).resample('30s', axis=1, level=0 ).mean().unstack([1,2])
-binario.raw_data = binario.data.copy()
-binario.data_info = binario.data_info.resample('30s').mean()
-
-# backup = [binario.data, binario.data_info]
-# binario.data        = backup[0]
-# binario.raw_data    = backup[0].copy()
-# binario.data_info   = backup[1]
+#             Backs = Backs.append( pd.read_csv( fname[-27:], usecols=[0,4], index_col=0, header=1, parse_dates=True, names=['Fecha','Bks'], converters = {'Bks':decode_hex_string} )  )
+#             BIN_fname  = np.genfromtxt('Datos/%s' %fname[-27:],delimiter=', ',dtype=object,usecols=(0,4),skip_header=2,\
+#                        converters = {0: lambda s: datetime.strptime(s, "%Y-%m-%d %H:%M:%S")})
 #
 #
-kwgs = dict( height=10, background= True,path='bkg',textsave='_10km')
-binario.plot(output = 'P(r)',**kwgs )
-
-binario.plot( output='RCS', **kwgs )
-
-binario.plot(textsave='_log' + kwgs.pop('textsave'), output='RCS',kind='Log',  **kwgs)
-
-
-binario.plot( output='Ln(RCS)', **kwgs )
-        #
-
-        # binario.plot(output='dLn(RCS)',kind='Anomaly',  **kwgs)
-
-        # binario.plot(output='fLn(RCS)', **kwgs)
-
-        # binario.plot(output='fdLn(RCS)',kind='Anomaly',  **kwgs)
-
-        # binario.plot(output='dfLn(RCS)', kind='Anomaly', **kwgs)
-
-        # binario.plot(output='fdfLn(RCS)', kind='Anomaly',  **kwgs)
-
-        #10 km
-        # kwgs = dict(  height=10,textsave='_10km',path='10km')# background= bkg)
-        #
-        # binario.plot(output = 'P(r)', **kwgs )
-        #
-        # binario.plot( output='RCS', **kwgs )
-        #
-        #
-        # binario.plot( output='Ln(RCS)', **kwgs )
-        # # #
-        #
-        # # binario.plot(output='dLn(RCS)',kind='Anomaly',  **kwgs)
-        #
-        # binario.plot(output='fLn(RCS)', **kwgs)
-        #
-        # # binario.plot(output='fdLn(RCS)',kind='Anomaly',  **kwgs)
-        #
-        # # binario.plot(output='dfLn(RCS)', kind='Anomaly', **kwgs)
-        #
-        # binario.plot(output='fdfLn(RCS)', kind='Anomaly',  **kwgs)
-        #
-        # kwgs.pop('textsave')
-        # binario.plot(textsave='_log_10km', output='RCS',kind='Log',  **kwgs)
-
-
-    # except:
-    #     pass
-
-
-# # ################################################################################
-# backgroud = '2018-06-30 19:07'
-# bkg = pd.read_csv('Background_test.csv',index_col=0,header=[0,1])
-# bkg = pd.read_csv('Background.csv',index_col=0,header=[0,1])
-# bkg.columns.set_levels(map(lambda x: int(x),bkg.columns.levels[0].values), level=0,inplace=True)
-# # bkg = bkg.rolling(30,center=True,min_periods=1).mean()
-# bkg = {'analog-p':5.307, 'analog-s':4.9846, 'photon-p':0.26578, 'photon-s':0.26578}
-
-# x = bkg.loc[bkg.index>15,pd.IndexSlice[:,'photon-s']]
-# x[x>0].min() - x[x>0].min().min() *18**2
-
-# bkg.loc[:,pd.IndexSlice[:,'analog-s']]  = 4.9846
-# bkg.loc[:,pd.IndexSlice[:,'analog-p']]  = 5.307
-# bkg.loc[:,pd.IndexSlice[:,['photon-p','photon-s']] ]  = 0.26578#0.13289
-
-# bkg.loc[:,pd.IndexSlice[:,'analog-p']]  =
-# ################################################################################
+#             DATA = np.array([decode_hex_string(BIN_fname[i,1]) for i in range(len(BIN_fname))]).T
 #
-# altura = 4.5
-# # for date in pd.date_range('2018-06-30','2018-06-30',freq='d'): #'2018-06-27','2018-07-14',freq='d'):
-# # try:
-# date = pd.date_range('2018-06-30','2018-06-30',freq='d')[0] #'2018-06-27','2018-07-14',freq='d'):
+#             File_Dates = np.array(BIN_fname[:,0].tolist())
 #
-# binario = Lidar(Fechai=date.strftime('%Y-%m-%d'),Fechaf=date.strftime('%Y-%m-%d'),scan='3D')
-# binario.read()
-# backup = [binario.raw_data, binario.data_info]
-# # binario.data        = backup[0]
-# # binario.raw_data    = backup[0]
-# # binario.data_info   = backup[1]
-#
-#
-# kwgs = dict(parameters=['photon-p'], dates=binario.data_info.index, make_gif=True, path= date.strftime('%Y-%m-%d-bkg-nonan'),height=altura, background= bkg)
-
-
-
-
-
-# binario.plot(scp=False, output='P(r)',**kwgs )
-#
-# binario.plot(scp=False, output='RCS', **kwgs )
-#
-# binario.plot(textsave='_log', output='RCS',kind='Log', scp=False, **kwgs)
-#
-#
-# binario.plot(scp=False, output='Ln(RCS)', **kwgs )
-# # #
-#
-# binario.plot(output='dLn(RCS)',kind='Anomaly', scp=False, **kwgs)
-#
-# binario.plot(scp=False,output='fLn(RCS)', **kwgs)
-#
-# binario.plot(output='fdLn(RCS)',kind='Anomaly', scp=False, **kwgs)
-#
-# binario.plot(output='dfLn(RCS)', kind='Anomaly',scp=False, **kwgs)
-#
-# binario.plot(output='fdfLn(RCS)', kind='Anomaly', scp=False, **kwgs)
-
-    # except:
-    #     pass
-# binario.plot(textsave='_test', parameters=['photon-p'], output='RCS', kind='Log', dates=binario.data_info.index, make_gif=True, path= '2018-07-04',scp=False)
-# binario.plot(textsave='_test', parameters=['photon-p'], output='fdfLn(RCS)', kind='Anomaly', dates=binario.data_info.index, make_gif=True, path= '2018-07-04') #,vlim=[-2,4]
-# binario.profiler(zenith=True,textsave='_RCS_log_test',parameter='analog-s',linear=False)
-# binario.profiler(zenith=True,textsave='_RCS_log_test',parameter='analog-p',linear=False)
-# binario.profiler(zenith=True,textsave='_RCS_log_test',parameter='photon-s',linear=False)
-# binario.profiler(zenith=True,textsave='_RCS_log_test',parameter='photon-p',linear=False)
-#
-# binario.profiler(zenith=True,textsave='_RCS_log_test',parameter='photon-p',linear=False)
-
-# plt.close('all')
-# # # #  pd.concat({'ascii':ascii.data[ascii.data.columns.levels[0][1]].sort_index(axis=1), 'binario':binario.data[binario.data.columns.levels[0][1]].sort_index(axis=1)} , axis = 1)
-# # #
-# # ascii.data[ascii.data.columns.levels[0][1]]
-# binario.derived_output(output='RCS')
-# x = binario.data[binario.data.columns.levels[0][1]]
-# # x.mask(x==0,inplace=True)
-# x.plot(xlim=(0,4000),subplots=True,figsize=(14,8),layout=(2,2),logy=True)
-# plt.savefig('Figuras/Datos_Lidar_RCS.png',bbox_inches='tight' )
-# os.system('scp Figuras/Datos_Lidar_RCS.png jhernandezv@siata.gov.co:/var/www/jhernandezv/Lidar/')
-# # #
-#
-# binario.data.mask(binario.data<=0,inplace=True)
-# binario.data = np.log(binario.data)
-# binario.profiler(zenith=True,textsave='_RCS_logdata_test',parameter='analog-s')
-# binario.profiler(zenith=True,textsave='_RCS_logdata_test',parameter='analog-p')
-# binario.profiler(zenith=True,textsave='_RCS_logdata_test',parameter='photon-s')
-# binario.profiler(zenith=True,textsave='_RCS_logdata_test',parameter='photon-p')
-#
-#
-# # #binario.data['2018-03-07 03:55:24'].iloc[:1200]
-#
-# # # #Plot
-# plt.close('all')
-# # # #  pd.concat({'ascii':ascii.data[ascii.data.columns.levels[0][1]].sort_index(axis=1), 'binario':binario.data[binario.data.columns.levels[0][1]].sort_index(axis=1)} , axis = 1)
-# # #
-# # ascii.data[ascii.data.columns.levels[0][1]]
-# x = binario.data[binario.data.columns.levels[0][4]]
-# # x.mask(x==0,inplace=True)
-# x.plot(xlim=(0,4000),subplots=True,figsize=(14,8),layout=(2,2),logy=True)
-# plt.savefig('Figuras/Datos_Lidar_RCS_log.png',bbox_inches='tight' )
-# os.system('scp Figuras/Datos_Lidar_RCS_log.png jhernandezv@siata.gov.co:/var/www/jhernandezv/Lidar/')
-# #
-# # # #
-# # #
-#
-# #Plot
-# plt.close('all')
-# binario.data[binario.data.columns.levels[0][1]].plot(xlim=(0,4000),subplots=True,figsize=(14,8),layout=(2,2))
-# plt.savefig('Figuras/Datos_Lidar_Binario_derived_rezago18.png',bbox_inches='tight' )
-# os.system('scp Figuras/Datos_Lidar_Binario_derived_rezago18.png jhernandezv@siata.gov.co:/var/www/jhernandezv/Lidar/')
-#
-# # # ################################################################################
-# # # Regresion Mediana
-# x   = ascii.data.groupby(axis=1,level=1).median()
-# y   = binario.data.groupby(axis=1,level=1).median()
-# z = pd.concat({'ascii':x,'binario':y},axis=1)
-#
-# plt.close('all')
-# z.plot(xlim=(0,4000),subplots=True,figsize=(24,12),layout=(2,4))
-# plt.savefig('Figuras/Datos_Lidar_media_derived.png',bbox_inches='tight')
-# os.system('scp Figuras/Datos_Lidar_media_derived.png jhernandezv@siata.gov.co:/var/www/jhernandezv/Lidar/')
-#
-#
-# # for rezago in range(19):
-# rezago=0
-# plt.close('all')
-# fig = plt.figure(figsize=(18,18))
-# ax = {}
-# for ix,col in enumerate(z.columns.levels[1].values):
-#     print col,ix
-#     # ax[ix] = fig.add_subplot(1 if ix <2 else 2,(ix%2)+1,(ix%2)+1)
-#     ax[ix] = fig.add_subplot(2,2,ix+1)
-#
-#     # rl  = stats.linregress(x[col],y.loc[y.index [rezago:rezago-18]  if rezago<18 else y.index [18:],col])
-#     rl  = stats.linregress(x[col],y[col])
-#     title = 'slope = {} \nintercept = {} \nrvalue = {}'.format(rl.slope,rl.intercept,rl.rvalue)
-#     # dataplot = z.xs(col,axis=1,level=1)
-#     # ax[ix].scatter(x[col],y.loc[y.index [rezago:rezago-18]  if rezago<18 else y.index [18:],col],label=col,)
-#     ax[ix].scatter(x[col],y[col],label=col,)
-#     ax[ix].set_title(title)
-#     ax[ix].legend()
-# plt.savefig('Figuras/Datos_Lidar_RL_derived.png',bbox_inches='tight')
-# os.system('scp Figuras/Datos_Lidar_RL_derived.png jhernandezv@siata.gov.co:/var/www/jhernandezv/Lidar/')
-
-
-# from pandas.plotting import scatter_matrix
-# plt.close('all')
-# scatter_matrix(z, alpha=0.2, figsize=(24, 24), diagonal='kde')
-# plt.savefig('Figuras/Datos_Lidar_median.scatter.png',bbox_inches='tight')
-# os.system('scp Figuras/Datos_Lidar_median.scatter.png jhernandezv@siata.gov.co:/var/www/jhernandezv/Lidar/')
-#
-#
-# y.loc[y.index[:-18],['analog-p','analog-s']] = y.loc[y.index[18:],['analog-p','analog-s']].values
-# y.loc[y.index[-18:],['analog-p','analog-s']] = np.NaN
-# z = pd.concat({'ascii':x,'binario':y},axis=1)
-#
-# plt.close('all')
-# scatter_matrix(z, alpha=0.2, figsize=(24, 24), diagonal='kde')
-# plt.savefig('Figuras/Datos_Lidar_median.scatter-18.png',bbox_inches='tight')
-# os.system('scp Figuras/Datos_Lidar_median.scatter-18.png jhernandezv@siata.gov.co:/var/www/jhernandezv/Lidar/')
-#
-#
-#
-# ################################################################################
-# # # # Multiple Linear Regression
-#
-# z = pd.concat({'ascii':ascii.data,'binario':binario.data})
-#
-# LR = pd.DataFrame() #columns =['slope','intercept','rvalue', 'pvalue', 'stderr'])
-# for col in z.columns:
-#     print col
-#     y = z.loc['binario',col]
-#     lr = stats.linregress(z.loc['ascii',col].values, (y.loc[y.index[18:]] if 'analog' in col[1] else y.loc[y.index[:-18]]).values  )
-#     LR = LR.append( pd.DataFrame({'slope':lr.slope, 'intercept':lr.intercept, 'rvalue':lr.rvalue, 'pvalue':lr.pvalue, 'stderr':lr.stderr}, index=[col] ) )
-#
-# LR.index = pd.MultiIndex.from_tuples(LR.index)
-# LR = LR.unstack()
-#
-#
-# plt.close('all')
-# plt.locator_params(axis='x', nbins=3)
-# LR[['intercept','slope']].plot(kind='kde',subplots=True, layout=(2,4),figsize=(26,15), sharex=False )
-# plt.savefig('Figuras/Datos_Lidar_Hist_LR.png',bbox_inches='tight')
-# os.system('scp Figuras/Datos_Lidar_Hist_LR.png jhernandezv@siata.gov.co:/var/www/jhernandezv/Lidar/')
-#
-# LR[['intercept','slope','rvalue']].max()
-# LR[['intercept','slope','rvalue']].min()
-
-
-#
-# # ################################################################################
-# #                 HISTORY
-# # ################################################################################
-# #
-# Error = []
-# os.system('mkdir Datos')
-# dates = pd.date_range('20171219','20180522',freq='d')
-#
-# for d in dates:
-# # d = dates[0]
-#     os.system('rm -r Datos/*')
-#     os.system('scp -r jhernandezv@192.168.1.62:/mnt/ALMACENAMIENTO/LIDAR/Scanning_Measurements/{}/* Datos/'.format( d.strftime('%Y%m%d')))
-#
-#     #Zenith
-#     folders = glob.glob('Datos/ZS*')
-#     if len(folders) > 0 :
-#         os.system('ssh jhernandezv@siata.gov.co "mkdir /var/www/jhernandezv/Lidar/Zenith/{}/"'.format( d.strftime('%Y%m%d')))
-#         for folder in folders:
-#             files   = glob.glob('{}/RM*'.format(folder))
-#             self    = Lidar(output='RCS')
-#             self.read(files,)
-#
-#             try:
-#                 self.plot(textsave = '_{}'.format(self.data_info.index[0].strftime('%H:%M')), path = 'jhernandezv/Lidar/Zenith/{}/'.format(d.strftime('%Y%m%d')),kind='Log')
-#             except:
-#                 Error.append(folder)
-#                 pass
-#
-#     #Azimuth
-#     folders = glob.glob('Datos/A*')
-#     if len(folders) > 0 :
-#         os.system('ssh jhernandezv@siata.gov.co "mkdir /var/www/jhernandezv/Lidar/Azimuth/{}/"'.format( d.strftime('%Y%m%d')))
-#         for folder in folders:
-#             files   = glob.glob('{}/RM*'.format(folder))
-#             self    = Lidar(output='RCS')
-#             self.read(files)
-#             try:
-#                 self.plot(zenith=False, kind='Log', \
-#                     textsave = '_{}'.format(self.data_info.index[0].strftime('%H:%M')), \
-#                     path = 'jhernandezv/Lidar/Azimuth/{}/'.format(d.strftime('%Y%m%d')))
-#             except:
-#                 Error.append(folder)
-#                 pass
-#
-# ##############################################################################
-# Error = []
-# Zenith = {}
-# #Fixed points
-# # dates = pd.date_range('20171219','20180522',freq='d')
-# dates = pd.date_range('20180425','20180522',freq='d')
-# for d in dates:
-# # d = dates[0]
-#     os.system('rm -r Datos/*')
-#     os.system('scp -r jhernandezv@192.168.1.62:/mnt/ALMACENAMIENTO/LIDAR/Fixed_Point/{}/* Datos/'.format( d.strftime('%Y%m%d')))
-#
-#     files = glob.glob('Datos/RM*')
-#     if len(files) > 0:
-#         os.system('ssh jhernandezv@siata.gov.co "mkdir /var/www/jhernandezv/Lidar/FixedPoint/{}/"'.format( d.strftime('%Y%m%d')))
-#         self = Lidar(scan=False,output='RCS')
-#         self.read(files)
-#
-#         try:
-#             Zenith [d.strftime('%Y%m%d')] = self.plot(kind='Log',zenith=False, \
-#                 textsave = '_{}'.format(self.data_info.index[0].strftime('%H:%M')), \
-#                 path = 'jhernandezv/Lidar/FixedPoint/{}/'.format(d.strftime('%Y%m%d')))
 #         except:
-#             Error.append(d.strftime('%Y%m%d'))
-#             pass
+#             continue
 #
-# print Zenith
-# ###############################################################################
-# #3Ds
-# os.system('rm Figuras/*')
-# os.system('mkdir Datos')
-# # dates = pd.date_range('20180624','20180717',freq='d')
-# dates = pd.date_range('20180704','20180705',freq='d')
+#         if idd == 0:
+#             Backs  = DATA
+#             Fechas = File_Dates
+#         else:
+#             Backs = np.concatenate([Backs,DATA],axis=1)
+#             Fechas = np.concatenate([Fechas, File_Dates])
 #
-# for d in dates:
-# # d = dates[0]
-#     os.system('rm -r Datos/*')
-#     os.system('scp -r jhernandezv@192.168.1.62:/mnt/ALMACENAMIENTO/LIDAR/Scanning_Measurements/{}/* Datos/'.format( d.strftime('%Y%m%d')))
+#         os.system('rm Datos/{}'.format(fname[-27:]))
 #
-#     folders = glob.glob('Datos/3D*')
-#     if len(folders) > 0 :
-#         os.system('ssh jhernandezv@siata.gov.co "mkdir /var/www/jhernandezv/Lidar/3D/{}/"'.format( d.strftime('%Y%m%d')))
-#         for folder in folders:
-#             files   = glob.glob('{}/RM*'.format(folder))
-#             self    = Lidar(output='RCS',ascii=d.strftime('%Y-%m-%d') in ['2018-06-24','2018-06-25','2018-06-26'] )
-#             print folder
-#             self.read(files,tresd=True)
-#             try:
-#                 self.plot(kind='Log', textsave ='_{}'.format(self.data_info.index[0].strftime('%H:%M')), \
-#                         path= '{}3D/{}/'.format(self.kwargs['path'],d.strftime('%Y%m%d')), vlim=[6.7,9])
-#             except:
-#                 Error.append(folders)
-#                 pass
-#         # os.system('convert -delay 20 -loop 0 {}*.png {}.gif'.format())
-#         for col in self.data.columns.levels[1].values:
-#             os.system( 'convert -delay 20 -loop 0 Figuras/Lidar_Scanning_RCS_{}_* Figuras/lidar_Scanning_RCS_{}_{}.gif'.format(col,col,d.strftime('%Y%m%d')))
-#             os.system('scp Figuras/lidar_Scanning_RCS_{}_{}.gif jhernandezv@siata.gov.co:/var/www/jhernandezv/Lidar/3D/{}/ '.format(col,d.strftime('%Y%m%d'),d.strftime('%Y%m%d')) )
+#     Backs = promedio(Backs, 3, 15)
+#     Backs = Backs.astype(np.float)
+#     Backs[Backs < 0] = np.NaN
+#
+#     Backs = pd.DataFrame(Backs.T, np.array(Fechas) - timedelta(hours=5))
+#     Backs = Backs[Fecha_Inicio:Fecha_Fin]
+#     locale.setlocale(locale.LC_TIME, ('es_co','utf-8'))
+#     return Backs
+
+# def twos_comp(val, bits):
+#     if((val & (1 << (bits - 1))) != 0):
+#         # print True
+#         val = val - (1 << bits)
+#     return val
+#
+# def decode_hex_string(string, fail_value=1, char_count=5, use_filter=False):
+#     data_len    = len(string)
+#     print '\nSize string = {}\n'.format(data_len)
+#     data        = np.zeros(data_len / char_count, dtype=int)
+#     key         = 0
+#     for i in xrange(0, data_len, char_count):
+#         hex_string      = string[i:i + char_count]
+#         data[key]       = twos_comp(int(hex_string, 16), 20)
+#         key             += 1
+#     if use_filter:
+#         data[data <= 0] = fail_value
+#         data            = np.log10(data) - 9.
+#     # print data[0]
+#     return data
+
+
+#
+# Fecha = pd.to_datetime('2018-08-03')
+# ceilometro = 'amva'
+# fname  = Fecha.strftime( 'jhernandezv@192.168.1.62:/mnt/ALMACENAMIENTO/ceilometro/datos/ceilometro{}/%Y/%b/CEILOMETER_1_LEVEL_2_%d.his'.format(ceilometro))
+# x =  pd.read_csv( fname[-27:], usecols=[0,4], index_col=0, header=1, parse_dates=True, names=['Fecha','Bks'], delimiter=', ' ) #converters = {'Bks':decode_hex_string}
+# # x3.apply(lambda x: x.str.len())
+# # x.applymap(decode_hex_string)
+#
+# height  = np.arange(0.01,4.51,0.01)
+# bks = pd.DataFrame()
+# np.empty(x.size)
+# for ix in x.index:
+#     print ix
+#     bks = bks.append(pd.DataFrame(decode_hex_string(x.loc[ix,'Bks']),index=height,columns=[ix]))
+# # ix = x.index[0]
+# pd.DataFrame(decode_hex_string(x.loc[ix,'Bks']),index=height,columns=[ix])
