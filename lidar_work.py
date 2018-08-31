@@ -130,7 +130,8 @@ binario.read()
 binario.datos = binario.datos.stack([1,2]).resample('30s', axis=1, level=0 ).mean().unstack([1,2])
 binario.raw_data = binario.datos.copy()
 binario.datos_info = binario.datos_info.resample('30s').mean()
-#
+
+ #.stack(0).unstack([1,2,3])
 backup = [binario.datos, binario.datos_info]
 # binario.datos        = backup[0]
 # binario.raw_data    = backup[0].copy()

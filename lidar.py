@@ -59,7 +59,7 @@ class Lidar(PlotBook):
 
     """
 
-    # mpl.cm.gist_earth_r}
+
     __metaclass__ = type
 
     lidar_props   = {'raw_data':{'analog':'','photon':'','cmap':shrunk_cmap},
