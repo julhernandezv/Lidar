@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import matplotlib as mpl
-# mpl.use('PDF')
+mpl.use('PDF')
 
 import datetime as dt
 import numpy as np
@@ -411,6 +411,7 @@ class Lidar(PlotBook):
         super(Lidar, self).__init__(data=Z, x=X, y=Y, **kwargs )
         self.generate()
         # kwargs.pop('vlim', None)
+        print kwargs
 
         if self.scan  in ['FixedPoint']:
             self.axes[0].xaxis.set_major_formatter(mdates.DateFormatter('%H:%M \n%d-%b'))

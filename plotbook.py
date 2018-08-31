@@ -4,9 +4,12 @@ mpl.use('PDF')
 
 import numpy as np
 import matplotlib.pyplot as plt
+import os
+
 from matplotlib.ticker import LogFormatterMathtext, LogLocator
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from pandas.plotting._core import MPLPlot
+
 
 plt.rc('font', family=mpl.font_manager.FontProperties(fname='/home/jhernandezv/Tools/AvenirLTStd-Book.ttf',).get_name(), size = 16)
 plt.rc('font', family=mpl.font_manager.FontProperties(fname='/home/jhernandezv/Tools/AvenirLTStd-Book.ttf',).get_name(), size = 16)
@@ -129,10 +132,10 @@ class PlotBook(MPLPlot):
             colorbar_kwd['format']  = self.kwargs['format']
 
         elif self.kwargs['colorbar_kind'] == 'Log':
-            #
-            if  self.kwargs['vlim'] is None:
-                Z.mask(Z<=0,inplace=True)
-                vmin, vmax =  np.log10( [Z.min().min(),Z.max().max()] ) # np.nanpercentile(Z,[1,99])))
+
+            Z.mask(Z<=0,inplace=True)
+
+            vmin, vmax =   np.log10([vmin,vmax])
 
             contour_kwd['levels']               = np.logspace(vmin,vmax,100)
             Z[Z < contour_kwd['levels'][0]]     = contour_kwd['levels'][0]

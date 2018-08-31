@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
 import matplotlib
 matplotlib.use('PDF')
-import datetime
+import datetime as dt
 import pandas as pd
 import numpy as np
-import scipy.stats as stats
-import datetime as dt
 import struct
 import sys, os, glob, locale
 import matplotlib.dates as mdates
@@ -138,13 +136,13 @@ backup = [binario.datos, binario.datos_info]
 # binario.datos_info   = backup[1]
 #
 # #
-kwgs = dict( height=4.5, path='informe',textsave='Test_MPLPlot')
+kwgs = dict( height=4.5, path='PlotBook/',)
 binario.plot(output = 'P(r)',**kwgs )
 #
-# binario.plot( output='RCS', **kwgs )
-#
-# binario.plot(textsave='_log' + kwgs.pop('textsave'), output='RCS',colorbar_kind='Log',  **kwgs)
-#
+binario.plot( output='RCS', **kwgs )
+
+binario.plot(textsave='_log' + kwgs.pop('textsave'), output='RCS',colorbar_kind='Log',  **kwgs)
+
 #
 # binario.plot( output='Ln(RCS)', **kwgs )
 ################################################################################
