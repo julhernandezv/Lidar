@@ -1,40 +1,21 @@
 # -*- coding: utf-8 -*-
-import matplotlib
-matplotlib.use('PDF')
-import datetime
-import pandas as pd
-import numpy as np
-import scipy.stats as stats
+import matplotlib as mpl
+# mpl.use('PDF')
+
 import datetime as dt
+import numpy as np
+import matplotlib.dates as mdates
+import matplotlib.pyplot as plt
+import pandas as pd
 import struct
 import sys, os, glob, locale
-import matplotlib.dates as mdates
+
+from .plotbook import PlotBook
 from dateutil.relativedelta import relativedelta
-from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-from matplotlib.ticker import LogFormatterMathtext, LogLocator
-import matplotlib.font_manager as fm
-import matplotlib.pyplot as plt
-import matplotlib as mpl
-plt.rc('font', family=fm.FontProperties(fname='/home/jhernandezv/Tools/AvenirLTStd-Book.ttf',).get_name(), size = 16)
-plt.rc('font', family=fm.FontProperties(fname='/home/jhernandezv/Tools/AvenirLTStd-Book.ttf',).get_name(), size = 16)
-typColor = '#%02x%02x%02x' % (115,115,115)
-plt.rc('axes',labelcolor=typColor, edgecolor=typColor,)#facecolor=typColor)
-plt.rc('axes.spines',right=False, top=False, left=True)
-plt.rc('text',color= typColor)
-plt.rc('xtick',color=typColor)
-plt.rc('ytick',color=typColor)
-plt.rc('figure.subplot', left=0, right=1, bottom=0, top=1)
-#figure.subplot.left    : 0.125  # the left side of the subplots of the figure
-#figure.subplot.right   : 0.9    # the right side of the subplots of the figure
-#figure.subplot.bottom  : 0.11    # the bottom of the subplots of the figure
-#figure.subplot.top
-
-reload (sys)
-sys.setdefaultencoding ("utf-8")
+# reload (sys)
+# sys.setdefaultencoding ("utf-8")
 locale.setlocale(locale.LC_TIME, ('es_co','utf-8'))
-
-from pandas.plotting._core import MPLPlot
 
 
 
@@ -44,7 +25,7 @@ def shiftedColorMap(cmap, start=0, midpoint=0.5, stop=1.0, name='shiftedcmap'):
     cdict = {'red': [],'green': [],'blue': [],'alpha': []}
 
     reg_index = np.linspace(start, stop, 257)
-
+#
     shift_index = np.hstack([
 
         np.linspace(0.0, midpoint, 128, endpoint=False),
@@ -65,152 +46,6 @@ def shiftedColorMap(cmap, start=0, midpoint=0.5, stop=1.0, name='shiftedcmap'):
 
 shrunk_cmap = shiftedColorMap(mpl.cm.jet, start=0.0,midpoint=0.65, stop=0.85, name='shrunk')
 
-class MidpointNormalize(mpl.colors.Normalize):
-	"""
-	Normalise the colorbar so that diverging bars work there way either side from a prescribed midpoint value)
-
-	e.g. im=ax1.imshow(array, norm=MidpointNormalize(midpoint=0.,vmin=-100, vmax=100))
-	"""
-	def __init__(self, vmin=None, vmax=None, midpoint=None, clip=False):
-		self.midpoint = midpoint
-		mpl.colors.Normalize.__init__(self, vmin, vmax, clip)
-
-	def __call__(self, value, clip=None):
-		# I'm ignoring masked values and all kinds of edge cases to make a
-		# simple example...
-		x, y = [self.vmin, self.midpoint, self.vmax], [0, 0.5, 1]
-		return np.ma.masked_array(np.interp(value, x, y), np.isnan(value))
-
-class PlotBook(MPLPlot):
-
-    """Subclass for ploting kwargs, properties and decorators
-
-    **Kwargs
-        ax          = Matplotlib axes object, optional
-        textsave    = string - file name saved.
-        formato      = string - file format type saved. default 'png'
-        title       = string - title plot.
-        path        = link to save files in /var/www/. default 'jhernandezv/Lidar/'
-        add_text    = string - add text.
-        scp         = bolean - copy to path. default True
-    """
-
-    os.system('mkdir Figuras')
-    kwargs         = {
-        'formato': 'png',
-        'local_path':'Figuras/Lidar',
-        'path': 'jhernandezv/Lidar/',
-        'scp':True,
-        'textsave': '',
-        'user':'jhernandezv',
-        'delay':30,
-        'textsave_gif':'',
-        'colorbar_kind': 'Linear',
-        'ylabel': '',
-        'xlabel':'',
-        'cbarlabel':'',
-        'format': '%.f',
-        'vlim': None,
-
-    }
-
-    def __init__(self, data, x, y, *args, **kwargs):
-
-        for kw in self.kwargs.keys():
-            if kw in kwargs.keys():
-                self.kwargs[kw] = kwargs.pop(kw)
-
-        super(PlotBook, self).__init__(data,*args,**kwargs)
-        self.x = x
-        self.y = y
-
-
-    def _save_fig(self,**kwargs):
-
-        # print 'Kwargs PlotBook.method \n {}'.format(kwargs)
-        # self.kwargs.update(kwargs)
-        kwg = self.kwargs.copy()
-        kwg.update(kwargs)
-        plt.savefig('{local_path}{textsave}.{formato}'.format(**kwg) ,bbox_inches="tight")
-        if kwg['scp']:
-            os.system('scp "{local_path}{textsave}.{formato}" {user}@siata.gov.co:/var/www/{path}'. format(**kwg) )
-        plt.close('all')
-
-    def _make_gif(self,**kwargs):
-
-        kwg = self.kwargs.copy()
-        kwg.update(kwargs)
-        os.system( 'convert -delay {delay} -loop 0 "{local_path}{textsave}*" "{local_path}{textsave}{textsave_gif}.gif"'.format(**kwg))
-        os.system('scp "{local_path}{textsave}{textsave_gif}.gif" {user}@siata.gov.co:/var/www/{path}'.format(**kwg) )
-
-    def _make_contour(self, **kwargs):
-
-        Z = self.data.copy()
-
-        if self.kwargs['vlim'] is not None:
-            vmin, vmax      = self.kwargs['vlim']
-        else:
-            vmin, vmax      = [Z.min().min(),Z.max().max()] #np.nanpercentile(Z,[2.5,97.5]) #
-        print vmin, vmax
-        colorbar_kwd        = {}
-        contour_kwd         = { 'levels':np.linspace(vmin,vmax,100), \
-                                'cmap':self.colormap} #,'extend':'both'}
-
-        if self.kwargs['colorbar_kind'] == 'Linear':
-            contour_kwd['norm']    = mpl.colors.Normalize(vmin,vmax)
-
-        elif self.kwargs['colorbar_kind'] == 'Anomaly':
-            contour_kwd['norm']     = MidpointNormalize(midpoint=0.,vmin=vmin, vmax=vmax)
-            colorbar_kwd['format']  = self.kwargs['format']
-
-        elif self.kwargs['colorbar_kind'] == 'Log':
-            #
-            if  self.kwargs['vlim'] is None:
-                Z.mask(Z<=0,inplace=True)
-                vmin, vmax =  np.log10( [Z.min().min(),Z.max().max()] ) # np.nanpercentile(Z,[1,99])))
-
-            contour_kwd['levels']               = np.logspace(vmin,vmax,100)
-            Z[Z < contour_kwd['levels'][0]]     = contour_kwd['levels'][0]
-            Z[Z > contour_kwd['levels'][-1]]    = contour_kwd['levels'][-1]
-            contour_kwd['norm']                 = mpl.colors.LogNorm(
-                                        contour_kwd['levels'][0], contour_kwd['levels'][-1] )
-            print contour_kwd['levels'][0],contour_kwd['levels'][-1]
-            # print Z
-
-            minorticks = np.hstack([np.arange(1,10,1)*log for log in np.logspace(-2,16,19)])
-            minorticks = minorticks[(minorticks >=contour_kwd['levels'] [0]) & (minorticks <=contour_kwd['levels'] [-1])]
-            colorbar_kwd.update(dict(format = LogFormatterMathtext(10) ,ticks=LogLocator(10) ))
-
-        # cf		= ax.contourf(X,Y,Z,levels=levels, alpha=1,cmap =shrunk_cmap,  norm=mpl.colors.LogNorm())   #
-        contour_kwd.pop('levels')
-        args    = (self.x, self.y, Z)
-        cf      = self.axes[0].pcolormesh(*args, **contour_kwd)
-
-        # cf		= ax.contourf(X,Y,Z,**contour_kwd) #extend='both')
-        if 'cax' not in kwargs.keys():
-            divider 	= make_axes_locatable(self.axes[0])
-            cax         = divider.append_axes("right", size="3%", pad='1%')
-        else:
-            cax = kwargs['cax']
-
-        cbar     = plt.colorbar(cf, cax = cax , **colorbar_kwd)
-        cbar.set_label(self.kwargs['cbarlabel'])
-
-        if self.kwargs['colorbar_kind']  == 'Log':
-            cbar.ax.yaxis.set_ticks(cf.norm(minorticks), minor=True)
-            cbar.ax.tick_params(which='minor',width=1,length=4)
-            cbar.ax.tick_params(which='major',width=1,length=6)
-            # ax.yaxis.set_minor_locator(LogLocator(10,subs=np.arange(2,10)))
-
-        return cf, cbar
-
-    def _make_plot(self):
-        print 'Overwrite method in child Classes'
-        pass
-
-    def _post_plot_logic(self, ax, data):
-        ax.set_ylabel(self.kwargs['ylabel'])
-        ax.set_xlabel(self.kwargs['xlabel'])
 
 
 class Lidar(PlotBook):
@@ -279,8 +114,8 @@ class Lidar(PlotBook):
         description = {}
 
         # ValorLocationStr = lineaLocationArray[0]
-        description ['Fecha'] = datetime.datetime.strptime (lineaLocationArray[1] + " " + lineaLocationArray[2], "%d/%m/%Y %H:%M:%S") - dt.timedelta(hours=5)
-        description ['Fecha_fin'] = datetime.datetime.strptime (lineaLocationArray[3] + " " + lineaLocationArray[4], "%d/%m/%Y %H:%M:%S") - dt.timedelta(hours=5)
+        description ['Fecha'] = dt.datetime.strptime (lineaLocationArray[1] + " " + lineaLocationArray[2], "%d/%m/%Y %H:%M:%S") - dt.timedelta(hours=5)
+        description ['Fecha_fin'] = dt.datetime.strptime (lineaLocationArray[3] + " " + lineaLocationArray[4], "%d/%m/%Y %H:%M:%S") - dt.timedelta(hours=5)
         # valorHeight = float (lineaLocationArray[5])
         # valorLong = float (lineaLocationArray[6])
         # valorLat = float (lineaLocationArray[7])
@@ -549,14 +384,13 @@ class Lidar(PlotBook):
         self._make_contour(cax = cax)
 
 
-
     def plot_lidar(self,X,Y,Z,**kwargs):
         """Function for ploting lidar profiles
 
         Parameters
             X,Y     = one or two dimensional array for grid plot
             Z       = DataFrame object for contour
-            colorbar_kind    = contour choices  - Linear, Log, Anomaly
+
             **PlotBook kwargs allowed
         """
         # plt.rc('font', size= kwargs.get('fontsize',16))
@@ -573,7 +407,7 @@ class Lidar(PlotBook):
         kwargs['colormap']      = self.lidar_props[self.output]['cmap']
 
 
-        # PlotBook(Z, figsize=figsize, **kwargs )
+
         super(Lidar, self).__init__(data=Z, x=X, y=Y, **kwargs )
         self.generate()
         # kwargs.pop('vlim', None)
@@ -652,6 +486,7 @@ class Lidar(PlotBook):
 
         _parameters         = kwargs.get('parameters',self.datos.columns.levels[-1].values)
         _textsave           = kwargs.get('textsave','')
+        _path               = self.kwargs['path']
         kwargs['path']      = "{}{}/{}/".format( self.kwargs['path'], self.scan, kwargs.get('path','') )
         os.system('ssh {}@siata.gov.co "mkdir /var/www/{}"'.format( self.kwargs['user'], kwargs['path']  ))
         os.system('rm Figuras/*')
@@ -687,6 +522,7 @@ class Lidar(PlotBook):
                 gif_kwargs['path']          = kwargs['path']
                 self._make_gif(**gif_kwargs)
 
+        self.kwargs['path'] = _path
 
     def get_from(self, height, parameter,date, **kwargs):
         if self.scan == 'FixedPoint':
@@ -731,9 +567,9 @@ class Lidar(PlotBook):
 
     @property
     def RCS(self):
-        # self.datos       = self.datos.stack([0,1]).apply(lambda x: x - self.bkg[x.name]).stack(0).unstack([1,2,3])
-        print self.datos.shape
-        return self.datos.apply(lambda x: x*x.index.values**2)
+        # self.datos       = self.datos.apply(lambda x: x - self.bkg[x.name[-1]])
+        # print self.datos.shape
+        return self.datos.apply(lambda x: (x - self.bkg[x.name[-1]])*x.index.values**2)
 
     @staticmethod
     def derived(obj):
