@@ -1,21 +1,21 @@
 # -*- coding: utf-8 -*-
-import matplotlib as mpl
-mpl.use('PDF')
+from matplotlib import use, colors
+use('PDF')
 
 import numpy as np
 import matplotlib.pyplot as plt
 import os
-
+from matplotlib.font_manager import FontProperties
 from matplotlib.ticker import LogFormatterMathtext, LogLocator
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from pandas.plotting._core import MPLPlot
 
 
-plt.rc('font', family=mpl.font_manager.FontProperties(fname='/home/jhernandezv/Tools/AvenirLTStd-Book.ttf',).get_name(), size = 16)
-plt.rc('font', family=mpl.font_manager.FontProperties(fname='/home/jhernandezv/Tools/AvenirLTStd-Book.ttf',).get_name(), size = 16)
+plt.rc('font', family=FontProperties(fname='/home/jhernandezv/Tools/AvenirLTStd-Book.ttf',).get_name(), size = 16)
+plt.rc('font', family=FontProperties(fname='/home/jhernandezv/Tools/AvenirLTStd-Book.ttf',).get_name(), size = 16)
 typColor = '#%02x%02x%02x' % (115,115,115)
 plt.rc('axes',labelcolor=typColor, edgecolor=typColor,)#facecolor=typColor)
-plt.rc('axes.spines',right=False, top=False, left=True)
+plt.rc('axes.spines',right=False, top=False, )#left=False, bottom=False)
 plt.rc('text',color= typColor)
 plt.rc('xtick',color=typColor)
 plt.rc('ytick',color=typColor)
@@ -24,7 +24,7 @@ plt.rc('figure.subplot', left=0, right=1, bottom=0, top=1)
 
 
 
-class MidpointNormalize(mpl.colors.Normalize):
+class MidpointNormalize(colors.Normalize):
 	"""
 	Normalise the colorbar so that diverging bars work there way either side from a prescribed midpoint value)
 
@@ -32,7 +32,7 @@ class MidpointNormalize(mpl.colors.Normalize):
 	"""
 	def __init__(self, vmin=None, vmax=None, midpoint=None, clip=False):
 		self.midpoint = midpoint
-		mpl.colors.Normalize.__init__(self, vmin, vmax, clip)
+		colors.Normalize.__init__(self, vmin, vmax, clip)
 
 	def __call__(self, value, clip=None):
 		# I'm ignoring masked values and all kinds of edge cases to make a
@@ -44,7 +44,7 @@ class PlotBook(MPLPlot):
 
     """Subclass for ploting easily by inheritance of pandas.plottin.core.MPLPlot
 
-    **Kwargs
+    **args
         ax          = Matplotlib axes object, optional
         textsave    = string - file name saved.
         formato      = string - file format type saved. default 'png'
@@ -57,7 +57,7 @@ class PlotBook(MPLPlot):
     """
 
     os.system('mkdir Figuras')
-    kwargs         = {
+    plotbook_args         = {
         'formato': 'png',
         'local_path':'Figuras/Lidar',
         'path': 'jhernandezv/Lidar/',
@@ -77,7 +77,9 @@ class PlotBook(MPLPlot):
 
     def __init__(self, data, x, y, *args, **kwargs):
 
-        for kw in self.kwargs.keys():
+        self.kwargs = self.plotbook_args.copy()
+
+        for kw in self.plotbook_args.keys():
             if kw in kwargs.keys():
                 self.kwargs[kw] = kwargs.pop(kw)
 
@@ -90,18 +92,20 @@ class PlotBook(MPLPlot):
 
         # print 'Kwargs PlotBook.method \n {}'.format(kwargs)
         # self.kwargs.update(kwargs)
-        kwg = self.kwargs.copy()
+        kwg = self.plotbook_args.copy()
         kwg.update(kwargs)
         plt.savefig('{local_path}{textsave}.{formato}'.format(**kwg) ,bbox_inches="tight")
         if kwg['scp']:
+            os.system('scp "{local_path}{textsave}.{formato}" {user}@siata.gov.co:/var/www/{path}'. format(**kwg) )
             os.system('scp "{local_path}{textsave}.{formato}" {user}@siata.gov.co:/var/www/{path}'. format(**kwg) )
         plt.close('all')
 
     def _make_gif(self,**kwargs):
 
-        kwg = self.kwargs.copy()
+        kwg = self.plotbook_args.copy()
         kwg.update(kwargs)
         os.system( 'convert -delay {delay} -loop 0 "{local_path}{textsave}*" "{local_path}{textsave}{textsave_gif}.gif"'.format(**kwg))
+        os.system('scp "{local_path}{textsave}{textsave_gif}.gif" {user}@siata.gov.co:/var/www/{path}'.format(**kwg) )
         os.system('scp "{local_path}{textsave}{textsave_gif}.gif" {user}@siata.gov.co:/var/www/{path}'.format(**kwg) )
 
     def _make_contour(self, **kwargs):
@@ -125,22 +129,23 @@ class PlotBook(MPLPlot):
                                 'cmap':self.colormap} #,'extend':'both'}
 
         if self.kwargs['colorbar_kind'] == 'Linear':
-            contour_kwd['norm']    = mpl.colors.Normalize(vmin,vmax)
+            contour_kwd['norm']    = colors.Normalize(vmin,vmax)
 
         elif self.kwargs['colorbar_kind'] == 'Anomaly':
             contour_kwd['norm']     = MidpointNormalize(midpoint=0.,vmin=vmin, vmax=vmax)
             colorbar_kwd['format']  = self.kwargs['format']
 
         elif self.kwargs['colorbar_kind'] == 'Log':
-
             Z.mask(Z<=0,inplace=True)
+            if  self.kwargs['vlim'] is None:
+                vmin, vmax =  [Z.min().min(),Z.max().max()]  # np.nanpercentile(Z,[1,99])))
 
             vmin, vmax =   np.log10([vmin,vmax])
 
             contour_kwd['levels']               = np.logspace(vmin,vmax,100)
             Z[Z < contour_kwd['levels'][0]]     = contour_kwd['levels'][0]
             Z[Z > contour_kwd['levels'][-1]]    = contour_kwd['levels'][-1]
-            contour_kwd['norm']                 = mpl.colors.LogNorm(
+            contour_kwd['norm']                 = colors.LogNorm(
                                         contour_kwd['levels'][0], contour_kwd['levels'][-1] )
             print contour_kwd['levels'][0],contour_kwd['levels'][-1]
             # print Z
@@ -149,7 +154,7 @@ class PlotBook(MPLPlot):
             minorticks = minorticks[(minorticks >=contour_kwd['levels'] [0]) & (minorticks <=contour_kwd['levels'] [-1])]
             colorbar_kwd.update(dict(format = LogFormatterMathtext(10) ,ticks=LogLocator(10) ))
 
-        # cf		= ax.contourf(X,Y,Z,levels=levels, alpha=1,cmap =shrunk_cmap,  norm=mpl.colors.LogNorm())   #
+        # cf		= ax.contourf(X,Y,Z,levels=levels, alpha=1,cmap =shrunk_cmap,  norm=colors.LogNorm())   #
         contour_kwd.pop('levels')
         args    = (self.x, self.y, Z)
         cf      = self.axes[0].pcolormesh(*args, **contour_kwd)
@@ -170,6 +175,7 @@ class PlotBook(MPLPlot):
             cbar.ax.tick_params(which='major',width=1,length=6)
             # ax.yaxis.set_minor_locator(LogLocator(10,subs=np.arange(2,10)))
 
+        self.kwargs['colorbar_kind'] = 'Linear'
         return cf, cbar
 
     def _make_plot(self):
