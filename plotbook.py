@@ -11,8 +11,13 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 from pandas.plotting._core import MPLPlot
 
 
-plt.rc('font', family=FontProperties(fname='/home/jhernandezv/Tools/AvenirLTStd-Book.ttf',).get_name(), size = 16)
-plt.rc('font', family=FontProperties(fname='/home/jhernandezv/Tools/AvenirLTStd-Book.ttf',).get_name(), size = 16)
+plt.rc(	'font',
+	size = 18,
+	family = FontProperties(
+		fname = '/home/jhernandezv/Tools/AvenirLTStd-Book.ttf'
+		).get_name()
+)
+
 typColor = '#%02x%02x%02x' % (115,115,115)
 plt.rc('axes',labelcolor=typColor, edgecolor=typColor,)#facecolor=typColor)
 plt.rc('axes.spines',right=False, top=False, )#left=False, bottom=False)
@@ -94,7 +99,10 @@ class PlotBook(MPLPlot):
         # self.kwargs.update(kwargs)
         kwg = self.plotbook_args.copy()
         kwg.update(kwargs)
-        plt.savefig('{local_path}{textsave}.{formato}'.format(**kwg) ,bbox_inches="tight")
+        plt.savefig(
+			'{local_path}{textsave}.{formato}'.format(**kwg) ,
+			bbox_inches="tight"
+		)
         if kwg['scp']:
             os.system('scp "{local_path}{textsave}.{formato}" {user}@siata.gov.co:/var/www/{path}'. format(**kwg) )
             os.system('scp "{local_path}{textsave}.{formato}" {user}@siata.gov.co:/var/www/{path}'. format(**kwg) )
@@ -124,7 +132,7 @@ class PlotBook(MPLPlot):
         else:
             vmin, vmax      = [Z.min().min(),Z.max().max()] #np.nanpercentile(Z,[2.5,97.5]) #
         print vmin, vmax
-        colorbar_kwd        = {}
+        colorbar_kwd        = {'extend':'both'}
         contour_kwd         = { 'levels':np.linspace(vmin,vmax,100), \
                                 'cmap':self.colormap} #,'extend':'both'}
 
@@ -178,9 +186,9 @@ class PlotBook(MPLPlot):
         self.kwargs['colorbar_kind'] = 'Linear'
         return cf, cbar
 
-    def _make_plot(self):
-        print 'Overwrite method in child Classes'
-        pass
+    # def _make_plot(self):
+    #     print 'Overwrite method in child Classes'
+    #     pass
 
     def _post_plot_logic(self, ax, data):
         ax.set_ylabel(self.kwargs['ylabel'])

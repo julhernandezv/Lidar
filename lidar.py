@@ -5,14 +5,14 @@ use('PDF')
 import datetime as dt
 import numpy as np
 import matplotlib.dates as mdates
-import matplotlib.pyplot as plt
+
 import pandas as pd
 import struct
 import sys, os, glob, locale
 
 from .plotbook import PlotBook
 from dateutil.relativedelta import relativedelta
-
+from matplotlib.pyplot import register_cmap
 # reload (sys)
 # sys.setdefaultencoding ("utf-8")
 locale.setlocale(locale.LC_TIME, ('es_co','utf-8'))
@@ -41,10 +41,10 @@ def shiftedColorMap(cmap, start=0, midpoint=0.5, stop=1.0, name='shiftedcmap'):
 
     newcmap = colors.LinearSegmentedColormap(name, cdict)
 
-    plt.register_cmap(cmap=newcmap)
+    register_cmap(cmap=newcmap)
     return newcmap
 
-shrunk_cmap = shiftedColorMap(cm.jet, start=0.15,midpoint=0.45, stop=0.85, name='shrunk')
+shrunk_cmap = shiftedColorMap(cm.jet, start=0.18,midpoint=0.45, stop=0.85, name='shrunk')
 shrunk_cmap2 = shiftedColorMap(cm.jet, start=0.0,midpoint=0.65, stop=0.85, name='shrunk_ceil')
 
 
@@ -59,9 +59,6 @@ class Lidar(PlotBook):
 
     """
 
-
-    __metaclass__ = type
-
     lidar_props   = {'raw_data':{'analog':'','photon':'','cmap':shrunk_cmap},
                 'P(r)':{'analog':r'$[mV]$','photon':r'$[MHz]$','cmap':shrunk_cmap},
                 'RCS':{'analog':r'RCS $[mV*Km^2]$','photon':r'RCS $[MHz*Km^2]$','cmap':shrunk_cmap},
@@ -71,10 +68,12 @@ class Lidar(PlotBook):
                 'dfLn(RCS)':{'analog':r'dfLn(RCS)','photon':r'dfLn(RCS)','cmap':cm.seismic},
                 'fdfLn(RCS)':{'analog':r'fdfLn(RCS)','photon':r'fdfLn(RCS)','cmap':cm.seismic},
     }
+
     ceil_cmap = shrunk_cmap2
 
     bkg = {'analog-p':5.29, 'analog-s':4.984, 'photon-p':0.13289, 'photon-s':0.13289} #0.26578
 
+    V0 = 0.051
 
 
     def __init__(self, Fechai=None, Fechaf=None, ascii=False, scan='3D', output='P(r)', **kwargs):
@@ -197,8 +196,14 @@ class Lidar(PlotBook):
 
         if self.ascii:
             fileObj.close ()
-            dataset = pd.read_csv(filename,delimiter='\t',header=9 if self.scan not in ['FixedPoint'] else 8,usecols=[0,1,2,3] )
-            ejex = np.array(range(1,dataset.shape[0]+ 1))*dictDescripcionDataset[1]["datasetBinWidth"] / 1000.
+            dataset =   pd.read_csv(filename,
+                            delimiter='\t',
+                            header=9 if self.scan not in ['FixedPoint'] else 8,
+                            usecols=[0,1,2,3]
+                        )
+            ejex =      np.array(
+                            range(1,dataset.shape[0]+ 1)
+                        )*dictDescripcionDataset[1]["datasetBinWidth"] / 1000.
 
             dataset.index  = ejex
             dataset.columns = dataset.columns.str.strip('355.000 .').str.strip(' 0 ').str.strip(' 1 ').str.replace(' ','-')
@@ -297,7 +302,10 @@ class Lidar(PlotBook):
             self.datos       = data
             self.datos_info  = data_info
             self.raw_data   = self.datos.copy()
-            self.derived_output(output=kwargs.pop('output',None))
+            self.derived_output(
+                output=kwargs.pop('output',None),
+                depolarization=kwargs.pop('depolarization',False)
+            )
 
         else:
             return data, data_info
@@ -338,10 +346,13 @@ class Lidar(PlotBook):
         self.datos.columns.set_levels( pd.to_datetime(self.datos.columns.levels[0]), level=0, inplace=True)
         self.datos_info.sort_index(inplace=True)
         self.raw_data   = self.datos.copy()
-        self.derived_output(output=kwargs.pop('output',None))
+        self.derived_output(
+            output=kwargs.pop('output',None),
+            depolarization=kwargs.pop('depolarization',False)
+        )
 
 
-    def derived_output(self,output=None):
+    def derived_output(self,output=None,depolarization=False):
         """Method for derived values
 
             output = Allowed {} """.format(self.lidar_props.keys())
@@ -350,6 +361,8 @@ class Lidar(PlotBook):
         if output is not None:
             # if kwargs['output'] not in self.lidar_props.keys():
             self.output     = output
+
+
 
         if self.output in self.lidar_props.keys():
             self.datos       = self.raw_data.copy()
@@ -360,8 +373,11 @@ class Lidar(PlotBook):
                     # self.datos = self.datos.groupby(axis=1,level=0).apply(lambda x: x -  pd.concat([kwargs['background']], axis=1,keys=[x.name]) )
 
             if self.output in ['RCS','Ln(RCS)','fLn(RCS)','dLn(RCS)','fdLn(RCS)','dfLn(RCS)','fdfLn(RCS)']:
-                # if 'background' in kwargs.keys():
-                self.datos       = self.RCS
+                self.datos      = self.background
+                if depolarization:
+                    self.datos = self.depolarization
+
+                self.datos      = self.RCS
 
                 # self.datos[ self.datos.isnull()] = 0.01
 
@@ -398,7 +414,6 @@ class Lidar(PlotBook):
 
             **PlotBook kwargs allowed
         """
-        # plt.rc('font', size= kwargs.get('fontsize',16))
 
         if self.scan not in ['FixedPoint']:
             rel                 = (Y.max()-Y.min())/(np.abs(X).max()-X.min())
@@ -501,14 +516,27 @@ class Lidar(PlotBook):
             parameters  = List like - Choice  parameter to plot - Default use all parameters in self.datos
             output      = Allowed {} """.format(self.lidar_props.keys())
 
-        self.derived_output(output=kwargs.pop('output',None))
+        self.derived_output(
+            output=kwargs.pop('output',None),
+            depolarization=kwargs.pop('depolarization',False)
+        )
 
         _parameters         = kwargs.get('parameters',self.datos.columns.levels[-1].values)
         _textsave           = kwargs.get('textsave','')
         _path               = kwargs.get('path','')
-        kwargs['path']      = "{}{}/{}{}".format( self.plotbook_args['path'], \
-                                self.scan, _path, '/' if _path[-1] != '/' else '' )
-        os.system('ssh {}@siata.gov.co "mkdir /var/www/{}"'.format( self.plotbook_args['user'], kwargs['path']  ))
+        kwargs['path']      = "{}{}/{}{}".format(
+                                self.plotbook_args['path'],
+                                self.scan,
+                                _path,
+                                '/' if _path[-1] != '/' else ''
+                            )
+        os.system(
+            'ssh {}@siata.gov.co "mkdir /var/www/{}"'
+            .format(
+                self.plotbook_args['user'],
+                kwargs['path']
+            )
+        )
         os.system('rm Figuras/*')
 
         _dates  = kwargs.get('dates', [self.datos_info.index[0]] )
@@ -518,29 +546,63 @@ class Lidar(PlotBook):
 
         for date in _dates if self.scan != 'FixedPoint' else [_dates[0]] :
             print date
-            kwargs['title']     = "{} = {}".format(self.degree_fixed ,
-            self.degrees_to_cardinal( self.datos_info.loc[date, self.degree_fixed], self.degree_fixed))
+            kwargs['title']     = "{} = {}".format(
+                                    self.degree_fixed,
+                                    self.degrees_to_cardinal(
+                                        self.datos_info.loc[date, self.degree_fixed], self.degree_fixed
+                                    )
+                                )
 
             for parameter in _parameters:
                 kwargs['cbarlabel'] = self.lidar_props[self.output][parameter[:6]]
-                kwargs['textsave']  = "_{}_{}_{}{}_{}".format( self.scan, \
-                        self.output, parameter, _textsave, \
-                        date.strftime('%H:%M' if self.scan != 'FixedPoint' else '%m-%d') )
-                vlim                = kwargs.get('vlim',_vlim[ parameter ].values)
-                dataframe           = kwargs.get('df', self.get_from(height,parameter, date, **kwargs))
+                kwargs['textsave']  = "_{}_{}_{}{}_{}".format(
+                                            self.scan,
+                                            self.output,
+                                            parameter,
+                                            _textsave,
+                                            date.strftime(
+                                                '%H:%M' if self.scan != 'FixedPoint' else '%m-%d'
+                                            )
+                                        )
+                vlim                = kwargs.get('vlim',
+                                        _vlim[ parameter ].values
+                                        )
+                dataframe           = kwargs.get('df',
+                                        self.get_from(
+                                            height, parameter,
+                                            date, **kwargs
+                                            )
+                                        )
 
                 if self.scan not in ['FixedPoint']:
                     kwargs['add_text']  = date.strftime('%b-%d\n%H:%M')
-                    self.profiler(dataframe, vlim=vlim, **kwargs)
+                    self.profiler(
+                        dataframe,
+                        vlim=vlim,
+                        **kwargs
+                    )
                 else:
                     kwargs.pop('title',None)
-                    self.plot_lidar(dataframe.columns.values, dataframe.index.values, dataframe, vlim=vlim, **kwargs)
+                    self.plot_lidar(
+                        dataframe.columns.values,
+                        dataframe.index.values,
+                        dataframe,
+                        vlim=vlim,
+                        **kwargs
+                    )
 
         if kwargs.get('make_gif',False) and self.scan != 'FixedPoint':
             gif_kwargs = {}
             for col in _parameters:
-                gif_kwargs['textsave']      = "_{}_{}_{}".format(self.scan,self.output,col)
-                gif_kwargs['textsave_gif']  = '{}_{}'.format( _textsave, kwargs['dates'][0].strftime('%Y-%m-%d'))
+                gif_kwargs['textsave']      = "_{}_{}_{}".format(
+                                                self.scan,
+                                                self.output,
+                                                col
+                                                )
+                gif_kwargs['textsave_gif']  = '{}_{}'.format(
+                                                _textsave,
+                                                kwargs['dates'][0].strftime('%Y-%m-%d')
+                                                )
                 gif_kwargs['path']          = kwargs['path']
                 self._make_gif(**gif_kwargs)
 
@@ -548,22 +610,31 @@ class Lidar(PlotBook):
     def get_from(self, height, parameter,date, **kwargs):
         if self.scan == 'FixedPoint':
             if 'dates' in kwargs.keys():
-                dataframe   = self.datos[ self.datos.index < height ][kwargs['dates']] \
-                            .xs( (90,parameter),level=[1,2],axis=1)
+                dataframe   = self.datos[ self.datos.index < height ] [ kwargs['dates'] ].xs(
+                    (90,parameter),
+                    level=[1,2],
+                    axis=1)
             else:
-                dataframe   = self.datos[ self.datos.index < height ][self.datos_info.index] \
-                            .xs( (90,parameter),level=[1,2],axis=1)
+                dataframe   = self.datos[ self.datos.index < height ] [self.datos_info.index].xs(
+                    (90,parameter),
+                    level=[1,2],
+                    axis=1 )
                             # .resample('30s', axis=1, level=0 ).mean()
         # if len(self.datos.columns.names) == 2:
         #     dataframe   = self.datos[ self.datos.index < height ].xs(parameter,level=-1,axis=1).T
         else:
-            dataframe   = self.datos[ self.datos.index < height].xs( (date,parameter),level=[0,-1],axis=1).T
+            dataframe   = self.datos[ self.datos.index < height ].xs(
+                (date,parameter),
+                level=[0,-1],
+                axis=1 ).T
         return dataframe
 
     def get_vlim(self, height, **kwrgs):
-        vlim = self.datos[self.datos.index < height] \
-                    .stack( [0,1] if len(self.datos.columns.names) > 2 else 0) \
-                    .apply(lambda x: np.nanpercentile(x,[1,99])) #.quantile([.01,.99])
+        vlim = self.datos[ self.datos.index < height ].stack(
+                    [0,1] if len(self.datos.columns.names) > 2 else 0
+                    ).apply(
+                        lambda x: np.nanpercentile(x,[1,99])
+                    ) #.quantile([.01,.99])
 
         if kwrgs.get('colorbar_kind','Linear') == 'Log':
             vlim [ vlim < 0.1 ]        = 0.1
@@ -587,10 +658,22 @@ class Lidar(PlotBook):
         return self.datos.apply( lambda serie: mvolts(serie) if 'analog' in serie.name[-1] else mHz(serie) )
 
     @property
+    def background(self):
+        # self.datos       = self.datos.apply(lambda x: x - self.bkg[x.name[-1]])
+        # print self.datos.shape
+        return self.datos.apply(lambda x: x - self.bkg[x.name[-1]])
+
+    @property
     def RCS(self):
         # self.datos       = self.datos.apply(lambda x: x - self.bkg[x.name[-1]])
         # print self.datos.shape
-        return self.datos.apply(lambda x: (x - self.bkg[x.name[-1]])*x.index.values**2)
+        return self.datos.apply(lambda x: x*x.index.values**2)
+
+    @property
+    def depolarization(self):
+        an =    self.datos.xs('analog-p',axis=1,level=2) + self.datos.xs('analog-s',axis=1,level=2)*self.V0
+        pc =    self.datos.xs('photon-p',axis=1,level=2) + self.datos.xs('photon-s',axis=1,level=2)
+        return pd.concat({'analog-b':an,'photon-b':pc}).unstack(0)
 
     @staticmethod
     def derived(obj):

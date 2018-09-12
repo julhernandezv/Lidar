@@ -127,7 +127,7 @@ import datetime as dt
 import os, locale
 os.system('rm lidar/*.pyc')
 from lidar.lidar import Lidar
-locale.setlocale(locale.LC_TIME, ('en_us','utf-8'))
+locale.setlocale(locale.LC_TIME, ('en_GB','utf-8'))
 
 
 # reload(Lidar)
@@ -136,12 +136,23 @@ locale.setlocale(locale.LC_TIME, ('en_us','utf-8'))
 #     try:
 date = pd.date_range('2018-08-28','2018-08-28',freq='d')[0] #'2018-06-27','2018-07-14',freq='d'):
         #
-binario = Lidar(Fechai=date.strftime('%Y-%m-%d'),Fechaf=date.strftime('%Y-%m-%d'),scan='FixedPoint',output='raw_data')
+binario =   Lidar(
+                Fechai=date.strftime('%Y-%m-%d'),
+                Fechaf=date.strftime('%Y-%m-%d'),
+                scan='FixedPoint',
+                output='raw_data'
+            )
 binario.read()
 binario.datos = binario.datos.stack([1,2]).resample('30s', axis=1, level=0 ).mean().unstack([1,2])
 binario.raw_data = binario.datos.copy()
 binario.datos_info = binario.datos_info.resample('30s').mean()
 
+
+x = binario.datos.copy()
+x
+
+index = x.columns.levels[0]
+( index.hour > 11 ) & ( index.hour < 15 )
  #.stack(0).unstack([1,2,3])
 # backup = [binario.datos, binario.datos_info]
 # binario.datos        = backup[0]
@@ -149,27 +160,40 @@ binario.datos_info = binario.datos_info.resample('30s').mean()
 # binario.datos_info   = backup[1]
 #
 # #
-kwgs = dict( height=4.5, path=date.strftime('%m-%d_cmap/'),textsave='')
+kwgs = dict( height=15, path=date.strftime('Test_dep/'),textsave='')
 binario.plot(output = 'P(r)',**kwgs )
 #
-binario.plot( output='RCS', **kwgs )
+binario.plot( output='RCS', depolarization=False,**kwgs )
+binario.plot( output='RCS', depolarization=True,**kwgs )
 
-binario.plot(textsave='_log' + kwgs.pop('textsave',''), output='RCS',colorbar_kind='Log',  **kwgs)
+binario.plot(
+    output='RCS',
+    colorbar_kind='Log',
+    textsave='_log' + kwgs.pop('textsave',''),
+    **kwgs
+)
 
 for location in ['amva','siata','itagui']:
     # binario = Lidar(Fechai='20180801',Fechaf='20180801',scan='FixedPoint',output='raw_data')
     ceil = lee_Ceil(ceilometro=location,  Fecha_Inicio=binario.datos_info.index[0].strftime('%Y%m%d %H:%M'), Fecha_Fin=binario.datos_info.index[-1].strftime('%Y%m%d %H:%M') ) #'%Y-%m-%d %H:%M:%S'
     # ceil         = lee_Ceil(ceilometro=location,  Fecha_Inicio='20180801 10:45', Fecha_Fin='20180801 13:25' )
     ceil.columns            = (ceil.columns+1)/100.
-    ceil[ceil < 100]        = 100
+    ceil[ceil < 100]        = 100scan='FixedPoint'
     ceil[ceil.isnull()]     = 100
     if ceil.size > 0:
-        binario.plot_lidar(ceil.index,ceil.columns,ceil.T,textsave='Ceilometro_'+location,colorbar_kind='Log',vlim=[10,13000],cbarlabel=r'Intensidad Backscatter $[10^{-9}m^{-1}sr^{-1}]$',path='jhernandezv/Lidar/FixedPoint/' +kwgs['path'],colormap = binario.ceil_cmap)
+        binario.plot_lidar(
+            ceil.index,ceil.columns,ceil.T,
+            textsave='Ceilometro_'+location,
+            colorbar_kind='Log',
+            vlim=[10,13000],
+            cbarlabel=r'Intensidad Backscatter $[10^{-9}m^{-1}sr^{-1}]$',
+            path='jhernandezv/Lidar/FixedPoint/' +kwgs['path'],
+            colormap = binario.ceil_cmap
+        )
     except:
         import traceback
         traceback.print_exc()
         pass
-
 #
 
 # binario.plot( output='Ln(RCS)', **kwgs )
