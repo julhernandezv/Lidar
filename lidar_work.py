@@ -46,7 +46,7 @@ from pandas.plotting._core import MPLPlot
 # # # ################################################################################
 # # # # ASCII
 # files = glob.glob('InfoLidar/ASCII/20180310/*')
-# ascii = Lidar(ascii=True,scan=False,output='raw_data')
+# ascii = Lidar(ascii=True,scan=False,output='raw')
 # ascii.read(files,inplace=False)
 # # #
 # #
@@ -58,15 +58,15 @@ import glob
 files = glob.glob('InfoLidar/ZS0_180709-151714/RM*')
 
 from lidar.lidar import Lidar
-binario = Lidar(scan='Zenith',output='raw_data')
+binario = Lidar(scan='Zenith',output='raw')
 binario.read(files)
 #
 # plt.close('all')
 # binario.data.groupby(axis=1,level=1).median().boxplot(column=['analog-p','analog-s'])
-# binario._save_fig(textsave='_boxplot_median_analog')
+# binario._save_fig(textSave='_boxplot_median_analog')
 # plt.close('all')
 # binario.data.groupby(axis=1,level=1).median().boxplot(column=['photon-p','photon-s'])
-# binario._save_fig(textsave='_boxplot_median_photon')
+# binario._save_fig(textSave='_boxplot_median_photon')
 
 # binario.data.quantile(np.arange(0,1,0.01)).groupby(axis=1,level=1).median()
 
@@ -76,42 +76,42 @@ binario.read(files)
 # files = glob.glob('InfoLidar/3Ds_180703-135028/RM*')        # test2
 # files = glob.glob('InfoLidar/3Ds_180704-105519/RM*')        # test3
 
-# binario = Lidar(Fechai='2018-07-04',Fechaf='2018-07-04',scan='3D')
+# binario = Lidar(fechaI='2018-07-04',Fechaf='2018-07-04',scan='3D')
 # binario.read()
 
-# backup = [binario.data, binario.data_info]
+# backup = [binario.data, binario.dataInfo]
 # binario.data        = backup[0]
-# binario.raw_data    = backup[0]
-# binario.data_info   = backup[1]
+# binario.raw    = backup[0]
+# binario.dataInfo   = backup[1]
 #
-# binario.plot(textsave='_test5_',parameters=['photon-p'])
-# binario.plot(textsave='_test5_log',parameters=['photon-p'],output='RCS',colorbar_kind='Log')
-# binario.plot(textsave='_test_4D',parameters=['photon-p'],output='RCS')
+# binario.plot(textSave='_test5_',parameters=['photon-p'])
+# binario.plot(textSave='_test5_log',parameters=['photon-p'],output='RCS',colorbarKind='Log')
+# binario.plot(textSave='_test_4D',parameters=['photon-p'],output='RCS')
 # # dd, di = binario.read_folder(files)
 # # '-75.5686', '6.2680'io.data.stack([1,2]).resample('30s', axis=1, level=0 ).mean().unstack([1,2])
 
 #
-# binario.plot(textsave='_test_1',parameters=['photon-p'])
-# binario.plot(textsave='_test_1',parameters=['photon-p'],output='RCS')
-# binario.plot(textsave='_log_test_1',output='RCS',parameters=['photon-p'],colorbar_kind='Log')
-# binario.plot(textsave='_test_1',output='Ln(RCS)',parameters=['photon-p'])
-# binario.plot(textsave='_test_1',output='dLn(RCS)',parameters=['photon-p'],colorbar_kind='Anomaly')
-# binario.plot(textsave='_test_1',output='fLn(RCS)',parameters=['photon-p'])
-# binario.plot(textsave='_test_1',output='fdLn(RCS)',parameters=['photon-p'],colorbar_kind='Anomaly')
-# binario.plot(textsave='_test_1',output='dfLn(RCS)',parameters=['photon-p'],colorbar_kind='Anomaly')
-# binario.plot(textsave='_test_1',output='fdfLn(RCS)',parameters=['photon-p'],colorbar_kind='Anomaly')
+# binario.plot(textSave='_test_1',parameters=['photon-p'])
+# binario.plot(textSave='_test_1',parameters=['photon-p'],output='RCS')
+# binario.plot(textSave='_log_test_1',output='RCS',parameters=['photon-p'],colorbarKind='Log')
+# binario.plot(textSave='_test_1',output='Ln(RCS)',parameters=['photon-p'])
+# binario.plot(textSave='_test_1',output='dLn(RCS)',parameters=['photon-p'],colorbarKind='Anomaly')
+# binario.plot(textSave='_test_1',output='fLn(RCS)',parameters=['photon-p'])
+# binario.plot(textSave='_test_1',output='fdLn(RCS)',parameters=['photon-p'],colorbarKind='Anomaly')
+# binario.plot(textSave='_test_1',output='dfLn(RCS)',parameters=['photon-p'],colorbarKind='Anomaly')
+# binario.plot(textSave='_test_1',output='fdfLn(RCS)',parameters=['photon-p'],colorbarKind='Anomaly')
 
 ################################################################################
 # FixedPoint#
 ################################################################################
 # date = pd.date_range('2018-08-06','2018-08-06',freq='d')[0] #'2018-06-27','2018-07-14',freq='d'):
 # altura = 4.5
-# binario = Lidar(Fechai=date.strftime('%Y-%m-%d'),Fechaf=date.strftime('%Y-%m-%d'),scan='FixedPoint')
+# binario = Lidar(fechaI=date.strftime('%Y-%m-%d'),Fechaf=date.strftime('%Y-%m-%d'),scan='FixedPoint')
 # binario.read()
 # binario.data = binario.data.stack([1,2]).resample('30s', axis=1, level=0 ).mean().unstack([1,2])
-# binario.raw_data = binario.data
-# binario.data_info = binario.data_info.resample('30s').mean()
-# binario.data_info = binario.data_info.reindex( pd.date_range(binario.data.columns.levels[0][0],binario.data.columns.levels[0][-1],freq='30s'))
+# binario.raw = binario.data
+# binario.dataInfo = binario.dataInfo.resample('30s').mean()
+# binario.dataInfo = binario.dataInfo.reindex( pd.date_range(binario.data.columns.levels[0][0],binario.data.columns.levels[0][-1],freq='30s'))
 # kwgs = dict( height=altura,)# background= bkg)
 # binario.plot(**kwgs )
 
@@ -129,70 +129,72 @@ os.system('rm lidar/*.pyc')
 from lidar.lidar import Lidar
 locale.setlocale(locale.LC_TIME, ('en_GB','utf-8'))
 
+vlim = {'analog-s':[0.1,16],'analog-p':[0.1,16] }
 
 
-for date in pd.date_range('2018-08-01','2018-08-31',freq='d'): #'2018-06-27','2018-07-14',freq='d'):
-    try:
-        # date = pd.date_range('2018-08-28','2018-08-28',freq='d')[0] #'2018-06-27','2018-07-14',freq='d'):
+# for date in pd.date_range('2018-08-01','2018-08-31',freq='d'): #'2018-06-27','2018-07-14',freq='d'):
+    # try:
+date = pd.date_range('2018-08-28','2018-08-28',freq='d')[0] #'2018-06-27','2018-07-14',freq='d'):
         #
-        binario =   Lidar(
-        Fechai=date.strftime('%Y-%m-%d'),
-        Fechaf=date.strftime('%Y-%m-%d'),
-        scan='FixedPoint',
-        output='raw_data'
-        )
-        binario.read()
+binario =   Lidar(
+    fechaI=date.strftime('%Y-%m-%d'),
+    fechaF=date.strftime('%Y-%m-%d'),
+    scan='FixedPoint',
+    output='raw'
+)
+binario.read()
 
-        # backup = [binario.datos, binario.datos_info]
-        # binario.datos        = backup[0]
-        # binario.raw_data    = backup[0].copy()
-        # binario.datos_info   = backup[1]
+# backup = [binario.datos, binario.datosInfo]
+# binario.datos        = backup[0]
+# binario.raw    = backup[0].copy()
+# binario.datosInfo   = backup[1]
 
-        binario.datos = binario.datos.resample('30s').mean()
-        binario.raw_data = binario.datos.copy()
-        binario.datos_info = binario.datos_info.resample('30s').mean()
+binario.datos = binario.datos.resample('30s').mean()
+binario.raw = binario.raw.resample('30s').mean()
+binario.datosInfo = binario.datosInfo.resample('30s').mean()
 
+# for param in ['analog-s','analog-p']:
 
-        # x = binario.datos.copy()
-        # # ################################################################################
-        # # x
-        # y = x.loc(axis=1)[
-        #         x.columns.levels[0][
-        #             (x.columns.levels[0]>18) &
-        #             (x.columns.levels[0]<21)
-        #         ]
-        #     ]
-        # y = y.groupby(level=(1,2),axis=1).mean()
-        # x.apply(lambda x: x - y[ (x.name[1],x.name[2]) ])
-         #.stack(0).unstack([1,2,3])
+# x = binario.datos.copy()
+# # ################################################################################
+# # x
+# y = x.loc(axis=1)[
+#         x.columns.levels[0][
+#             (x.columns.levels[0]>18) &
+#             (x.columns.levels[0]<21)
+#         ]
+#     ]
+# y = y.groupby(level=(1,2),axis=1).mean()
+# x.apply(lambda x: x - y[ (x.name[1],x.name[2]) ])
+ #.stack(0).unstack([1,2,3])
 
-        #
-        # #
-        kwgs = dict( height=4.5, path=date.strftime('test_vlim'),textsave='',parameters=['analog-s'],vlim=[0.1,16])
-        # binario.plot(output = 'Depolarization',**kwgs )
-        # binario.plot(output = 'P(r)',**kwgs )
-        #
-        binario.plot( output='RCS', total_signal=False, **kwgs )
-        # binario.plot( output='RCS', total_signal=True, **kwgs )
+#
+# #
+kwgs = dict(
+    height=4.5,
+    # path=date.strftime(''),
+    textSave='_s-p',
+    # parameters=['analog-s','analog-p','analog-b'],
+    vlim=[0.,0.7]
+)
+binario.plot(output = 'LVD',**kwgs )
+# binario.plot(output = 'P(r)',**kwgs )
+#
+# binario.plot( output='RCS', total_signal=False, **kwgs )
+# binario.plot( output='RCS', total_signal=True, **kwgs )
 
-        binario.plot(
-            output='RCS',
-            colorbar_kind='Log',
-            textsave='_log' + kwgs.pop('textsave',''),
-            **kwgs
-        )
-        #  binario.plot(
-        #     output='RCS',
-        #     colorbar_kind='Log',
-        #     textsave='_log',
-        #     total_signal=True,
-        #     **kwgs
-        # )
+binario.plot(
+    output='RCS',
+    colorbarKind='Log',
+    textSave='_log' + kwgs.pop('textSave',''),
+    **kwgs
+)
+
         # for location in ['amva','siata','itagui']:
-        #     # binario = Lidar(Fechai='20180801',Fechaf='20180801',scan='FixedPoint',output='raw_data')
+        #     # binario = Lidar(fechaI='20180801',Fechaf='20180801',scan='FixedPoint',output='raw')
         #     ceil = lee_Ceil(
         #         ceilometro=location,
-        #         Fecha_Inicio=binario.datos_info.index[0].strftime('%Y%m%d %H:%M'), Fecha_Fin=binario.datos_info.index[-1].strftime('%Y%m%d %H:%M') ) #'%Y-%m-%d %H:%M:%S'
+        #         Fecha_Inicio=binario.datosInfo.index[0].strftime('%Y%m%d %H:%M'), Fecha_Fin=binario.datosInfo.index[-1].strftime('%Y%m%d %H:%M') ) #'%Y-%m-%d %H:%M:%S'
         #     # ceil         = lee_Ceil(ceilometro=location,  Fecha_Inicio='20180801 10:45', Fecha_Fin='20180801 13:25' )
         #     ceil.columns            = (ceil.columns+1)/100.
         #     ceil[ceil < 100]        = 100
@@ -200,12 +202,12 @@ for date in pd.date_range('2018-08-01','2018-08-31',freq='d'): #'2018-06-27','20
         #     if ceil.size > 0:
         #         binario.plot_lidar(
         #             ceil.index,ceil.columns,ceil.T,
-        #             textsave='Ceilometro_'+location,
-        #             colorbar_kind='Log',
+        #             textSave='Ceilometro_'+location,
+        #             colorbarKind='Log',
         #             vlim=[10,13000],
         #             cbarlabel=r'Intensidad Backscatter $[10^{-9}m^{-1}sr^{-1}]$',
         #             path='jhernandezv/Lidar/FixedPoint/' +kwgs['path'],
-        #             colormap = binario.ceil_cmap
+        #             colormap = binario.ceilCmap
                 # )
     except:
         import traceback
@@ -224,22 +226,22 @@ ceil.columns = (ceil.columns+1)/100.
 ceil[ceil < 100] = 100
 ceil[ceil.isnull()] = 100
 #
-binario.plot_lidar(ceil.index,ceil.columns,ceil.T,textsave='Ceilometro_AMVA',colorbar_kind='Log',vlim=[10,13000],cbarlabel='Intensidad Backscatter $[10^{-9}m^{-1}sr^{-1}]$',**kwgs)
+binario.plot_lidar(ceil.index,ceil.columns,ceil.T,textSave='Ceilometro_AMVA',colorbarKind='Log',vlim=[10,13000],cbarlabel='Intensidad Backscatter $[10^{-9}m^{-1}sr^{-1}]$',**kwgs)
 ##############################################################################
         #
 
-        # binario.plot(output='dLn(RCS)',colorbar_kind='Anomaly',  **kwgs)
+        # binario.plot(output='dLn(RCS)',colorbarKind='Anomaly',  **kwgs)
 
         # binario.plot(output='fLn(RCS)', **kwgs)
 
-        # binario.plot(output='fdLn(RCS)',colorbar_kind='Anomaly',  **kwgs)
+        # binario.plot(output='fdLn(RCS)',colorbarKind='Anomaly',  **kwgs)
 
-        # binario.plot(output='dfLn(RCS)', colorbar_kind='Anomaly', **kwgs)
+        # binario.plot(output='dfLn(RCS)', colorbarKind='Anomaly', **kwgs)
 
-        # binario.plot(output='fdfLn(RCS)', colorbar_kind='Anomaly',  **kwgs)
+        # binario.plot(output='fdfLn(RCS)', colorbarKind='Anomaly',  **kwgs)
 
         #10 km
-        # kwgs = dict(  height=10,textsave='_10km',path='10km')# background= bkg)
+        # kwgs = dict(  height=10,textSave='_10km',path='10km')# background= bkg)
         #
         # binario.plot(output = 'P(r)', **kwgs )
         #
@@ -249,18 +251,18 @@ binario.plot_lidar(ceil.index,ceil.columns,ceil.T,textsave='Ceilometro_AMVA',col
         # binario.plot( output='Ln(RCS)', **kwgs )
         # # #
         #
-        # # binario.plot(output='dLn(RCS)',colorbar_kind='Anomaly',  **kwgs)
+        # # binario.plot(output='dLn(RCS)',colorbarKind='Anomaly',  **kwgs)
         #
         # binario.plot(output='fLn(RCS)', **kwgs)
         #
-        # # binario.plot(output='fdLn(RCS)',colorbar_kind='Anomaly',  **kwgs)
+        # # binario.plot(output='fdLn(RCS)',colorbarKind='Anomaly',  **kwgs)
         #
-        # # binario.plot(output='dfLn(RCS)', colorbar_kind='Anomaly', **kwgs)
+        # # binario.plot(output='dfLn(RCS)', colorbarKind='Anomaly', **kwgs)
         #
-        # binario.plot(output='fdfLn(RCS)', colorbar_kind='Anomaly',  **kwgs)
+        # binario.plot(output='fdfLn(RCS)', colorbarKind='Anomaly',  **kwgs)
         #
-        # kwgs.pop('textsave')
-        # binario.plot(textsave='_log_10km', output='RCS',colorbar_kind='Log',  **kwgs)
+        # kwgs.pop('textSave')
+        # binario.plot(textSave='_log_10km', output='RCS',colorbarKind='Log',  **kwgs)
 
 
     # except:
@@ -290,16 +292,16 @@ binario.plot_lidar(ceil.index,ceil.columns,ceil.T,textsave='Ceilometro_AMVA',col
 # # # try:
 # date = pd.date_range('2018-06-30','2018-06-30',freq='d')[0] #'2018-06-27','2018-07-14',freq='d'):
 #
-# binario = Lidar(Fechai=date.strftime('%Y-%m-%d'),Fechaf=date.strftime('%Y-%m-%d'),scan='3D')
+# binario = Lidar(fechaI=date.strftime('%Y-%m-%d'),Fechaf=date.strftime('%Y-%m-%d'),scan='3D')
 # binario.read()
-# # backup = [binario.raw_data, binario.data_info]
+# # backup = [binario.raw, binario.dataInfo]
 # # binario.data        = backup[0]
-# # binario.raw_data    = backup[0]
-# # binario.data_info   = backup[1]
+# # binario.raw    = backup[0]
+# # binario.dataInfo   = backup[1]
 #
 #
-# # kwgs = dict(parameters=['photon-p'], dates=binario.data_info.index, make_gif=True, path= date.strftime('%Y-%m-%d-bkg-nonan'),height=altura, background= bkg)
-# kwgs = dict(height=altura,path='informe',dates =binario.data_info.index[binario.data_info.index.hour <1 ])
+# # kwgs = dict(parameters=['photon-p'], dates=binario.dataInfo.index, make_gif=True, path= date.strftime('%Y-%m-%d-bkg-nonan'),height=altura, background= bkg)
+# kwgs = dict(height=altura,path='informe',dates =binario.dataInfo.index[binario.dataInfo.index.hour <1 ])
 #
 # #
 # #
@@ -307,32 +309,32 @@ binario.plot_lidar(ceil.index,ceil.columns,ceil.T,textsave='Ceilometro_AMVA',col
 #
 # binario.plot( output='RCS', **kwgs )
 #
-# binario.plot(textsave='_log', output='RCS',colorbar_kind='Log',  **kwgs)
+# binario.plot(textSave='_log', output='RCS',colorbarKind='Log',  **kwgs)
 #
 #
 # binario.plot( output='Ln(RCS)', **kwgs )
 # # #
 #
-# binario.plot(output='dLn(RCS)',colorbar_kind='Anomaly',  **kwgs)
+# binario.plot(output='dLn(RCS)',colorbarKind='Anomaly',  **kwgs)
 #
 # binario.plot(scp=False,output='fLn(RCS)', **kwgs)
 #
-# binario.plot(output='fdLn(RCS)',colorbar_kind='Anomaly',  **kwgs)
+# binario.plot(output='fdLn(RCS)',colorbarKind='Anomaly',  **kwgs)
 #
-# binario.plot(output='dfLn(RCS)', colorbar_kind='Anomaly', **kwgs)
+# binario.plot(output='dfLn(RCS)', colorbarKind='Anomaly', **kwgs)
 #
-# binario.plot(output='fdfLn(RCS)', colorbar_kind='Anomaly',  **kwgs)
+# binario.plot(output='fdfLn(RCS)', colorbarKind='Anomaly',  **kwgs)
 
     # except:
     #     pass
-# binario.plot(textsave='_test', parameters=['photon-p'], output='RCS', colorbar_kind='Log', dates=binario.data_info.index, make_gif=True, path= '2018-07-04',scp=False)
-# binario.plot(textsave='_test', parameters=['photon-p'], output='fdfLn(RCS)', colorbar_kind='Anomaly', dates=binario.data_info.index, make_gif=True, path= '2018-07-04') #,vlim=[-2,4]
-# binario.profiler(zenith=True,textsave='_RCS_log_test',parameter='analog-s',linear=False)
-# binario.profiler(zenith=True,textsave='_RCS_log_test',parameter='analog-p',linear=False)
-# binario.profiler(zenith=True,textsave='_RCS_log_test',parameter='photon-s',linear=False)
-# binario.profiler(zenith=True,textsave='_RCS_log_test',parameter='photon-p',linear=False)
+# binario.plot(textSave='_test', parameters=['photon-p'], output='RCS', colorbarKind='Log', dates=binario.dataInfo.index, make_gif=True, path= '2018-07-04',scp=False)
+# binario.plot(textSave='_test', parameters=['photon-p'], output='fdfLn(RCS)', colorbarKind='Anomaly', dates=binario.dataInfo.index, make_gif=True, path= '2018-07-04') #,vlim=[-2,4]
+# binario.profiler(zenith=True,textSave='_RCS_log_test',parameter='analog-s',linear=False)
+# binario.profiler(zenith=True,textSave='_RCS_log_test',parameter='analog-p',linear=False)
+# binario.profiler(zenith=True,textSave='_RCS_log_test',parameter='photon-s',linear=False)
+# binario.profiler(zenith=True,textSave='_RCS_log_test',parameter='photon-p',linear=False)
 #
-# binario.profiler(zenith=True,textsave='_RCS_log_test',parameter='photon-p',linear=False)
+# binario.profiler(zenith=True,textSave='_RCS_log_test',parameter='photon-p',linear=False)
 
 # plt.close('all')
 # # # #  pd.concat({'ascii':ascii.data[ascii.data.columns.levels[0][1]].sort_index(axis=1), 'binario':binario.data[binario.data.columns.levels[0][1]].sort_index(axis=1)} , axis = 1)
@@ -348,10 +350,10 @@ binario.plot_lidar(ceil.index,ceil.columns,ceil.T,textsave='Ceilometro_AMVA',col
 #
 # binario.data.mask(binario.data<=0,inplace=True)
 # binario.data = np.log(binario.data)
-# binario.profiler(zenith=True,textsave='_RCS_logdata_test',parameter='analog-s')
-# binario.profiler(zenith=True,textsave='_RCS_logdata_test',parameter='analog-p')
-# binario.profiler(zenith=True,textsave='_RCS_logdata_test',parameter='photon-s')
-# binario.profiler(zenith=True,textsave='_RCS_logdata_test',parameter='photon-p')
+# binario.profiler(zenith=True,textSave='_RCS_logdata_test',parameter='analog-s')
+# binario.profiler(zenith=True,textSave='_RCS_logdata_test',parameter='analog-p')
+# binario.profiler(zenith=True,textSave='_RCS_logdata_test',parameter='photon-s')
+# binario.profiler(zenith=True,textSave='_RCS_logdata_test',parameter='photon-p')
 #
 #
 # # #binario.data['2018-03-07 03:55:24'].iloc[:1200]
@@ -478,7 +480,7 @@ binario.plot_lidar(ceil.index,ceil.columns,ceil.T,textsave='Ceilometro_AMVA',col
 #             self.read(files,)
 #
 #             try:
-#                 self.plot(textsave = '_{}'.format(self.data_info.index[0].strftime('%H:%M')), path = 'jhernandezv/Lidar/Zenith/{}/'.format(d.strftime('%Y%m%d')),colorbar_kind='Log')
+#                 self.plot(textSave = '_{}'.format(self.dataInfo.index[0].strftime('%H:%M')), path = 'jhernandezv/Lidar/Zenith/{}/'.format(d.strftime('%Y%m%d')),colorbarKind='Log')
 #             except:
 #                 Error.append(folder)
 #                 pass
@@ -492,8 +494,8 @@ binario.plot_lidar(ceil.index,ceil.columns,ceil.T,textsave='Ceilometro_AMVA',col
 #             self    = Lidar(output='RCS')
 #             self.read(files)
 #             try:
-#                 self.plot(zenith=False, colorbar_kind='Log', \
-#                     textsave = '_{}'.format(self.data_info.index[0].strftime('%H:%M')), \
+#                 self.plot(zenith=False, colorbarKind='Log', \
+#                     textSave = '_{}'.format(self.dataInfo.index[0].strftime('%H:%M')), \
 #                     path = 'jhernandezv/Lidar/Azimuth/{}/'.format(d.strftime('%Y%m%d')))
 #             except:
 #                 Error.append(folder)
@@ -517,8 +519,8 @@ binario.plot_lidar(ceil.index,ceil.columns,ceil.T,textsave='Ceilometro_AMVA',col
 #         self.read(files)
 #
 #         try:
-#             Zenith [d.strftime('%Y%m%d')] = self.plot(colorbar_kind='Log',zenith=False, \
-#                 textsave = '_{}'.format(self.data_info.index[0].strftime('%H:%M')), \
+#             Zenith [d.strftime('%Y%m%d')] = self.plot(colorbarKind='Log',zenith=False, \
+#                 textSave = '_{}'.format(self.dataInfo.index[0].strftime('%H:%M')), \
 #                 path = 'jhernandezv/Lidar/FixedPoint/{}/'.format(d.strftime('%Y%m%d')))
 #         except:
 #             Error.append(d.strftime('%Y%m%d'))
@@ -546,7 +548,7 @@ binario.plot_lidar(ceil.index,ceil.columns,ceil.T,textsave='Ceilometro_AMVA',col
 #             print folder
 #             self.read(files,tresd=True)
 #             try:
-#                 self.plot(colorbar_kind='Log', textsave ='_{}'.format(self.data_info.index[0].strftime('%H:%M')), \
+#                 self.plot(colorbarKind='Log', textSave ='_{}'.format(self.dataInfo.index[0].strftime('%H:%M')), \
 #                         path= '{}3D/{}/'.format(self.kwargs['path'],d.strftime('%Y%m%d')), vlim=[6.7,9])
 #             except:
 #                 Error.append(folders)
