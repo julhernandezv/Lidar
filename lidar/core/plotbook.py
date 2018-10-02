@@ -11,11 +11,14 @@ from matplotlib.ticker import LogFormatterMathtext, LogLocator
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from pandas.plotting._core import MPLPlot
 
+import pkg_resources
+# pkg_resources
+DATA_PATH = pkg_resources.resource_filename('lidar', 'staticfiles')
 
 plt.rc(    'font',
     size = 18,
     family = FontProperties(
-        fname = '/home/jhernandezv/Tools/AvenirLTStd-Book.ttf'
+        fname = '{}/AvenirLTStd-Book.ttf'.format(DATA_PATH)
         ).get_name()
 )
 

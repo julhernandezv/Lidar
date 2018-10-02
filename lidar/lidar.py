@@ -4,14 +4,13 @@ use('PDF')
 
 import datetime as dt
 import numpy as np
-
-
 import pandas as pd
 import struct
 import sys, os, glob, locale
 
-from lidar.core.plotbook import PlotBook
-from lidar._libs.ctools import (cy_range_corrected, cy_mVolts, cy_mHz, cy_brackground)
+from .core.plotbook import PlotBook
+from ctools import (cy_range_corrected, cy_mVolts, cy_mHz, cy_brackground)
+
 from dateutil.relativedelta import relativedelta
 from matplotlib.pyplot import register_cmap, get_cmap
 from matplotlib.dates import DateFormatter
@@ -763,22 +762,19 @@ class Lidar(PlotBook):
         for col in self.datos.columns.levels[2]:
             tmp  = self.datos.loc(axis=1)[:,:,col]
 
-            tmpList.append(
-                pd.DataFrame(
-                    cy_mVolts(tmp.values,
-                        self.datosInfo[ 'InputRange_'+col ].values,
-                        self.datosInfo[ 'ADCBits_'+col ].values,
-                        self.datosInfo[ 'ShotNumber_'+col ].values
-                        )
-                    if 'analog' in col else
-                    cy_mHz(tmp.values,
-                        self.datosInfo['BinWidth_'+col ].values,
-                        self.datosInfo[ 'ShotNumber_'+col ].values
-                        )
-                ,
-                index=tmp.index,
-                columns=tmp.columns
-                )
+            if 'analog' in col:
+                tmp_data    = cy_mVolts( tmp.values,
+                            self.datosInfo[ 'InputRange_'+col ].values,
+                            self.datosInfo[ 'ADCBits_'+col ].values,
+                            self.datosInfo[ 'ShotNumber_'+col ].values)
+            else:
+                tmp_data    = cy_mHz(tmp.values,
+                            self.datosInfo['BinWidth_'+col ].values,
+                            self.datosInfo[ 'ShotNumber_'+col ].values)
+
+            tmpList.append( pd.DataFrame(tmp_data,
+                                        index=tmp.index,
+                                        columns=tmp.columns)
             )
         return pd.concat(tmpList,axis=1).sort_index(axis=1)
 
@@ -807,9 +803,9 @@ class Lidar(PlotBook):
         bkg [bkg.isnull()] = 0
 
         return  pd.DataFrame(
-                    cy_brackground(self.datos.values, bkg.values)
+                    cy_brackground(self.datos.values, bkg.values),
                     index = self.datos.index,
-                    columns = self.datos.columns
+                    columns = self.datos.columns,
                 )
 
         # self.datos.apply(lambda x: x - y[ (x.name[1],x.name[2]) ])
