@@ -9,7 +9,7 @@ import struct
 import sys, os, glob, locale
 
 from .core.plotbook import PlotBook
-from ctools import (cy_range_corrected, cy_mVolts, cy_mHz, cy_brackground)
+from cytools import (cy_range_corrected, cy_mVolts, cy_mHz, cy_brackground)
 
 from dateutil.relativedelta import relativedelta
 from matplotlib.pyplot import register_cmap, get_cmap

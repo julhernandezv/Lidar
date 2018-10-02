@@ -5,7 +5,7 @@ import numpy as np
 
 #requirements = read requirements.txt
 
-ext_modul = [  Extension(name="lidar.cytools",
+ext_modul = [  Extension(name="cytools",
         sources=["lidar/_libs/cytools.pyx"],
         include_dirs=[np.get_include()],
         # libraries=["m"]  # Unix-like specific
