@@ -6,7 +6,7 @@ cimport numpy as np
 cimport cython
 
 
-#DTYPE = np.float64
+DTYPE = np.float64
 ctypedef np.float64_t DTYPE_t
 
 @cython.boundscheck(False) # turn off bounds-checking for entire function
@@ -37,12 +37,14 @@ def mVolts ( np.ndarray [np.int64_t, ndim=2] matrix,
     cdef int const2 = 2
     cdef int rdim = matrix.shape[0]
     cdef int cdim = matrix.shape[1]
+    cdef np.ndarray[DTYPE_t, ndim=2] result = np.empty_like(matrix, dtype=DTYPE)
+
     for i in range(rdim):
         for j in range(cdim):
             #assert shotNumber[i] != 0
             power = const2 ** -ADCBits[i]
-            matrix[i,j] *= inputRange[i] * const1 *  power  / shotNumber[i]
-    return matrix
+            result[i,j] = matrix[i,j] * inputRange[i] * const1 *  power  / shotNumber[i]
+    return result
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
@@ -54,7 +56,9 @@ def mHz ( np.ndarray [np.int64_t, ndim=2] matrix,
     cdef int const1 = 150
     cdef int rdim = matrix.shape[0]
     cdef int cdim = matrix.shape[1]
+    cdef np.ndarray[DTYPE_t, ndim=2] result = np.empty_like(matrix, dtype=DTYPE)
+
     for i in range(rdim):
         for j in range(cdim):
-            matrix[i,j] *= ( const1 /  binWidth[i] ) / shotNumber[i]
+            result[i,j] = matrix[i,j] * ( const1 /  binWidth[i] ) / shotNumber[i]
     return matrix

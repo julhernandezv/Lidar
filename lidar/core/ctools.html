@@ -380,16 +380,23 @@ body.cython { font-family: courier; font-size: 12; }
   if (<span class='py_c_api'>PyDict_SetItem</span>(__pyx_d, __pyx_n_s_np, __pyx_t_1) &lt; 0) __PYX_ERR(0, 4, __pyx_L1_error)
   <span class='pyx_macro_api'>__Pyx_DECREF</span>(__pyx_t_1); __pyx_t_1 = 0;
 /* … */
-  __pyx_t_1 = <span class='py_c_api'>PyDict_New</span>(); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 4, __pyx_L1_error)
-  <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_1);
-  if (<span class='py_c_api'>PyDict_SetItem</span>(__pyx_d, __pyx_n_s_test, __pyx_t_1) &lt; 0) __PYX_ERR(0, 4, __pyx_L1_error)
-  <span class='pyx_macro_api'>__Pyx_DECREF</span>(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_2 = <span class='py_c_api'>PyDict_New</span>(); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 4, __pyx_L1_error)
+  <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_2);
+  if (<span class='py_c_api'>PyDict_SetItem</span>(__pyx_d, __pyx_n_s_test, __pyx_t_2) &lt; 0) __PYX_ERR(0, 4, __pyx_L1_error)
+  <span class='pyx_macro_api'>__Pyx_DECREF</span>(__pyx_t_2); __pyx_t_2 = 0;
 </pre><pre class="cython line score-0">&#xA0;<span class="">05</span>: <span class="k">cimport</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span></pre>
 <pre class="cython line score-0">&#xA0;<span class="">06</span>: <span class="k">cimport</span> <span class="nn">cython</span></pre>
 <pre class="cython line score-0">&#xA0;<span class="">07</span>: </pre>
 <pre class="cython line score-0">&#xA0;<span class="">08</span>: </pre>
-<pre class="cython line score-0">&#xA0;<span class="">09</span>: <span class="c">#DTYPE = np.float64</span></pre>
-<pre class="cython line score-0">&#xA0;<span class="">10</span>: <span class="k">ctypedef</span> <span class="n">np</span><span class="o">.</span><span class="n">float64_t</span> <span class="n">DTYPE_t</span></pre>
+<pre class="cython line score-11" onclick='toggleDiv(this)'>+<span class="">09</span>: <span class="n">DTYPE</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span></pre>
+<pre class='cython code score-11 '>  __pyx_t_1 = <span class='pyx_c_api'>__Pyx_GetModuleGlobalName</span>(__pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 9, __pyx_L1_error)
+  <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_1);
+  __pyx_t_2 = <span class='pyx_c_api'>__Pyx_PyObject_GetAttrStr</span>(__pyx_t_1, __pyx_n_s_float64); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 9, __pyx_L1_error)
+  <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_2);
+  <span class='pyx_macro_api'>__Pyx_DECREF</span>(__pyx_t_1); __pyx_t_1 = 0;
+  if (<span class='py_c_api'>PyDict_SetItem</span>(__pyx_d, __pyx_n_s_DTYPE, __pyx_t_2) &lt; 0) __PYX_ERR(0, 9, __pyx_L1_error)
+  <span class='pyx_macro_api'>__Pyx_DECREF</span>(__pyx_t_2); __pyx_t_2 = 0;
+</pre><pre class="cython line score-0">&#xA0;<span class="">10</span>: <span class="k">ctypedef</span> <span class="n">np</span><span class="o">.</span><span class="n">float64_t</span> <span class="n">DTYPE_t</span></pre>
 <pre class="cython line score-0">&#xA0;<span class="">11</span>: </pre>
 <pre class="cython line score-0">&#xA0;<span class="">12</span>: <span class="nd">@cython</span><span class="o">.</span><span class="n">boundscheck</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span> <span class="c"># turn off bounds-checking for entire function</span></pre>
 <pre class="cython line score-0">&#xA0;<span class="">13</span>: <span class="nd">@cython</span><span class="o">.</span><span class="n">wraparound</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span></pre>
@@ -486,7 +493,7 @@ static PyObject *__pyx_pf_5lidar_5lidar_4core_6ctools_range_corrected(CYTHON_UNU
   __pyx_pybuffernd_matrix.diminfo[0].strides = __pyx_pybuffernd_matrix.rcbuffer-&gt;pybuffer.strides[0]; __pyx_pybuffernd_matrix.diminfo[0].shape = __pyx_pybuffernd_matrix.rcbuffer-&gt;pybuffer.shape[0]; __pyx_pybuffernd_matrix.diminfo[1].strides = __pyx_pybuffernd_matrix.rcbuffer-&gt;pybuffer.strides[1]; __pyx_pybuffernd_matrix.diminfo[1].shape = __pyx_pybuffernd_matrix.rcbuffer-&gt;pybuffer.shape[1];
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(<span class='pyx_c_api'>__Pyx_GetBufferAndValidate</span>(&amp;__pyx_pybuffernd_rang.rcbuffer-&gt;pybuffer, (PyObject*)__pyx_v_rang, &amp;__Pyx_TypeInfo_nn___pyx_t_5numpy_int64_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 14, __pyx_L1_error)
+    if (unlikely(<span class='pyx_c_api'>__Pyx_GetBufferAndValidate</span>(&amp;__pyx_pybuffernd_rang.rcbuffer-&gt;pybuffer, (PyObject*)__pyx_v_rang, &amp;__Pyx_TypeInfo_nn___pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 14, __pyx_L1_error)
   }
   __pyx_pybuffernd_rang.diminfo[0].strides = __pyx_pybuffernd_rang.rcbuffer-&gt;pybuffer.strides[0]; __pyx_pybuffernd_rang.diminfo[0].shape = __pyx_pybuffernd_rang.rcbuffer-&gt;pybuffer.shape[0];
 /* … */
@@ -515,12 +522,12 @@ static PyObject *__pyx_pf_5lidar_5lidar_4core_6ctools_range_corrected(CYTHON_UNU
   <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_tuple__10);
   <span class='refnanny'>__Pyx_GIVEREF</span>(__pyx_tuple__10);
 /* … */
-  __pyx_t_1 = PyCFunction_NewEx(&amp;__pyx_mdef_5lidar_5lidar_4core_6ctools_1range_corrected, NULL, __pyx_n_s_lidar_lidar_core_ctools); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 14, __pyx_L1_error)
-  <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_1);
-  if (<span class='py_c_api'>PyDict_SetItem</span>(__pyx_d, __pyx_n_s_range_corrected, __pyx_t_1) &lt; 0) __PYX_ERR(0, 14, __pyx_L1_error)
-  <span class='pyx_macro_api'>__Pyx_DECREF</span>(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_2 = PyCFunction_NewEx(&amp;__pyx_mdef_5lidar_5lidar_4core_6ctools_1range_corrected, NULL, __pyx_n_s_lidar_lidar_core_ctools); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 14, __pyx_L1_error)
+  <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_2);
+  if (<span class='py_c_api'>PyDict_SetItem</span>(__pyx_d, __pyx_n_s_range_corrected, __pyx_t_2) &lt; 0) __PYX_ERR(0, 14, __pyx_L1_error)
+  <span class='pyx_macro_api'>__Pyx_DECREF</span>(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_codeobj__11 = (PyObject*)<span class='pyx_c_api'>__Pyx_PyCode_New</span>(2, 0, 6, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__10, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_jhernandezv_Documents_SIAT, __pyx_n_s_range_corrected, 14, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__11)) __PYX_ERR(0, 14, __pyx_L1_error)
-</pre><pre class="cython line score-0">&#xA0;<span class="">15</span>:                     <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">int64_t</span><span class="p">,</span> <span class="n">ndim</span><span class="o">=</span><span class="mf">1</span><span class="p">]</span> <span class="n">rang</span><span class="p">):</span></pre>
+</pre><pre class="cython line score-0">&#xA0;<span class="">15</span>:                     <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="p">[</span><span class="n">DTYPE_t</span><span class="p">,</span> <span class="n">ndim</span><span class="o">=</span><span class="mf">1</span><span class="p">]</span> <span class="n">rang</span><span class="p">):</span></pre>
 <pre class="cython line score-0">&#xA0;<span class="">16</span>:     <span class="k">cdef</span> <span class="kt">int</span> <span class="nf">i</span><span class="p">,</span><span class="nf">j</span></pre>
 <pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">17</span>:     <span class="k">cdef</span> <span class="kt">int</span> <span class="nf">rdim</span> <span class="o">=</span> <span class="n">matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span></pre>
 <pre class='cython code score-0 '>  __pyx_v_rdim = (__pyx_v_matrix-&gt;dimensions[0]);
@@ -540,7 +547,7 @@ static PyObject *__pyx_pf_5lidar_5lidar_4core_6ctools_range_corrected(CYTHON_UNU
 <pre class='cython code score-0 '>      __pyx_t_5 = __pyx_v_j;
       __pyx_t_6 = __pyx_v_i;
       __pyx_t_7 = __pyx_v_j;
-      *__Pyx_BufPtrStrided2d(__pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t *, __pyx_pybuffernd_matrix.rcbuffer-&gt;pybuffer.buf, __pyx_t_6, __pyx_pybuffernd_matrix.diminfo[0].strides, __pyx_t_7, __pyx_pybuffernd_matrix.diminfo[1].strides) *= (*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_int64_t *, __pyx_pybuffernd_rang.rcbuffer-&gt;pybuffer.buf, __pyx_t_5, __pyx_pybuffernd_rang.diminfo[0].strides));
+      *__Pyx_BufPtrStrided2d(__pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t *, __pyx_pybuffernd_matrix.rcbuffer-&gt;pybuffer.buf, __pyx_t_6, __pyx_pybuffernd_matrix.diminfo[0].strides, __pyx_t_7, __pyx_pybuffernd_matrix.diminfo[1].strides) *= (*__Pyx_BufPtrStrided1d(__pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t *, __pyx_pybuffernd_rang.rcbuffer-&gt;pybuffer.buf, __pyx_t_5, __pyx_pybuffernd_rang.diminfo[0].strides));
     }
   }
 </pre><pre class="cython line score-2" onclick='toggleDiv(this)'>+<span class="">24</span>:     <span class="k">return</span> <span class="n">matrix</span></pre>
@@ -552,8 +559,8 @@ static PyObject *__pyx_pf_5lidar_5lidar_4core_6ctools_range_corrected(CYTHON_UNU
 <pre class="cython line score-0">&#xA0;<span class="">26</span>: </pre>
 <pre class="cython line score-0">&#xA0;<span class="">27</span>: <span class="nd">@cython</span><span class="o">.</span><span class="n">boundscheck</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span></pre>
 <pre class="cython line score-0">&#xA0;<span class="">28</span>: <span class="nd">@cython</span><span class="o">.</span><span class="n">wraparound</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span></pre>
-<pre class="cython line score-99" onclick='toggleDiv(this)'>+<span class="">29</span>: <span class="k">def</span> <span class="nf">mVolts</span> <span class="p">(</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="p">[</span><span class="n">DTYPE_t</span><span class="p">,</span> <span class="n">ndim</span><span class="o">=</span><span class="mf">2</span><span class="p">]</span> <span class="n">matrix</span><span class="p">,</span></pre>
-<pre class='cython code score-99 '>/* Python wrapper */
+<pre class="cython line score-108" onclick='toggleDiv(this)'>+<span class="">29</span>: <span class="k">def</span> <span class="nf">mVolts</span> <span class="p">(</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">int64_t</span><span class="p">,</span> <span class="n">ndim</span><span class="o">=</span><span class="mf">2</span><span class="p">]</span> <span class="n">matrix</span><span class="p">,</span></pre>
+<pre class='cython code score-108 '>/* Python wrapper */
 static PyObject *__pyx_pw_5lidar_5lidar_4core_6ctools_3mVolts(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
 static PyMethodDef __pyx_mdef_5lidar_5lidar_4core_6ctools_3mVolts = {"mVolts", (PyCFunction)__pyx_pw_5lidar_5lidar_4core_6ctools_3mVolts, METH_VARARGS|METH_KEYWORDS, 0};
 static PyObject *__pyx_pw_5lidar_5lidar_4core_6ctools_3mVolts(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
@@ -646,17 +653,24 @@ static PyObject *__pyx_pf_5lidar_5lidar_4core_6ctools_2mVolts(CYTHON_UNUSED PyOb
   int __pyx_v_const2;
   int __pyx_v_rdim;
   int __pyx_v_cdim;
+  PyArrayObject *__pyx_v_result = 0;
   __Pyx_LocalBuf_ND __pyx_pybuffernd_ADCBits;
   __Pyx_Buffer __pyx_pybuffer_ADCBits;
   __Pyx_LocalBuf_ND __pyx_pybuffernd_inputRange;
   __Pyx_Buffer __pyx_pybuffer_inputRange;
   __Pyx_LocalBuf_ND __pyx_pybuffernd_matrix;
   __Pyx_Buffer __pyx_pybuffer_matrix;
+  __Pyx_LocalBuf_ND __pyx_pybuffernd_result;
+  __Pyx_Buffer __pyx_pybuffer_result;
   __Pyx_LocalBuf_ND __pyx_pybuffernd_shotNumber;
   __Pyx_Buffer __pyx_pybuffer_shotNumber;
   PyObject *__pyx_r = NULL;
   <span class='refnanny'>__Pyx_RefNannyDeclarations</span>
   <span class='refnanny'>__Pyx_RefNannySetupContext</span>("mVolts", 0);
+  __pyx_pybuffer_result.pybuffer.buf = NULL;
+  __pyx_pybuffer_result.refcount = 0;
+  __pyx_pybuffernd_result.data = NULL;
+  __pyx_pybuffernd_result.rcbuffer = &amp;__pyx_pybuffer_result;
   __pyx_pybuffer_matrix.pybuffer.buf = NULL;
   __pyx_pybuffer_matrix.refcount = 0;
   __pyx_pybuffernd_matrix.data = NULL;
@@ -675,7 +689,7 @@ static PyObject *__pyx_pf_5lidar_5lidar_4core_6ctools_2mVolts(CYTHON_UNUSED PyOb
   __pyx_pybuffernd_shotNumber.rcbuffer = &amp;__pyx_pybuffer_shotNumber;
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(<span class='pyx_c_api'>__Pyx_GetBufferAndValidate</span>(&amp;__pyx_pybuffernd_matrix.rcbuffer-&gt;pybuffer, (PyObject*)__pyx_v_matrix, &amp;__Pyx_TypeInfo_nn___pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES| PyBUF_WRITABLE, 2, 0, __pyx_stack) == -1)) __PYX_ERR(0, 29, __pyx_L1_error)
+    if (unlikely(<span class='pyx_c_api'>__Pyx_GetBufferAndValidate</span>(&amp;__pyx_pybuffernd_matrix.rcbuffer-&gt;pybuffer, (PyObject*)__pyx_v_matrix, &amp;__Pyx_TypeInfo_nn___pyx_t_5numpy_int64_t, PyBUF_FORMAT| PyBUF_STRIDES, 2, 0, __pyx_stack) == -1)) __PYX_ERR(0, 29, __pyx_L1_error)
   }
   __pyx_pybuffernd_matrix.diminfo[0].strides = __pyx_pybuffernd_matrix.rcbuffer-&gt;pybuffer.strides[0]; __pyx_pybuffernd_matrix.diminfo[0].shape = __pyx_pybuffernd_matrix.rcbuffer-&gt;pybuffer.shape[0]; __pyx_pybuffernd_matrix.diminfo[1].strides = __pyx_pybuffernd_matrix.rcbuffer-&gt;pybuffer.strides[1]; __pyx_pybuffernd_matrix.diminfo[1].shape = __pyx_pybuffernd_matrix.rcbuffer-&gt;pybuffer.shape[1];
   {
@@ -696,6 +710,10 @@ static PyObject *__pyx_pf_5lidar_5lidar_4core_6ctools_2mVolts(CYTHON_UNUSED PyOb
 /* … */
   /* function exit code */
   __pyx_L1_error:;
+  <span class='pyx_macro_api'>__Pyx_XDECREF</span>(__pyx_t_1);
+  <span class='pyx_macro_api'>__Pyx_XDECREF</span>(__pyx_t_2);
+  <span class='pyx_macro_api'>__Pyx_XDECREF</span>(__pyx_t_3);
+  <span class='pyx_macro_api'>__Pyx_XDECREF</span>(__pyx_t_4);
   { PyObject *__pyx_type, *__pyx_value, *__pyx_tb;
     __Pyx_PyThreadState_declare
     __Pyx_PyThreadState_assign
@@ -703,6 +721,7 @@ static PyObject *__pyx_pf_5lidar_5lidar_4core_6ctools_2mVolts(CYTHON_UNUSED PyOb
     <span class='pyx_c_api'>__Pyx_SafeReleaseBuffer</span>(&amp;__pyx_pybuffernd_ADCBits.rcbuffer-&gt;pybuffer);
     <span class='pyx_c_api'>__Pyx_SafeReleaseBuffer</span>(&amp;__pyx_pybuffernd_inputRange.rcbuffer-&gt;pybuffer);
     <span class='pyx_c_api'>__Pyx_SafeReleaseBuffer</span>(&amp;__pyx_pybuffernd_matrix.rcbuffer-&gt;pybuffer);
+    <span class='pyx_c_api'>__Pyx_SafeReleaseBuffer</span>(&amp;__pyx_pybuffernd_result.rcbuffer-&gt;pybuffer);
     <span class='pyx_c_api'>__Pyx_SafeReleaseBuffer</span>(&amp;__pyx_pybuffernd_shotNumber.rcbuffer-&gt;pybuffer);
   <span class='pyx_c_api'>__Pyx_ErrRestore</span>(__pyx_type, __pyx_value, __pyx_tb);}
   <span class='pyx_c_api'>__Pyx_AddTraceback</span>("lidar.lidar.core.ctools.mVolts", __pyx_clineno, __pyx_lineno, __pyx_filename);
@@ -712,22 +731,24 @@ static PyObject *__pyx_pf_5lidar_5lidar_4core_6ctools_2mVolts(CYTHON_UNUSED PyOb
   <span class='pyx_c_api'>__Pyx_SafeReleaseBuffer</span>(&amp;__pyx_pybuffernd_ADCBits.rcbuffer-&gt;pybuffer);
   <span class='pyx_c_api'>__Pyx_SafeReleaseBuffer</span>(&amp;__pyx_pybuffernd_inputRange.rcbuffer-&gt;pybuffer);
   <span class='pyx_c_api'>__Pyx_SafeReleaseBuffer</span>(&amp;__pyx_pybuffernd_matrix.rcbuffer-&gt;pybuffer);
+  <span class='pyx_c_api'>__Pyx_SafeReleaseBuffer</span>(&amp;__pyx_pybuffernd_result.rcbuffer-&gt;pybuffer);
   <span class='pyx_c_api'>__Pyx_SafeReleaseBuffer</span>(&amp;__pyx_pybuffernd_shotNumber.rcbuffer-&gt;pybuffer);
   __pyx_L2:;
+  <span class='pyx_macro_api'>__Pyx_XDECREF</span>((PyObject *)__pyx_v_result);
   <span class='refnanny'>__Pyx_XGIVEREF</span>(__pyx_r);
   <span class='refnanny'>__Pyx_RefNannyFinishContext</span>();
   return __pyx_r;
 }
 /* … */
-  __pyx_tuple__12 = <span class='py_c_api'>PyTuple_Pack</span>(11, __pyx_n_s_matrix, __pyx_n_s_inputRange, __pyx_n_s_ADCBits, __pyx_n_s_shotNumber, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_power, __pyx_n_s_const1, __pyx_n_s_const2, __pyx_n_s_rdim, __pyx_n_s_cdim); if (unlikely(!__pyx_tuple__12)) __PYX_ERR(0, 29, __pyx_L1_error)
+  __pyx_tuple__12 = <span class='py_c_api'>PyTuple_Pack</span>(12, __pyx_n_s_matrix, __pyx_n_s_inputRange, __pyx_n_s_ADCBits, __pyx_n_s_shotNumber, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_power, __pyx_n_s_const1, __pyx_n_s_const2, __pyx_n_s_rdim, __pyx_n_s_cdim, __pyx_n_s_result); if (unlikely(!__pyx_tuple__12)) __PYX_ERR(0, 29, __pyx_L1_error)
   <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_tuple__12);
   <span class='refnanny'>__Pyx_GIVEREF</span>(__pyx_tuple__12);
 /* … */
-  __pyx_t_1 = PyCFunction_NewEx(&amp;__pyx_mdef_5lidar_5lidar_4core_6ctools_3mVolts, NULL, __pyx_n_s_lidar_lidar_core_ctools); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 29, __pyx_L1_error)
-  <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_1);
-  if (<span class='py_c_api'>PyDict_SetItem</span>(__pyx_d, __pyx_n_s_mVolts, __pyx_t_1) &lt; 0) __PYX_ERR(0, 29, __pyx_L1_error)
-  <span class='pyx_macro_api'>__Pyx_DECREF</span>(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_codeobj__13 = (PyObject*)<span class='pyx_c_api'>__Pyx_PyCode_New</span>(4, 0, 11, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__12, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_jhernandezv_Documents_SIAT, __pyx_n_s_mVolts, 29, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__13)) __PYX_ERR(0, 29, __pyx_L1_error)
+  __pyx_t_2 = PyCFunction_NewEx(&amp;__pyx_mdef_5lidar_5lidar_4core_6ctools_3mVolts, NULL, __pyx_n_s_lidar_lidar_core_ctools); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 29, __pyx_L1_error)
+  <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_2);
+  if (<span class='py_c_api'>PyDict_SetItem</span>(__pyx_d, __pyx_n_s_mVolts, __pyx_t_2) &lt; 0) __PYX_ERR(0, 29, __pyx_L1_error)
+  <span class='pyx_macro_api'>__Pyx_DECREF</span>(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_codeobj__13 = (PyObject*)<span class='pyx_c_api'>__Pyx_PyCode_New</span>(4, 0, 12, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__12, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_jhernandezv_Documents_SIAT, __pyx_n_s_mVolts, 29, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__13)) __PYX_ERR(0, 29, __pyx_L1_error)
 </pre><pre class="cython line score-0">&#xA0;<span class="">30</span>:             <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[</span><span class="n">DTYPE_t</span><span class="p">,</span> <span class="n">ndim</span><span class="o">=</span><span class="mf">1</span><span class="p">]</span> <span class="n">inputRange</span><span class="p">,</span></pre>
 <pre class="cython line score-0">&#xA0;<span class="">31</span>:             <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[</span><span class="n">DTYPE_t</span><span class="p">,</span> <span class="n">ndim</span><span class="o">=</span><span class="mf">1</span><span class="p">]</span> <span class="n">ADCBits</span><span class="p">,</span></pre>
 <pre class="cython line score-0">&#xA0;<span class="">32</span>:             <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[</span><span class="n">DTYPE_t</span><span class="p">,</span> <span class="n">ndim</span><span class="o">=</span><span class="mf">1</span><span class="p">]</span> <span class="n">shotNumber</span><span class="p">):</span></pre>
@@ -742,42 +763,80 @@ static PyObject *__pyx_pf_5lidar_5lidar_4core_6ctools_2mVolts(CYTHON_UNUSED PyOb
 <pre class='cython code score-0 '>  __pyx_v_rdim = (__pyx_v_matrix-&gt;dimensions[0]);
 </pre><pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">39</span>:     <span class="k">cdef</span> <span class="kt">int</span> <span class="nf">cdim</span> <span class="o">=</span> <span class="n">matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mf">1</span><span class="p">]</span></pre>
 <pre class='cython code score-0 '>  __pyx_v_cdim = (__pyx_v_matrix-&gt;dimensions[1]);
-</pre><pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">40</span>:     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">rdim</span><span class="p">):</span></pre>
-<pre class='cython code score-0 '>  __pyx_t_1 = __pyx_v_rdim;
-  for (__pyx_t_2 = 0; __pyx_t_2 &lt; __pyx_t_1; __pyx_t_2+=1) {
-    __pyx_v_i = __pyx_t_2;
-</pre><pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">41</span>:         <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">cdim</span><span class="p">):</span></pre>
-<pre class='cython code score-0 '>    __pyx_t_3 = __pyx_v_cdim;
-    for (__pyx_t_4 = 0; __pyx_t_4 &lt; __pyx_t_3; __pyx_t_4+=1) {
-      __pyx_v_j = __pyx_t_4;
-</pre><pre class="cython line score-0">&#xA0;<span class="">42</span>:             <span class="c">#assert shotNumber[i] != 0</span></pre>
-<pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">43</span>:             <span class="n">power</span> <span class="o">=</span> <span class="n">const2</span> <span class="o">**</span> <span class="o">-</span><span class="n">ADCBits</span><span class="p">[</span><span class="n">i</span><span class="p">]</span></pre>
-<pre class='cython code score-0 '>      __pyx_t_5 = __pyx_v_i;
-      __pyx_v_power = pow(((__pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t)__pyx_v_const2), (-(*__Pyx_BufPtrStrided1d(__pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t *, __pyx_pybuffernd_ADCBits.rcbuffer-&gt;pybuffer.buf, __pyx_t_5, __pyx_pybuffernd_ADCBits.diminfo[0].strides))));
-</pre><pre class="cython line score-5" onclick='toggleDiv(this)'>+<span class="">44</span>:             <span class="n">matrix</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">*=</span> <span class="n">inputRange</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">const1</span> <span class="o">*</span>  <span class="n">power</span>  <span class="o">/</span> <span class="n">shotNumber</span><span class="p">[</span><span class="n">i</span><span class="p">]</span></pre>
-<pre class='cython code score-5 '>      __pyx_t_6 = __pyx_v_i;
-      __pyx_t_7 = (((*__Pyx_BufPtrStrided1d(__pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t *, __pyx_pybuffernd_inputRange.rcbuffer-&gt;pybuffer.buf, __pyx_t_6, __pyx_pybuffernd_inputRange.diminfo[0].strides)) * __pyx_v_const1) * __pyx_v_power);
-      __pyx_t_8 = __pyx_v_i;
-      __pyx_t_9 = (*__Pyx_BufPtrStrided1d(__pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t *, __pyx_pybuffernd_shotNumber.rcbuffer-&gt;pybuffer.buf, __pyx_t_8, __pyx_pybuffernd_shotNumber.diminfo[0].strides));
-      if (unlikely(__pyx_t_9 == 0)) {
-        <span class='py_c_api'>PyErr_SetString</span>(PyExc_ZeroDivisionError, "float division");
-        __PYX_ERR(0, 44, __pyx_L1_error)
-      }
-      __pyx_t_10 = __pyx_v_i;
-      __pyx_t_11 = __pyx_v_j;
-      *__Pyx_BufPtrStrided2d(__pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t *, __pyx_pybuffernd_matrix.rcbuffer-&gt;pybuffer.buf, __pyx_t_10, __pyx_pybuffernd_matrix.diminfo[0].strides, __pyx_t_11, __pyx_pybuffernd_matrix.diminfo[1].strides) *= (__pyx_t_7 / __pyx_t_9);
+</pre><pre class="cython line score-35" onclick='toggleDiv(this)'>+<span class="">40</span>:     <span class="k">cdef</span> <span class="kt">np</span>.<span class="kt">ndarray</span>[<span class="nf">DTYPE_t</span><span class="p">,</span> <span class="nf">ndim</span><span class="o">=</span><span class="mf">2</span><span class="p">]</span> <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty_like</span><span class="p">(</span><span class="n">matrix</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">DTYPE</span><span class="p">)</span></pre>
+<pre class='cython code score-35 '>  __pyx_t_1 = <span class='pyx_c_api'>__Pyx_GetModuleGlobalName</span>(__pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 40, __pyx_L1_error)
+  <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_1);
+  __pyx_t_2 = <span class='pyx_c_api'>__Pyx_PyObject_GetAttrStr</span>(__pyx_t_1, __pyx_n_s_empty_like); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 40, __pyx_L1_error)
+  <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_2);
+  <span class='pyx_macro_api'>__Pyx_DECREF</span>(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_1 = <span class='py_c_api'>PyTuple_New</span>(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 40, __pyx_L1_error)
+  <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_1);
+  <span class='pyx_macro_api'>__Pyx_INCREF</span>(((PyObject *)__pyx_v_matrix));
+  <span class='refnanny'>__Pyx_GIVEREF</span>(((PyObject *)__pyx_v_matrix));
+  <span class='py_macro_api'>PyTuple_SET_ITEM</span>(__pyx_t_1, 0, ((PyObject *)__pyx_v_matrix));
+  __pyx_t_3 = <span class='py_c_api'>PyDict_New</span>(); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 40, __pyx_L1_error)
+  <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_3);
+  __pyx_t_4 = <span class='pyx_c_api'>__Pyx_GetModuleGlobalName</span>(__pyx_n_s_DTYPE); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 40, __pyx_L1_error)
+  <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_4);
+  if (<span class='py_c_api'>PyDict_SetItem</span>(__pyx_t_3, __pyx_n_s_dtype, __pyx_t_4) &lt; 0) __PYX_ERR(0, 40, __pyx_L1_error)
+  <span class='pyx_macro_api'>__Pyx_DECREF</span>(__pyx_t_4); __pyx_t_4 = 0;
+  __pyx_t_4 = <span class='pyx_c_api'>__Pyx_PyObject_Call</span>(__pyx_t_2, __pyx_t_1, __pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 40, __pyx_L1_error)
+  <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_4);
+  <span class='pyx_macro_api'>__Pyx_DECREF</span>(__pyx_t_2); __pyx_t_2 = 0;
+  <span class='pyx_macro_api'>__Pyx_DECREF</span>(__pyx_t_1); __pyx_t_1 = 0;
+  <span class='pyx_macro_api'>__Pyx_DECREF</span>(__pyx_t_3); __pyx_t_3 = 0;
+  if (!(likely(((__pyx_t_4) == Py_None) || likely(<span class='pyx_c_api'>__Pyx_TypeTest</span>(__pyx_t_4, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 40, __pyx_L1_error)
+  __pyx_t_5 = ((PyArrayObject *)__pyx_t_4);
+  {
+    __Pyx_BufFmt_StackElem __pyx_stack[1];
+    if (unlikely(<span class='pyx_c_api'>__Pyx_GetBufferAndValidate</span>(&amp;__pyx_pybuffernd_result.rcbuffer-&gt;pybuffer, (PyObject*)__pyx_t_5, &amp;__Pyx_TypeInfo_nn___pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES| PyBUF_WRITABLE, 2, 0, __pyx_stack) == -1)) {
+      __pyx_v_result = ((PyArrayObject *)Py_None); <span class='pyx_macro_api'>__Pyx_INCREF</span>(Py_None); __pyx_pybuffernd_result.rcbuffer-&gt;pybuffer.buf = NULL;
+      __PYX_ERR(0, 40, __pyx_L1_error)
+    } else {__pyx_pybuffernd_result.diminfo[0].strides = __pyx_pybuffernd_result.rcbuffer-&gt;pybuffer.strides[0]; __pyx_pybuffernd_result.diminfo[0].shape = __pyx_pybuffernd_result.rcbuffer-&gt;pybuffer.shape[0]; __pyx_pybuffernd_result.diminfo[1].strides = __pyx_pybuffernd_result.rcbuffer-&gt;pybuffer.strides[1]; __pyx_pybuffernd_result.diminfo[1].shape = __pyx_pybuffernd_result.rcbuffer-&gt;pybuffer.shape[1];
     }
   }
-</pre><pre class="cython line score-2" onclick='toggleDiv(this)'>+<span class="">45</span>:     <span class="k">return</span> <span class="n">matrix</span></pre>
+  __pyx_t_5 = 0;
+  __pyx_v_result = ((PyArrayObject *)__pyx_t_4);
+  __pyx_t_4 = 0;
+</pre><pre class="cython line score-0">&#xA0;<span class="">41</span>: </pre>
+<pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">42</span>:     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">rdim</span><span class="p">):</span></pre>
+<pre class='cython code score-0 '>  __pyx_t_6 = __pyx_v_rdim;
+  for (__pyx_t_7 = 0; __pyx_t_7 &lt; __pyx_t_6; __pyx_t_7+=1) {
+    __pyx_v_i = __pyx_t_7;
+</pre><pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">43</span>:         <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">cdim</span><span class="p">):</span></pre>
+<pre class='cython code score-0 '>    __pyx_t_8 = __pyx_v_cdim;
+    for (__pyx_t_9 = 0; __pyx_t_9 &lt; __pyx_t_8; __pyx_t_9+=1) {
+      __pyx_v_j = __pyx_t_9;
+</pre><pre class="cython line score-0">&#xA0;<span class="">44</span>:             <span class="c">#assert shotNumber[i] != 0</span></pre>
+<pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">45</span>:             <span class="n">power</span> <span class="o">=</span> <span class="n">const2</span> <span class="o">**</span> <span class="o">-</span><span class="n">ADCBits</span><span class="p">[</span><span class="n">i</span><span class="p">]</span></pre>
+<pre class='cython code score-0 '>      __pyx_t_10 = __pyx_v_i;
+      __pyx_v_power = pow(((__pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t)__pyx_v_const2), (-(*__Pyx_BufPtrStrided1d(__pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t *, __pyx_pybuffernd_ADCBits.rcbuffer-&gt;pybuffer.buf, __pyx_t_10, __pyx_pybuffernd_ADCBits.diminfo[0].strides))));
+</pre><pre class="cython line score-5" onclick='toggleDiv(this)'>+<span class="">46</span>:             <span class="n">result</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">matrix</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="n">inputRange</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">const1</span> <span class="o">*</span>  <span class="n">power</span>  <span class="o">/</span> <span class="n">shotNumber</span><span class="p">[</span><span class="n">i</span><span class="p">]</span></pre>
+<pre class='cython code score-5 '>      __pyx_t_11 = __pyx_v_i;
+      __pyx_t_12 = __pyx_v_j;
+      __pyx_t_13 = __pyx_v_i;
+      __pyx_t_14 = ((((*__Pyx_BufPtrStrided2d(__pyx_t_5numpy_int64_t *, __pyx_pybuffernd_matrix.rcbuffer-&gt;pybuffer.buf, __pyx_t_11, __pyx_pybuffernd_matrix.diminfo[0].strides, __pyx_t_12, __pyx_pybuffernd_matrix.diminfo[1].strides)) * (*__Pyx_BufPtrStrided1d(__pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t *, __pyx_pybuffernd_inputRange.rcbuffer-&gt;pybuffer.buf, __pyx_t_13, __pyx_pybuffernd_inputRange.diminfo[0].strides))) * __pyx_v_const1) * __pyx_v_power);
+      __pyx_t_15 = __pyx_v_i;
+      __pyx_t_16 = (*__Pyx_BufPtrStrided1d(__pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t *, __pyx_pybuffernd_shotNumber.rcbuffer-&gt;pybuffer.buf, __pyx_t_15, __pyx_pybuffernd_shotNumber.diminfo[0].strides));
+      if (unlikely(__pyx_t_16 == 0)) {
+        <span class='py_c_api'>PyErr_SetString</span>(PyExc_ZeroDivisionError, "float division");
+        __PYX_ERR(0, 46, __pyx_L1_error)
+      }
+      __pyx_t_17 = __pyx_v_i;
+      __pyx_t_18 = __pyx_v_j;
+      *__Pyx_BufPtrStrided2d(__pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t *, __pyx_pybuffernd_result.rcbuffer-&gt;pybuffer.buf, __pyx_t_17, __pyx_pybuffernd_result.diminfo[0].strides, __pyx_t_18, __pyx_pybuffernd_result.diminfo[1].strides) = (__pyx_t_14 / __pyx_t_16);
+    }
+  }
+</pre><pre class="cython line score-2" onclick='toggleDiv(this)'>+<span class="">47</span>:     <span class="k">return</span> <span class="n">result</span></pre>
 <pre class='cython code score-2 '>  <span class='pyx_macro_api'>__Pyx_XDECREF</span>(__pyx_r);
-  <span class='pyx_macro_api'>__Pyx_INCREF</span>(((PyObject *)__pyx_v_matrix));
-  __pyx_r = ((PyObject *)__pyx_v_matrix);
+  <span class='pyx_macro_api'>__Pyx_INCREF</span>(((PyObject *)__pyx_v_result));
+  __pyx_r = ((PyObject *)__pyx_v_result);
   goto __pyx_L0;
-</pre><pre class="cython line score-0">&#xA0;<span class="">46</span>: </pre>
-<pre class="cython line score-0">&#xA0;<span class="">47</span>: <span class="nd">@cython</span><span class="o">.</span><span class="n">boundscheck</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span></pre>
-<pre class="cython line score-0">&#xA0;<span class="">48</span>: <span class="nd">@cython</span><span class="o">.</span><span class="n">wraparound</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span></pre>
-<pre class="cython line score-80" onclick='toggleDiv(this)'>+<span class="">49</span>: <span class="k">def</span> <span class="nf">mHz</span> <span class="p">(</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="p">[</span><span class="n">DTYPE_t</span><span class="p">,</span> <span class="n">ndim</span><span class="o">=</span><span class="mf">2</span><span class="p">]</span> <span class="n">matrix</span><span class="p">,</span></pre>
-<pre class='cython code score-80 '>/* Python wrapper */
+</pre><pre class="cython line score-0">&#xA0;<span class="">48</span>: </pre>
+<pre class="cython line score-0">&#xA0;<span class="">49</span>: <span class="nd">@cython</span><span class="o">.</span><span class="n">boundscheck</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span></pre>
+<pre class="cython line score-0">&#xA0;<span class="">50</span>: <span class="nd">@cython</span><span class="o">.</span><span class="n">wraparound</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span></pre>
+<pre class="cython line score-89" onclick='toggleDiv(this)'>+<span class="">51</span>: <span class="k">def</span> <span class="nf">mHz</span> <span class="p">(</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">int64_t</span><span class="p">,</span> <span class="n">ndim</span><span class="o">=</span><span class="mf">2</span><span class="p">]</span> <span class="n">matrix</span><span class="p">,</span></pre>
+<pre class='cython code score-89 '>/* Python wrapper */
 static PyObject *__pyx_pw_5lidar_5lidar_4core_6ctools_5mHz(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
 static PyMethodDef __pyx_mdef_5lidar_5lidar_4core_6ctools_5mHz = {"mHz", (PyCFunction)__pyx_pw_5lidar_5lidar_4core_6ctools_5mHz, METH_VARARGS|METH_KEYWORDS, 0};
 static PyObject *__pyx_pw_5lidar_5lidar_4core_6ctools_5mHz(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
@@ -808,16 +867,16 @@ static PyObject *__pyx_pw_5lidar_5lidar_4core_6ctools_5mHz(PyObject *__pyx_self,
         case  1:
         if (likely((values[1] = <span class='py_c_api'>PyDict_GetItem</span>(__pyx_kwds, __pyx_n_s_binWidth)) != 0)) kw_args--;
         else {
-          <span class='pyx_c_api'>__Pyx_RaiseArgtupleInvalid</span>("mHz", 1, 3, 3, 1); __PYX_ERR(0, 49, __pyx_L3_error)
+          <span class='pyx_c_api'>__Pyx_RaiseArgtupleInvalid</span>("mHz", 1, 3, 3, 1); __PYX_ERR(0, 51, __pyx_L3_error)
         }
         case  2:
         if (likely((values[2] = <span class='py_c_api'>PyDict_GetItem</span>(__pyx_kwds, __pyx_n_s_shotNumber)) != 0)) kw_args--;
         else {
-          <span class='pyx_c_api'>__Pyx_RaiseArgtupleInvalid</span>("mHz", 1, 3, 3, 2); __PYX_ERR(0, 49, __pyx_L3_error)
+          <span class='pyx_c_api'>__Pyx_RaiseArgtupleInvalid</span>("mHz", 1, 3, 3, 2); __PYX_ERR(0, 51, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args &gt; 0)) {
-        if (unlikely(<span class='pyx_c_api'>__Pyx_ParseOptionalKeywords</span>(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "mHz") &lt; 0)) __PYX_ERR(0, 49, __pyx_L3_error)
+        if (unlikely(<span class='pyx_c_api'>__Pyx_ParseOptionalKeywords</span>(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "mHz") &lt; 0)) __PYX_ERR(0, 51, __pyx_L3_error)
       }
     } else if (<span class='py_macro_api'>PyTuple_GET_SIZE</span>(__pyx_args) != 3) {
       goto __pyx_L5_argtuple_error;
@@ -832,15 +891,15 @@ static PyObject *__pyx_pw_5lidar_5lidar_4core_6ctools_5mHz(PyObject *__pyx_self,
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  <span class='pyx_c_api'>__Pyx_RaiseArgtupleInvalid</span>("mHz", 1, 3, 3, <span class='py_macro_api'>PyTuple_GET_SIZE</span>(__pyx_args)); __PYX_ERR(0, 49, __pyx_L3_error)
+  <span class='pyx_c_api'>__Pyx_RaiseArgtupleInvalid</span>("mHz", 1, 3, 3, <span class='py_macro_api'>PyTuple_GET_SIZE</span>(__pyx_args)); __PYX_ERR(0, 51, __pyx_L3_error)
   __pyx_L3_error:;
   <span class='pyx_c_api'>__Pyx_AddTraceback</span>("lidar.lidar.core.ctools.mHz", __pyx_clineno, __pyx_lineno, __pyx_filename);
   <span class='refnanny'>__Pyx_RefNannyFinishContext</span>();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!<span class='pyx_c_api'>__Pyx_ArgTypeTest</span>(((PyObject *)__pyx_v_matrix), __pyx_ptype_5numpy_ndarray, 1, "matrix", 0))) __PYX_ERR(0, 49, __pyx_L1_error)
-  if (unlikely(!<span class='pyx_c_api'>__Pyx_ArgTypeTest</span>(((PyObject *)__pyx_v_binWidth), __pyx_ptype_5numpy_ndarray, 1, "binWidth", 0))) __PYX_ERR(0, 50, __pyx_L1_error)
-  if (unlikely(!<span class='pyx_c_api'>__Pyx_ArgTypeTest</span>(((PyObject *)__pyx_v_shotNumber), __pyx_ptype_5numpy_ndarray, 1, "shotNumber", 0))) __PYX_ERR(0, 51, __pyx_L1_error)
+  if (unlikely(!<span class='pyx_c_api'>__Pyx_ArgTypeTest</span>(((PyObject *)__pyx_v_matrix), __pyx_ptype_5numpy_ndarray, 1, "matrix", 0))) __PYX_ERR(0, 51, __pyx_L1_error)
+  if (unlikely(!<span class='pyx_c_api'>__Pyx_ArgTypeTest</span>(((PyObject *)__pyx_v_binWidth), __pyx_ptype_5numpy_ndarray, 1, "binWidth", 0))) __PYX_ERR(0, 52, __pyx_L1_error)
+  if (unlikely(!<span class='pyx_c_api'>__Pyx_ArgTypeTest</span>(((PyObject *)__pyx_v_shotNumber), __pyx_ptype_5numpy_ndarray, 1, "shotNumber", 0))) __PYX_ERR(0, 53, __pyx_L1_error)
   __pyx_r = __pyx_pf_5lidar_5lidar_4core_6ctools_4mHz(__pyx_self, __pyx_v_matrix, __pyx_v_binWidth, __pyx_v_shotNumber);
 
   /* function exit code */
@@ -858,15 +917,22 @@ static PyObject *__pyx_pf_5lidar_5lidar_4core_6ctools_4mHz(CYTHON_UNUSED PyObjec
   int __pyx_v_const1;
   int __pyx_v_rdim;
   int __pyx_v_cdim;
+  PyArrayObject *__pyx_v_result = 0;
   __Pyx_LocalBuf_ND __pyx_pybuffernd_binWidth;
   __Pyx_Buffer __pyx_pybuffer_binWidth;
   __Pyx_LocalBuf_ND __pyx_pybuffernd_matrix;
   __Pyx_Buffer __pyx_pybuffer_matrix;
+  __Pyx_LocalBuf_ND __pyx_pybuffernd_result;
+  __Pyx_Buffer __pyx_pybuffer_result;
   __Pyx_LocalBuf_ND __pyx_pybuffernd_shotNumber;
   __Pyx_Buffer __pyx_pybuffer_shotNumber;
   PyObject *__pyx_r = NULL;
   <span class='refnanny'>__Pyx_RefNannyDeclarations</span>
   <span class='refnanny'>__Pyx_RefNannySetupContext</span>("mHz", 0);
+  __pyx_pybuffer_result.pybuffer.buf = NULL;
+  __pyx_pybuffer_result.refcount = 0;
+  __pyx_pybuffernd_result.data = NULL;
+  __pyx_pybuffernd_result.rcbuffer = &amp;__pyx_pybuffer_result;
   __pyx_pybuffer_matrix.pybuffer.buf = NULL;
   __pyx_pybuffer_matrix.refcount = 0;
   __pyx_pybuffernd_matrix.data = NULL;
@@ -881,28 +947,33 @@ static PyObject *__pyx_pf_5lidar_5lidar_4core_6ctools_4mHz(CYTHON_UNUSED PyObjec
   __pyx_pybuffernd_shotNumber.rcbuffer = &amp;__pyx_pybuffer_shotNumber;
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(<span class='pyx_c_api'>__Pyx_GetBufferAndValidate</span>(&amp;__pyx_pybuffernd_matrix.rcbuffer-&gt;pybuffer, (PyObject*)__pyx_v_matrix, &amp;__Pyx_TypeInfo_nn___pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES| PyBUF_WRITABLE, 2, 0, __pyx_stack) == -1)) __PYX_ERR(0, 49, __pyx_L1_error)
+    if (unlikely(<span class='pyx_c_api'>__Pyx_GetBufferAndValidate</span>(&amp;__pyx_pybuffernd_matrix.rcbuffer-&gt;pybuffer, (PyObject*)__pyx_v_matrix, &amp;__Pyx_TypeInfo_nn___pyx_t_5numpy_int64_t, PyBUF_FORMAT| PyBUF_STRIDES, 2, 0, __pyx_stack) == -1)) __PYX_ERR(0, 51, __pyx_L1_error)
   }
   __pyx_pybuffernd_matrix.diminfo[0].strides = __pyx_pybuffernd_matrix.rcbuffer-&gt;pybuffer.strides[0]; __pyx_pybuffernd_matrix.diminfo[0].shape = __pyx_pybuffernd_matrix.rcbuffer-&gt;pybuffer.shape[0]; __pyx_pybuffernd_matrix.diminfo[1].strides = __pyx_pybuffernd_matrix.rcbuffer-&gt;pybuffer.strides[1]; __pyx_pybuffernd_matrix.diminfo[1].shape = __pyx_pybuffernd_matrix.rcbuffer-&gt;pybuffer.shape[1];
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(<span class='pyx_c_api'>__Pyx_GetBufferAndValidate</span>(&amp;__pyx_pybuffernd_binWidth.rcbuffer-&gt;pybuffer, (PyObject*)__pyx_v_binWidth, &amp;__Pyx_TypeInfo_nn___pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 49, __pyx_L1_error)
+    if (unlikely(<span class='pyx_c_api'>__Pyx_GetBufferAndValidate</span>(&amp;__pyx_pybuffernd_binWidth.rcbuffer-&gt;pybuffer, (PyObject*)__pyx_v_binWidth, &amp;__Pyx_TypeInfo_nn___pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 51, __pyx_L1_error)
   }
   __pyx_pybuffernd_binWidth.diminfo[0].strides = __pyx_pybuffernd_binWidth.rcbuffer-&gt;pybuffer.strides[0]; __pyx_pybuffernd_binWidth.diminfo[0].shape = __pyx_pybuffernd_binWidth.rcbuffer-&gt;pybuffer.shape[0];
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(<span class='pyx_c_api'>__Pyx_GetBufferAndValidate</span>(&amp;__pyx_pybuffernd_shotNumber.rcbuffer-&gt;pybuffer, (PyObject*)__pyx_v_shotNumber, &amp;__Pyx_TypeInfo_nn___pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 49, __pyx_L1_error)
+    if (unlikely(<span class='pyx_c_api'>__Pyx_GetBufferAndValidate</span>(&amp;__pyx_pybuffernd_shotNumber.rcbuffer-&gt;pybuffer, (PyObject*)__pyx_v_shotNumber, &amp;__Pyx_TypeInfo_nn___pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 51, __pyx_L1_error)
   }
   __pyx_pybuffernd_shotNumber.diminfo[0].strides = __pyx_pybuffernd_shotNumber.rcbuffer-&gt;pybuffer.strides[0]; __pyx_pybuffernd_shotNumber.diminfo[0].shape = __pyx_pybuffernd_shotNumber.rcbuffer-&gt;pybuffer.shape[0];
 /* … */
   /* function exit code */
   __pyx_L1_error:;
+  <span class='pyx_macro_api'>__Pyx_XDECREF</span>(__pyx_t_1);
+  <span class='pyx_macro_api'>__Pyx_XDECREF</span>(__pyx_t_2);
+  <span class='pyx_macro_api'>__Pyx_XDECREF</span>(__pyx_t_3);
+  <span class='pyx_macro_api'>__Pyx_XDECREF</span>(__pyx_t_4);
   { PyObject *__pyx_type, *__pyx_value, *__pyx_tb;
     __Pyx_PyThreadState_declare
     __Pyx_PyThreadState_assign
     <span class='pyx_c_api'>__Pyx_ErrFetch</span>(&amp;__pyx_type, &amp;__pyx_value, &amp;__pyx_tb);
     <span class='pyx_c_api'>__Pyx_SafeReleaseBuffer</span>(&amp;__pyx_pybuffernd_binWidth.rcbuffer-&gt;pybuffer);
     <span class='pyx_c_api'>__Pyx_SafeReleaseBuffer</span>(&amp;__pyx_pybuffernd_matrix.rcbuffer-&gt;pybuffer);
+    <span class='pyx_c_api'>__Pyx_SafeReleaseBuffer</span>(&amp;__pyx_pybuffernd_result.rcbuffer-&gt;pybuffer);
     <span class='pyx_c_api'>__Pyx_SafeReleaseBuffer</span>(&amp;__pyx_pybuffernd_shotNumber.rcbuffer-&gt;pybuffer);
   <span class='pyx_c_api'>__Pyx_ErrRestore</span>(__pyx_type, __pyx_value, __pyx_tb);}
   <span class='pyx_c_api'>__Pyx_AddTraceback</span>("lidar.lidar.core.ctools.mHz", __pyx_clineno, __pyx_lineno, __pyx_filename);
@@ -911,59 +982,99 @@ static PyObject *__pyx_pf_5lidar_5lidar_4core_6ctools_4mHz(CYTHON_UNUSED PyObjec
   __pyx_L0:;
   <span class='pyx_c_api'>__Pyx_SafeReleaseBuffer</span>(&amp;__pyx_pybuffernd_binWidth.rcbuffer-&gt;pybuffer);
   <span class='pyx_c_api'>__Pyx_SafeReleaseBuffer</span>(&amp;__pyx_pybuffernd_matrix.rcbuffer-&gt;pybuffer);
+  <span class='pyx_c_api'>__Pyx_SafeReleaseBuffer</span>(&amp;__pyx_pybuffernd_result.rcbuffer-&gt;pybuffer);
   <span class='pyx_c_api'>__Pyx_SafeReleaseBuffer</span>(&amp;__pyx_pybuffernd_shotNumber.rcbuffer-&gt;pybuffer);
   __pyx_L2:;
+  <span class='pyx_macro_api'>__Pyx_XDECREF</span>((PyObject *)__pyx_v_result);
   <span class='refnanny'>__Pyx_XGIVEREF</span>(__pyx_r);
   <span class='refnanny'>__Pyx_RefNannyFinishContext</span>();
   return __pyx_r;
 }
 /* … */
-  __pyx_tuple__14 = <span class='py_c_api'>PyTuple_Pack</span>(8, __pyx_n_s_matrix, __pyx_n_s_binWidth, __pyx_n_s_shotNumber, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_const1, __pyx_n_s_rdim, __pyx_n_s_cdim); if (unlikely(!__pyx_tuple__14)) __PYX_ERR(0, 49, __pyx_L1_error)
+  __pyx_tuple__14 = <span class='py_c_api'>PyTuple_Pack</span>(9, __pyx_n_s_matrix, __pyx_n_s_binWidth, __pyx_n_s_shotNumber, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_const1, __pyx_n_s_rdim, __pyx_n_s_cdim, __pyx_n_s_result); if (unlikely(!__pyx_tuple__14)) __PYX_ERR(0, 51, __pyx_L1_error)
   <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_tuple__14);
   <span class='refnanny'>__Pyx_GIVEREF</span>(__pyx_tuple__14);
 /* … */
-  __pyx_t_1 = PyCFunction_NewEx(&amp;__pyx_mdef_5lidar_5lidar_4core_6ctools_5mHz, NULL, __pyx_n_s_lidar_lidar_core_ctools); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 49, __pyx_L1_error)
-  <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_1);
-  if (<span class='py_c_api'>PyDict_SetItem</span>(__pyx_d, __pyx_n_s_mHz, __pyx_t_1) &lt; 0) __PYX_ERR(0, 49, __pyx_L1_error)
-  <span class='pyx_macro_api'>__Pyx_DECREF</span>(__pyx_t_1); __pyx_t_1 = 0;
-</pre><pre class="cython line score-0">&#xA0;<span class="">50</span>:             <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[</span><span class="n">DTYPE_t</span><span class="p">,</span> <span class="n">ndim</span><span class="o">=</span><span class="mf">1</span><span class="p">]</span> <span class="n">binWidth</span><span class="p">,</span></pre>
-<pre class="cython line score-0">&#xA0;<span class="">51</span>:             <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[</span><span class="n">DTYPE_t</span><span class="p">,</span> <span class="n">ndim</span><span class="o">=</span><span class="mf">1</span><span class="p">]</span> <span class="n">shotNumber</span><span class="p">):</span></pre>
-<pre class="cython line score-0">&#xA0;<span class="">52</span>: </pre>
-<pre class="cython line score-0">&#xA0;<span class="">53</span>:     <span class="k">cdef</span> <span class="kt">int</span> <span class="nf">i</span><span class="p">,</span><span class="nf">j</span></pre>
-<pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">54</span>:     <span class="k">cdef</span> <span class="kt">int</span> <span class="nf">const1</span> <span class="o">=</span> <span class="mf">150</span></pre>
+  __pyx_t_2 = PyCFunction_NewEx(&amp;__pyx_mdef_5lidar_5lidar_4core_6ctools_5mHz, NULL, __pyx_n_s_lidar_lidar_core_ctools); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 51, __pyx_L1_error)
+  <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_2);
+  if (<span class='py_c_api'>PyDict_SetItem</span>(__pyx_d, __pyx_n_s_mHz, __pyx_t_2) &lt; 0) __PYX_ERR(0, 51, __pyx_L1_error)
+  <span class='pyx_macro_api'>__Pyx_DECREF</span>(__pyx_t_2); __pyx_t_2 = 0;
+</pre><pre class="cython line score-0">&#xA0;<span class="">52</span>:             <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[</span><span class="n">DTYPE_t</span><span class="p">,</span> <span class="n">ndim</span><span class="o">=</span><span class="mf">1</span><span class="p">]</span> <span class="n">binWidth</span><span class="p">,</span></pre>
+<pre class="cython line score-0">&#xA0;<span class="">53</span>:             <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[</span><span class="n">DTYPE_t</span><span class="p">,</span> <span class="n">ndim</span><span class="o">=</span><span class="mf">1</span><span class="p">]</span> <span class="n">shotNumber</span><span class="p">):</span></pre>
+<pre class="cython line score-0">&#xA0;<span class="">54</span>: </pre>
+<pre class="cython line score-0">&#xA0;<span class="">55</span>:     <span class="k">cdef</span> <span class="kt">int</span> <span class="nf">i</span><span class="p">,</span><span class="nf">j</span></pre>
+<pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">56</span>:     <span class="k">cdef</span> <span class="kt">int</span> <span class="nf">const1</span> <span class="o">=</span> <span class="mf">150</span></pre>
 <pre class='cython code score-0 '>  __pyx_v_const1 = 0x96;
-</pre><pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">55</span>:     <span class="k">cdef</span> <span class="kt">int</span> <span class="nf">rdim</span> <span class="o">=</span> <span class="n">matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span></pre>
+</pre><pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">57</span>:     <span class="k">cdef</span> <span class="kt">int</span> <span class="nf">rdim</span> <span class="o">=</span> <span class="n">matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span></pre>
 <pre class='cython code score-0 '>  __pyx_v_rdim = (__pyx_v_matrix-&gt;dimensions[0]);
-</pre><pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">56</span>:     <span class="k">cdef</span> <span class="kt">int</span> <span class="nf">cdim</span> <span class="o">=</span> <span class="n">matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mf">1</span><span class="p">]</span></pre>
+</pre><pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">58</span>:     <span class="k">cdef</span> <span class="kt">int</span> <span class="nf">cdim</span> <span class="o">=</span> <span class="n">matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mf">1</span><span class="p">]</span></pre>
 <pre class='cython code score-0 '>  __pyx_v_cdim = (__pyx_v_matrix-&gt;dimensions[1]);
-</pre><pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">57</span>:     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">rdim</span><span class="p">):</span></pre>
-<pre class='cython code score-0 '>  __pyx_t_1 = __pyx_v_rdim;
-  for (__pyx_t_2 = 0; __pyx_t_2 &lt; __pyx_t_1; __pyx_t_2+=1) {
-    __pyx_v_i = __pyx_t_2;
-</pre><pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">58</span>:         <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">cdim</span><span class="p">):</span></pre>
-<pre class='cython code score-0 '>    __pyx_t_3 = __pyx_v_cdim;
-    for (__pyx_t_4 = 0; __pyx_t_4 &lt; __pyx_t_3; __pyx_t_4+=1) {
-      __pyx_v_j = __pyx_t_4;
-</pre><pre class="cython line score-10" onclick='toggleDiv(this)'>+<span class="">59</span>:             <span class="n">matrix</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">*=</span> <span class="p">(</span> <span class="n">const1</span> <span class="o">/</span>  <span class="n">binWidth</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="p">)</span> <span class="o">/</span> <span class="n">shotNumber</span><span class="p">[</span><span class="n">i</span><span class="p">]</span></pre>
-<pre class='cython code score-10 '>      __pyx_t_5 = __pyx_v_i;
-      __pyx_t_6 = (*__Pyx_BufPtrStrided1d(__pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t *, __pyx_pybuffernd_binWidth.rcbuffer-&gt;pybuffer.buf, __pyx_t_5, __pyx_pybuffernd_binWidth.diminfo[0].strides));
-      if (unlikely(__pyx_t_6 == 0)) {
-        <span class='py_c_api'>PyErr_SetString</span>(PyExc_ZeroDivisionError, "float division");
-        __PYX_ERR(0, 59, __pyx_L1_error)
-      }
-      __pyx_t_7 = (__pyx_v_const1 / __pyx_t_6);
-      __pyx_t_8 = __pyx_v_i;
-      __pyx_t_6 = (*__Pyx_BufPtrStrided1d(__pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t *, __pyx_pybuffernd_shotNumber.rcbuffer-&gt;pybuffer.buf, __pyx_t_8, __pyx_pybuffernd_shotNumber.diminfo[0].strides));
-      if (unlikely(__pyx_t_6 == 0)) {
-        <span class='py_c_api'>PyErr_SetString</span>(PyExc_ZeroDivisionError, "float division");
-        __PYX_ERR(0, 59, __pyx_L1_error)
-      }
-      __pyx_t_9 = __pyx_v_i;
-      __pyx_t_10 = __pyx_v_j;
-      *__Pyx_BufPtrStrided2d(__pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t *, __pyx_pybuffernd_matrix.rcbuffer-&gt;pybuffer.buf, __pyx_t_9, __pyx_pybuffernd_matrix.diminfo[0].strides, __pyx_t_10, __pyx_pybuffernd_matrix.diminfo[1].strides) *= (__pyx_t_7 / __pyx_t_6);
+</pre><pre class="cython line score-35" onclick='toggleDiv(this)'>+<span class="">59</span>:     <span class="k">cdef</span> <span class="kt">np</span>.<span class="kt">ndarray</span>[<span class="nf">DTYPE_t</span><span class="p">,</span> <span class="nf">ndim</span><span class="o">=</span><span class="mf">2</span><span class="p">]</span> <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty_like</span><span class="p">(</span><span class="n">matrix</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">DTYPE</span><span class="p">)</span></pre>
+<pre class='cython code score-35 '>  __pyx_t_1 = <span class='pyx_c_api'>__Pyx_GetModuleGlobalName</span>(__pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 59, __pyx_L1_error)
+  <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_1);
+  __pyx_t_2 = <span class='pyx_c_api'>__Pyx_PyObject_GetAttrStr</span>(__pyx_t_1, __pyx_n_s_empty_like); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 59, __pyx_L1_error)
+  <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_2);
+  <span class='pyx_macro_api'>__Pyx_DECREF</span>(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_1 = <span class='py_c_api'>PyTuple_New</span>(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 59, __pyx_L1_error)
+  <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_1);
+  <span class='pyx_macro_api'>__Pyx_INCREF</span>(((PyObject *)__pyx_v_matrix));
+  <span class='refnanny'>__Pyx_GIVEREF</span>(((PyObject *)__pyx_v_matrix));
+  <span class='py_macro_api'>PyTuple_SET_ITEM</span>(__pyx_t_1, 0, ((PyObject *)__pyx_v_matrix));
+  __pyx_t_3 = <span class='py_c_api'>PyDict_New</span>(); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 59, __pyx_L1_error)
+  <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_3);
+  __pyx_t_4 = <span class='pyx_c_api'>__Pyx_GetModuleGlobalName</span>(__pyx_n_s_DTYPE); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 59, __pyx_L1_error)
+  <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_4);
+  if (<span class='py_c_api'>PyDict_SetItem</span>(__pyx_t_3, __pyx_n_s_dtype, __pyx_t_4) &lt; 0) __PYX_ERR(0, 59, __pyx_L1_error)
+  <span class='pyx_macro_api'>__Pyx_DECREF</span>(__pyx_t_4); __pyx_t_4 = 0;
+  __pyx_t_4 = <span class='pyx_c_api'>__Pyx_PyObject_Call</span>(__pyx_t_2, __pyx_t_1, __pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 59, __pyx_L1_error)
+  <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_4);
+  <span class='pyx_macro_api'>__Pyx_DECREF</span>(__pyx_t_2); __pyx_t_2 = 0;
+  <span class='pyx_macro_api'>__Pyx_DECREF</span>(__pyx_t_1); __pyx_t_1 = 0;
+  <span class='pyx_macro_api'>__Pyx_DECREF</span>(__pyx_t_3); __pyx_t_3 = 0;
+  if (!(likely(((__pyx_t_4) == Py_None) || likely(<span class='pyx_c_api'>__Pyx_TypeTest</span>(__pyx_t_4, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 59, __pyx_L1_error)
+  __pyx_t_5 = ((PyArrayObject *)__pyx_t_4);
+  {
+    __Pyx_BufFmt_StackElem __pyx_stack[1];
+    if (unlikely(<span class='pyx_c_api'>__Pyx_GetBufferAndValidate</span>(&amp;__pyx_pybuffernd_result.rcbuffer-&gt;pybuffer, (PyObject*)__pyx_t_5, &amp;__Pyx_TypeInfo_nn___pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES| PyBUF_WRITABLE, 2, 0, __pyx_stack) == -1)) {
+      __pyx_v_result = ((PyArrayObject *)Py_None); <span class='pyx_macro_api'>__Pyx_INCREF</span>(Py_None); __pyx_pybuffernd_result.rcbuffer-&gt;pybuffer.buf = NULL;
+      __PYX_ERR(0, 59, __pyx_L1_error)
+    } else {__pyx_pybuffernd_result.diminfo[0].strides = __pyx_pybuffernd_result.rcbuffer-&gt;pybuffer.strides[0]; __pyx_pybuffernd_result.diminfo[0].shape = __pyx_pybuffernd_result.rcbuffer-&gt;pybuffer.shape[0]; __pyx_pybuffernd_result.diminfo[1].strides = __pyx_pybuffernd_result.rcbuffer-&gt;pybuffer.strides[1]; __pyx_pybuffernd_result.diminfo[1].shape = __pyx_pybuffernd_result.rcbuffer-&gt;pybuffer.shape[1];
     }
   }
-</pre><pre class="cython line score-2" onclick='toggleDiv(this)'>+<span class="">60</span>:     <span class="k">return</span> <span class="n">matrix</span></pre>
+  __pyx_t_5 = 0;
+  __pyx_v_result = ((PyArrayObject *)__pyx_t_4);
+  __pyx_t_4 = 0;
+</pre><pre class="cython line score-0">&#xA0;<span class="">60</span>: </pre>
+<pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">61</span>:     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">rdim</span><span class="p">):</span></pre>
+<pre class='cython code score-0 '>  __pyx_t_6 = __pyx_v_rdim;
+  for (__pyx_t_7 = 0; __pyx_t_7 &lt; __pyx_t_6; __pyx_t_7+=1) {
+    __pyx_v_i = __pyx_t_7;
+</pre><pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">62</span>:         <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">cdim</span><span class="p">):</span></pre>
+<pre class='cython code score-0 '>    __pyx_t_8 = __pyx_v_cdim;
+    for (__pyx_t_9 = 0; __pyx_t_9 &lt; __pyx_t_8; __pyx_t_9+=1) {
+      __pyx_v_j = __pyx_t_9;
+</pre><pre class="cython line score-10" onclick='toggleDiv(this)'>+<span class="">63</span>:             <span class="n">result</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">matrix</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span> <span class="n">const1</span> <span class="o">/</span>  <span class="n">binWidth</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="p">)</span> <span class="o">/</span> <span class="n">shotNumber</span><span class="p">[</span><span class="n">i</span><span class="p">]</span></pre>
+<pre class='cython code score-10 '>      __pyx_t_10 = __pyx_v_i;
+      __pyx_t_11 = __pyx_v_j;
+      __pyx_t_12 = __pyx_v_i;
+      __pyx_t_13 = (*__Pyx_BufPtrStrided1d(__pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t *, __pyx_pybuffernd_binWidth.rcbuffer-&gt;pybuffer.buf, __pyx_t_12, __pyx_pybuffernd_binWidth.diminfo[0].strides));
+      if (unlikely(__pyx_t_13 == 0)) {
+        <span class='py_c_api'>PyErr_SetString</span>(PyExc_ZeroDivisionError, "float division");
+        __PYX_ERR(0, 63, __pyx_L1_error)
+      }
+      __pyx_t_14 = ((*__Pyx_BufPtrStrided2d(__pyx_t_5numpy_int64_t *, __pyx_pybuffernd_matrix.rcbuffer-&gt;pybuffer.buf, __pyx_t_10, __pyx_pybuffernd_matrix.diminfo[0].strides, __pyx_t_11, __pyx_pybuffernd_matrix.diminfo[1].strides)) * (__pyx_v_const1 / __pyx_t_13));
+      __pyx_t_15 = __pyx_v_i;
+      __pyx_t_13 = (*__Pyx_BufPtrStrided1d(__pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t *, __pyx_pybuffernd_shotNumber.rcbuffer-&gt;pybuffer.buf, __pyx_t_15, __pyx_pybuffernd_shotNumber.diminfo[0].strides));
+      if (unlikely(__pyx_t_13 == 0)) {
+        <span class='py_c_api'>PyErr_SetString</span>(PyExc_ZeroDivisionError, "float division");
+        __PYX_ERR(0, 63, __pyx_L1_error)
+      }
+      __pyx_t_16 = __pyx_v_i;
+      __pyx_t_17 = __pyx_v_j;
+      *__Pyx_BufPtrStrided2d(__pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t *, __pyx_pybuffernd_result.rcbuffer-&gt;pybuffer.buf, __pyx_t_16, __pyx_pybuffernd_result.diminfo[0].strides, __pyx_t_17, __pyx_pybuffernd_result.diminfo[1].strides) = (__pyx_t_14 / __pyx_t_13);
+    }
+  }
+</pre><pre class="cython line score-2" onclick='toggleDiv(this)'>+<span class="">64</span>:     <span class="k">return</span> <span class="n">matrix</span></pre>
 <pre class='cython code score-2 '>  <span class='pyx_macro_api'>__Pyx_XDECREF</span>(__pyx_r);
   <span class='pyx_macro_api'>__Pyx_INCREF</span>(((PyObject *)__pyx_v_matrix));
   __pyx_r = ((PyObject *)__pyx_v_matrix);
