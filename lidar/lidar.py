@@ -10,8 +10,8 @@ import pandas as pd
 import struct
 import sys, os, glob, locale
 
-from core.plotbook import PlotBook
-from core.ctools import (range_corrected, mVolts, mHz)
+from .core.plotbook import PlotBook
+from .core.ctools import (range_corrected, mVolts, mHz)
 from dateutil.relativedelta import relativedelta
 from matplotlib.pyplot import register_cmap, get_cmap
 from matplotlib.dates import DateFormatter
