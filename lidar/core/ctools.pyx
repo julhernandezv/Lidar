@@ -12,7 +12,7 @@ ctypedef np.float64_t DTYPE_t
 @cython.boundscheck(False) # turn off bounds-checking for entire function
 @cython.wraparound(False)
 def range_corrected( np.ndarray [DTYPE_t, ndim=2] matrix,
-                    np.ndarray [DTYPE_t, ndim=1] rang):
+                    np.ndarray [np.int64_t, ndim=1] rang):
     cdef int i,j
     cdef int rdim = matrix.shape[0]
     cdef int cdim = matrix.shape[1]
@@ -56,5 +56,5 @@ def mHz ( np.ndarray [DTYPE_t, ndim=2] matrix,
     cdef int cdim = matrix.shape[1]
     for i in range(rdim):
         for j in range(cdim):
-            matrix[i,j] *= ( const1 /  binWidth ) / shotNumber
+            matrix[i,j] *= ( const1 /  binWidth[i] ) / shotNumber[i]
     return matrix

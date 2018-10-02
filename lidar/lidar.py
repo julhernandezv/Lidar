@@ -763,15 +763,15 @@ class Lidar(PlotBook):
 
             tmpList.append(
                 pd.DataFrame(
-                    mVolts(tmp,
-                        self.datosInfo[ 'InputRange_'+col ],
-                        self.datosInfo[ 'ADCBits_'+col ],
-                        self.datosInfo[ 'ShotNumber_'+col ]
+                    mVolts(tmp.values,
+                        self.datosInfo[ 'InputRange_'+col ].values,
+                        self.datosInfo[ 'ADCBits_'+col ].values,
+                        self.datosInfo[ 'ShotNumber_'+col ].values
                         )
                     if 'analog' in col else
-                    mHz(tmp,
-                        self.datosInfo['BinWidth_'+col ],
-                        self.datosInfo[ 'ShotNumber_'+col ]
+                    mHz(tmp.values,
+                        self.datosInfo['BinWidth_'+col ].values,
+                        self.datosInfo[ 'ShotNumber_'+col ].values
                         )
                 ,
                 index=tmp.index,

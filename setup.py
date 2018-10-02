@@ -6,7 +6,7 @@ import numpy as np
 
 ext_modules = [
     Extension("ctools",
-        sources=["lidar/core/tools.pyx"],
+        sources=["lidar/core/ctools.pyx"],
         # libraries=["m"]  # Unix-like specific
         )
 ]
@@ -17,7 +17,7 @@ setup(
     author='Julian Hernandez Velasquez',
     author_email='jhernandezv@unal.edu.co',
     packages=['lidar'],
-    package_data={'cpr':['Nivel.py','SqlDb.py','static.py','information.py']},
+    # package_data={'lidar':['Nivel.py','SqlDb.py','static.py','information.py']},
     url='https://github.com/julhernandezv/Lidar.git',
     license='LICENSE.txt',
     description="Class for manipulating SIATA's Scanning Lidar",
