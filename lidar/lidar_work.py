@@ -125,8 +125,8 @@ import pandas as pd
 import numpy as np
 import datetime as dt
 import os, locale
-os.system('rm lidar/*.pyc')
-from lidar.lidar import Lidar
+os.system('rm lidar/lidar/*.pyc')
+from lidar.lidar.lidar import Lidar
 locale.setlocale(locale.LC_TIME, ('en_GB','utf-8'))
 
 # vlim = {'analog-s':[0.2,16],'analog-p':[0.2,16],'analog':[0,0.7] }
@@ -134,7 +134,7 @@ locale.setlocale(locale.LC_TIME, ('en_GB','utf-8'))
 
 # for date in pd.date_range('2018-08-01','2018-08-31',freq='d'): #'2018-06-27','2018-07-14',freq='d'):
     # try:
-date = pd.date_range('2018-08-03','2018-08-07',freq='d') #'2018-06-27','2018-07-14',freq='d'):
+date = pd.date_range('2018-08-06','2018-08-06',freq='d') #'2018-06-27','2018-07-14',freq='d'):
         #
 binario =   Lidar(
     fechaI=date.strftime('%Y-%m-%d')[0],
@@ -145,7 +145,7 @@ binario =   Lidar(
 binario.read()
 
 # binario.datos.loc(axis=1)[:,:,'photon-p'] * binario.datosInfo.loc[0,'BinWidth_photon-p']
-# backup = [binario.datos, binario.datosInfo]
+backup = [binario.datos.copy(), binario.datosInfo.copy()]
 # binario.datos        = backup[0]
 # binario.raw    = backup[0].copy()
 # binario.datosInfo   = backup[1]

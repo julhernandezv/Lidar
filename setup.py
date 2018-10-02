@@ -5,7 +5,7 @@ from Cython.Build import cythonize
 import numpy as np
 
 ext_modules = [
-    Extension("ctools",
+    Extension("lidar/core/ctools",
         sources=["lidar/core/ctools.pyx"],
         # libraries=["m"]  # Unix-like specific
         )

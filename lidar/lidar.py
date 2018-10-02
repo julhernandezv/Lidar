@@ -741,19 +741,19 @@ class Lidar(PlotBook):
 
         return vlim
 
-    @staticmethod
-    def mVolts(inputRange, ADCBits, shotNumber):
-        # print name
-        tmp     =   inputRange * 1000 * ( 2. ** (-ADCBits) ) / shotNumber
-        # tmp.index.name = 'Dates'
-        return tmp
-
-    @staticmethod
-    def mHz(binWidth, shotNumber):
-        """Parameters are pandas.Series used to multiply by raw data"""
-        tmp     = ( 150 /  binWidth ) / shotNumber
-        # tmp.index.name = 'Dates'
-        return tmp
+    # @staticmethod
+    # def mVolts(inputRange, ADCBits, shotNumber):
+    #     # print name
+    #     tmp     =   inputRange * 1000 * ( 2. ** (-ADCBits) ) / shotNumber
+    #     # tmp.index.name = 'Dates'
+    #     return tmp
+    #
+    # @staticmethod
+    # def mHz(binWidth, shotNumber):
+    #     """Parameters are pandas.Series used to multiply by raw data"""
+    #     tmp     = ( 150 /  binWidth ) / shotNumber
+    #     # tmp.index.name = 'Dates'
+    #     return tmp
 
     @property
     def Pr(self):
@@ -778,7 +778,7 @@ class Lidar(PlotBook):
                 columns=tmp.columns
                 )
             )
-        return pd.concat(tmpList,axis=1)
+        return pd.concat(tmpList,axis=1).sort_index(axis=1)
 
         # return  self.datos.stack([0,1]).apply(
         #             lambda serie:
