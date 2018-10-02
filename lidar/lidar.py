@@ -11,6 +11,7 @@ import struct
 import sys, os, glob, locale
 
 from core.plotbook import PlotBook
+from core.ctools import (range_corrected, mVolts, mHz)
 from dateutil.relativedelta import relativedelta
 from matplotlib.pyplot import register_cmap, get_cmap
 from matplotlib.dates import DateFormatter
@@ -756,20 +757,42 @@ class Lidar(PlotBook):
 
     @property
     def Pr(self):
+        tmpList = []
+        for col in self.datos.columns.levels[2]:
+            tmp  = self.datos.loc(axis=1)[:,:,col]
 
-        return  self.datos.stack([0,1]).apply(
-                    lambda serie:
-                        serie * self.mVolts(
-                            self.datosInfo[ 'InputRange_'+serie.name ],
-                            self.datosInfo[ 'ADCBits_'+serie.name ],
-                            self.datosInfo[ 'ShotNumber_'+serie.name ]
+            tmpList.append(
+                pd.DataFrame(
+                    mVolts(tmp,
+                        self.datosInfo[ 'InputRange_'+col ],
+                        self.datosInfo[ 'ADCBits_'+col ],
+                        self.datosInfo[ 'ShotNumber_'+col ]
                         )
-                        if 'analog' in serie.name else
-                        serie * self.mHz(
-                            self.datosInfo['BinWidth_'+serie.name ],
-                            self.datosInfo[ 'ShotNumber_'+serie.name ]
+                    if 'analog' in col else
+                    mHz(tmp,
+                        self.datosInfo['BinWidth_'+col ],
+                        self.datosInfo[ 'ShotNumber_'+col ]
                         )
-                    ).stack().unstack([1,2,3])
+                ,
+                index=tmp.index,
+                columns=tmp.columns
+                )
+            )
+        return pd.concat(tmpList,axis=1)
+
+        # return  self.datos.stack([0,1]).apply(
+        #             lambda serie:
+        #                 serie * self.mVolts(
+        #                     self.datosInfo[ 'InputRange_'+serie.name ],
+        #                     self.datosInfo[ 'ADCBits_'+serie.name ],
+        #                     self.datosInfo[ 'ShotNumber_'+serie.name ]
+        #                 )
+        #                 if 'analog' in serie.name else
+        #                 serie * self.mHz(
+        #                     self.datosInfo['BinWidth_'+serie.name ],
+        #                     self.datosInfo[ 'ShotNumber_'+serie.name ]
+        #                 )
+        #             ).stack().unstack([1,2,3])
 
     @property
     def background(self):
@@ -787,15 +810,19 @@ class Lidar(PlotBook):
         # print self.datos.shape
         # return self.datos.apply(lambda x: x - self.bkg[x.name[-1]])
 
-    cpdef
 
     @property
     def RCS(self):
+        tmp     =   range_corrected(
+                        self.datos.values,
+                        self.datos.columns.get_level_values(0).values
+                    )
         # self.datos       = self.datos.apply(lambda x: x - self.bkg[x.name[-1]])
         #self.datos.apply(lambda x: x*( x.name[0]**2) )
-        return self.datos.stack([1,2]).apply(
-                    lambda x: x*(x.name**2)).unstack([1,2])
-
+        #self.datos.stack([1,2]).apply( lambda x: x*(x.name**2)).unstack([1,2])
+        return pd.DataFrame(tmp,
+                    index=self.datos.index,
+                    columns=self.datos.columns)
 
     @property
     def total_signal(self):
