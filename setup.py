@@ -12,7 +12,7 @@ import numpy as np
 # ]
 
 setup(
-ext_modules=cythonize("lidar/core/ctools.pyx"),
+ext_modules=cythonize("core/ctools.pyx"),
     include_dirs=[np.get_include()],
 )
 
