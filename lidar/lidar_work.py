@@ -298,17 +298,26 @@ binario.plot_lidar(ceil.index,ceil.columns,ceil.T,textSave='Ceilometro_AMVA',col
 
 # bkg.loc[:,pd.IndexSlice[:,'analog-p']]  =
 # ################################################################################
-#### Informe de Actividades
+from Funciones_Lectura import lee_Ceil,lee_data_ceil
+# import pandas as pd
+import pandas as pd
+import numpy as np
+import datetime as dt
+import os, locale
+os.system('rm lidar/lidar/*.pyc')
+from lidar.lidar.lidar import Lidar
+locale.setlocale(locale.LC_TIME, ('en_GB','utf-8'))
+
 altura = 4.5
 # # for date in pd.date_range('2018-06-30','2018-06-30',freq='d'): #'2018-06-27','2018-07-14',freq='d'):
 # # try:
 date = pd.date_range('2018-06-30','2018-06-30',freq='d')[0] #'2018-06-27','2018-07-14',freq='d'):
 
 binario = Lidar(
-    fechaI=date.strftime('%Y-%m-%d'),
-    fechaF=date.strftime('%Y-%m-%d'),
-    scan='3D',
-    output='raw')
+fechaI=date.strftime('%Y-%m-%d'),
+fechaF=date.strftime('%Y-%m-%d'),
+scan='3D',
+output='raw')
 binario.read()
 # # backup = [binario.raw, binario.dataInfo]
 # # binario.data        = backup[0]
@@ -319,32 +328,33 @@ binario.read()
 # kwgs = dict(parameters=['photon-p'], dates=binario.dataInfo.index, make_gif=True, path= date.strftime('%Y-%m-%d-bkg-nonan'),height=altura, background= bkg)
 # kwgs = dict(height=altura,path='vlim',dates =binario.dataInfo.index[binario.dataInfo.index.hour <1 ])
 kwgs = dict(
-    height=4.5,
-    path=date.strftime('vlim'),
-    textSave='',
+height=4.5,
+path=date.strftime('vlim'),
+textSave='',
 )
 
 
 binario.plot(
-    output='RCS',
-    parameters=['analog-b'],
-    vlim = [0.25,20],
-    **kwgs
+output='RCS',
+parameters=['analog-b'],
+vlim = [0.25,20],
+**kwgs
 )
 kwgs['parameters'] = ['analog-s','analog-p']
 kwgs['vlim'] = [0.15,16]
 
 
 binario.plot(
-    output='RCS',
-    **kwgs
+output='RCS',
+**kwgs
 )
 kwgs['parameters'] = ['photon-s','photon-p','photon-b']
 kwgs['vlim'] = [10,400]
 binario.plot(
-    output='RCS',
-    **kwgs
+output='RCS',
+**kwgs
 )
+#### Informe de Actividades
 #
 # #
 # #

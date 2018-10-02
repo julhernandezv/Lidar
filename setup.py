@@ -1,29 +1,32 @@
 # -*- coding: utf-8 -*-
-from distutils.core import setup
-from distutils.extension import Extension
 from Cython.Build import cythonize
+# from distutils.core import setup
+# from distutils.extension import Extension
+from setuptools import setup, Extension,find_packages
 import numpy as np
 
-ext_modules = [
-    Extension("lidar/core/ctools",
-        sources=["lidar/core/ctools.pyx"],
+ext_modul = [  Extension("lidar._libs.ctools",
+        sources=["lidar/_libs/ctools.pyx"],
+        include_dirs=[np.get_include()],
         # libraries=["m"]  # Unix-like specific
         )
 ]
-
+print find_packages(include=['lidar','lidar.*'])
+print ext_modul
+print cythonize(ext_modul)
 setup(
     name='lidar',
     version='0.0.1',
     author='Julian Hernandez Velasquez',
     author_email='jhernandezv@unal.edu.co',
-    packages=['lidar'],
-    # package_data={'lidar':['Nivel.py','SqlDb.py','static.py','information.py']},
+    packages=find_packages(include=['lidar','lidar.*']),
+    # package_data={'lidar':['core.plotbook.py','lidar.py']}, #'core/SqlDb.py'
     url='https://github.com/julhernandezv/Lidar.git',
     license='LICENSE.txt',
     description="Class for manipulating SIATA's Scanning Lidar",
     long_description=open('README.md').read(),
-    ext_modules=cythonize(ext_modules),
-    include_dirs=[np.get_include()],
+    ext_modules=cythonize(ext_modul), #solo una extención
+    # include_dirs=[np.get_include()],
 )
 
 

@@ -895,7 +895,7 @@ typedef npy_longdouble __pyx_t_5numpy_longdouble_t;
  * DTYPE = np.float64
  * ctypedef np.float64_t DTYPE_t             # <<<<<<<<<<<<<<
  * 
- * @cython.boundscheck(False) # turn off bounds-checking for entire function
+ * 
  */
 typedef __pyx_t_5numpy_float64_t __pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t;
 /* Declarations.proto */
@@ -1393,10 +1393,11 @@ static PyObject *__pyx_builtin_range;
 static PyObject *__pyx_builtin_ValueError;
 static PyObject *__pyx_builtin_RuntimeError;
 static PyObject *__pyx_builtin_ImportError;
+static const char __pyx_k_c[] = "c";
 static const char __pyx_k_i[] = "i";
 static const char __pyx_k_j[] = "j";
 static const char __pyx_k_np[] = "np";
-static const char __pyx_k_mHz[] = "mHz";
+static const char __pyx_k_bkg[] = "bkg";
 static const char __pyx_k_cdim[] = "cdim";
 static const char __pyx_k_main[] = "__main__";
 static const char __pyx_k_rang[] = "rang";
@@ -1406,20 +1407,23 @@ static const char __pyx_k_DTYPE[] = "DTYPE";
 static const char __pyx_k_numpy[] = "numpy";
 static const char __pyx_k_power[] = "power";
 static const char __pyx_k_range[] = "range";
+static const char __pyx_k_bkgdim[] = "bkgdim";
 static const char __pyx_k_const1[] = "const1";
 static const char __pyx_k_const2[] = "const2";
+static const char __pyx_k_cy_mHz[] = "cy_mHz";
 static const char __pyx_k_import[] = "__import__";
-static const char __pyx_k_mVolts[] = "mVolts";
 static const char __pyx_k_matrix[] = "matrix";
 static const char __pyx_k_ADCBits[] = "ADCBits";
 static const char __pyx_k_float64[] = "float64";
 static const char __pyx_k_binWidth[] = "binWidth";
+static const char __pyx_k_cy_mVolts[] = "cy_mVolts";
 static const char __pyx_k_ValueError[] = "ValueError";
 static const char __pyx_k_inputRange[] = "inputRange";
 static const char __pyx_k_shotNumber[] = "shotNumber";
 static const char __pyx_k_ImportError[] = "ImportError";
 static const char __pyx_k_RuntimeError[] = "RuntimeError";
-static const char __pyx_k_range_corrected[] = "range_corrected";
+static const char __pyx_k_cy_brackground[] = "cy_brackground";
+static const char __pyx_k_cy_range_corrected[] = "cy_range_corrected";
 static const char __pyx_k_lidar_lidar_core_ctools[] = "lidar.lidar.core.ctools";
 static const char __pyx_k_ndarray_is_not_C_contiguous[] = "ndarray is not C contiguous";
 static const char __pyx_k_home_jhernandezv_Documents_SIAT[] = "/home/jhernandezv/Documents/SIATA/Lidar/lidar/lidar/core/ctools.pyx";
@@ -1439,9 +1443,16 @@ static PyObject *__pyx_kp_u_Non_native_byte_order_not_suppor;
 static PyObject *__pyx_n_s_RuntimeError;
 static PyObject *__pyx_n_s_ValueError;
 static PyObject *__pyx_n_s_binWidth;
+static PyObject *__pyx_n_s_bkg;
+static PyObject *__pyx_n_s_bkgdim;
+static PyObject *__pyx_n_s_c;
 static PyObject *__pyx_n_s_cdim;
 static PyObject *__pyx_n_s_const1;
 static PyObject *__pyx_n_s_const2;
+static PyObject *__pyx_n_s_cy_brackground;
+static PyObject *__pyx_n_s_cy_mHz;
+static PyObject *__pyx_n_s_cy_mVolts;
+static PyObject *__pyx_n_s_cy_range_corrected;
 static PyObject *__pyx_n_s_float64;
 static PyObject *__pyx_kp_s_home_jhernandezv_Documents_SIAT;
 static PyObject *__pyx_n_s_i;
@@ -1449,8 +1460,6 @@ static PyObject *__pyx_n_s_import;
 static PyObject *__pyx_n_s_inputRange;
 static PyObject *__pyx_n_s_j;
 static PyObject *__pyx_n_s_lidar_lidar_core_ctools;
-static PyObject *__pyx_n_s_mHz;
-static PyObject *__pyx_n_s_mVolts;
 static PyObject *__pyx_n_s_main;
 static PyObject *__pyx_n_s_matrix;
 static PyObject *__pyx_kp_u_ndarray_is_not_C_contiguous;
@@ -1462,14 +1471,14 @@ static PyObject *__pyx_kp_s_numpy_core_umath_failed_to_impor;
 static PyObject *__pyx_n_s_power;
 static PyObject *__pyx_n_s_rang;
 static PyObject *__pyx_n_s_range;
-static PyObject *__pyx_n_s_range_corrected;
 static PyObject *__pyx_n_s_rdim;
 static PyObject *__pyx_n_s_shotNumber;
 static PyObject *__pyx_n_s_test;
 static PyObject *__pyx_kp_u_unknown_dtype_code_in_numpy_pxd;
-static PyObject *__pyx_pf_5lidar_5lidar_4core_6ctools_range_corrected(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_matrix, PyArrayObject *__pyx_v_rang); /* proto */
-static PyObject *__pyx_pf_5lidar_5lidar_4core_6ctools_2mVolts(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_matrix, PyArrayObject *__pyx_v_inputRange, PyArrayObject *__pyx_v_ADCBits, PyArrayObject *__pyx_v_shotNumber); /* proto */
-static PyObject *__pyx_pf_5lidar_5lidar_4core_6ctools_4mHz(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_matrix, PyArrayObject *__pyx_v_binWidth, PyArrayObject *__pyx_v_shotNumber); /* proto */
+static PyObject *__pyx_pf_5lidar_5lidar_4core_6ctools_cy_range_corrected(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_matrix, PyArrayObject *__pyx_v_rang); /* proto */
+static PyObject *__pyx_pf_5lidar_5lidar_4core_6ctools_2cy_mVolts(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_matrix, PyArrayObject *__pyx_v_inputRange, PyArrayObject *__pyx_v_ADCBits, PyArrayObject *__pyx_v_shotNumber); /* proto */
+static PyObject *__pyx_pf_5lidar_5lidar_4core_6ctools_4cy_mHz(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_matrix, PyArrayObject *__pyx_v_binWidth, PyArrayObject *__pyx_v_shotNumber); /* proto */
+static PyObject *__pyx_pf_5lidar_5lidar_4core_6ctools_6cy_brackground(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_matrix, PyArrayObject *__pyx_v_bkg); /* proto */
 static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, Py_buffer *__pyx_v_info, int __pyx_v_flags); /* proto */
 static void __pyx_pf_5numpy_7ndarray_2__releasebuffer__(PyArrayObject *__pyx_v_self, Py_buffer *__pyx_v_info); /* proto */
 static PyObject *__pyx_tuple_;
@@ -1484,27 +1493,29 @@ static PyObject *__pyx_tuple__9;
 static PyObject *__pyx_tuple__10;
 static PyObject *__pyx_tuple__12;
 static PyObject *__pyx_tuple__14;
+static PyObject *__pyx_tuple__16;
 static PyObject *__pyx_codeobj__11;
 static PyObject *__pyx_codeobj__13;
 static PyObject *__pyx_codeobj__15;
+static PyObject *__pyx_codeobj__17;
 
-/* "lidar/lidar/core/ctools.pyx":14
+/* "lidar/lidar/core/ctools.pyx":16
  * @cython.boundscheck(False) # turn off bounds-checking for entire function
  * @cython.wraparound(False)
- * def range_corrected( np.ndarray [DTYPE_t, ndim=2] matrix,             # <<<<<<<<<<<<<<
+ * def cy_range_corrected( np.ndarray [DTYPE_t, ndim=2] matrix,             # <<<<<<<<<<<<<<
  *                     np.ndarray [DTYPE_t, ndim=1] rang):
  *     cdef int i,j
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5lidar_5lidar_4core_6ctools_1range_corrected(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_5lidar_5lidar_4core_6ctools_1range_corrected = {"range_corrected", (PyCFunction)__pyx_pw_5lidar_5lidar_4core_6ctools_1range_corrected, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_5lidar_5lidar_4core_6ctools_1range_corrected(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_5lidar_5lidar_4core_6ctools_1cy_range_corrected(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_5lidar_5lidar_4core_6ctools_1cy_range_corrected = {"cy_range_corrected", (PyCFunction)__pyx_pw_5lidar_5lidar_4core_6ctools_1cy_range_corrected, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_5lidar_5lidar_4core_6ctools_1cy_range_corrected(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyArrayObject *__pyx_v_matrix = 0;
   PyArrayObject *__pyx_v_rang = 0;
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("range_corrected (wrapper)", 0);
+  __Pyx_RefNannySetupContext("cy_range_corrected (wrapper)", 0);
   {
     static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_matrix,&__pyx_n_s_rang,0};
     PyObject* values[2] = {0,0};
@@ -1525,11 +1536,11 @@ static PyObject *__pyx_pw_5lidar_5lidar_4core_6ctools_1range_corrected(PyObject 
         case  1:
         if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_rang)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("range_corrected", 1, 2, 2, 1); __PYX_ERR(0, 14, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("cy_range_corrected", 1, 2, 2, 1); __PYX_ERR(0, 16, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "range_corrected") < 0)) __PYX_ERR(0, 14, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "cy_range_corrected") < 0)) __PYX_ERR(0, 16, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -1542,15 +1553,15 @@ static PyObject *__pyx_pw_5lidar_5lidar_4core_6ctools_1range_corrected(PyObject 
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("range_corrected", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 14, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("cy_range_corrected", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 16, __pyx_L3_error)
   __pyx_L3_error:;
-  __Pyx_AddTraceback("lidar.lidar.core.ctools.range_corrected", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("lidar.lidar.core.ctools.cy_range_corrected", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_matrix), __pyx_ptype_5numpy_ndarray, 1, "matrix", 0))) __PYX_ERR(0, 14, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_rang), __pyx_ptype_5numpy_ndarray, 1, "rang", 0))) __PYX_ERR(0, 15, __pyx_L1_error)
-  __pyx_r = __pyx_pf_5lidar_5lidar_4core_6ctools_range_corrected(__pyx_self, __pyx_v_matrix, __pyx_v_rang);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_matrix), __pyx_ptype_5numpy_ndarray, 1, "matrix", 0))) __PYX_ERR(0, 16, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_rang), __pyx_ptype_5numpy_ndarray, 1, "rang", 0))) __PYX_ERR(0, 17, __pyx_L1_error)
+  __pyx_r = __pyx_pf_5lidar_5lidar_4core_6ctools_cy_range_corrected(__pyx_self, __pyx_v_matrix, __pyx_v_rang);
 
   /* function exit code */
   goto __pyx_L0;
@@ -1561,7 +1572,7 @@ static PyObject *__pyx_pw_5lidar_5lidar_4core_6ctools_1range_corrected(PyObject 
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5lidar_5lidar_4core_6ctools_range_corrected(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_matrix, PyArrayObject *__pyx_v_rang) {
+static PyObject *__pyx_pf_5lidar_5lidar_4core_6ctools_cy_range_corrected(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_matrix, PyArrayObject *__pyx_v_rang) {
   int __pyx_v_i;
   int __pyx_v_j;
   int __pyx_v_rdim;
@@ -1579,7 +1590,7 @@ static PyObject *__pyx_pf_5lidar_5lidar_4core_6ctools_range_corrected(CYTHON_UNU
   Py_ssize_t __pyx_t_5;
   Py_ssize_t __pyx_t_6;
   Py_ssize_t __pyx_t_7;
-  __Pyx_RefNannySetupContext("range_corrected", 0);
+  __Pyx_RefNannySetupContext("cy_range_corrected", 0);
   __pyx_pybuffer_matrix.pybuffer.buf = NULL;
   __pyx_pybuffer_matrix.refcount = 0;
   __pyx_pybuffernd_matrix.data = NULL;
@@ -1590,16 +1601,16 @@ static PyObject *__pyx_pf_5lidar_5lidar_4core_6ctools_range_corrected(CYTHON_UNU
   __pyx_pybuffernd_rang.rcbuffer = &__pyx_pybuffer_rang;
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_matrix.rcbuffer->pybuffer, (PyObject*)__pyx_v_matrix, &__Pyx_TypeInfo_nn___pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES| PyBUF_WRITABLE, 2, 0, __pyx_stack) == -1)) __PYX_ERR(0, 14, __pyx_L1_error)
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_matrix.rcbuffer->pybuffer, (PyObject*)__pyx_v_matrix, &__Pyx_TypeInfo_nn___pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES| PyBUF_WRITABLE, 2, 0, __pyx_stack) == -1)) __PYX_ERR(0, 16, __pyx_L1_error)
   }
   __pyx_pybuffernd_matrix.diminfo[0].strides = __pyx_pybuffernd_matrix.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_matrix.diminfo[0].shape = __pyx_pybuffernd_matrix.rcbuffer->pybuffer.shape[0]; __pyx_pybuffernd_matrix.diminfo[1].strides = __pyx_pybuffernd_matrix.rcbuffer->pybuffer.strides[1]; __pyx_pybuffernd_matrix.diminfo[1].shape = __pyx_pybuffernd_matrix.rcbuffer->pybuffer.shape[1];
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_rang.rcbuffer->pybuffer, (PyObject*)__pyx_v_rang, &__Pyx_TypeInfo_nn___pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 14, __pyx_L1_error)
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_rang.rcbuffer->pybuffer, (PyObject*)__pyx_v_rang, &__Pyx_TypeInfo_nn___pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 16, __pyx_L1_error)
   }
   __pyx_pybuffernd_rang.diminfo[0].strides = __pyx_pybuffernd_rang.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_rang.diminfo[0].shape = __pyx_pybuffernd_rang.rcbuffer->pybuffer.shape[0];
 
-  /* "lidar/lidar/core/ctools.pyx":17
+  /* "lidar/lidar/core/ctools.pyx":19
  *                     np.ndarray [DTYPE_t, ndim=1] rang):
  *     cdef int i,j
  *     cdef int rdim = matrix.shape[0]             # <<<<<<<<<<<<<<
@@ -1608,7 +1619,7 @@ static PyObject *__pyx_pf_5lidar_5lidar_4core_6ctools_range_corrected(CYTHON_UNU
  */
   __pyx_v_rdim = (__pyx_v_matrix->dimensions[0]);
 
-  /* "lidar/lidar/core/ctools.pyx":18
+  /* "lidar/lidar/core/ctools.pyx":20
  *     cdef int i,j
  *     cdef int rdim = matrix.shape[0]
  *     cdef int cdim = matrix.shape[1]             # <<<<<<<<<<<<<<
@@ -1617,7 +1628,7 @@ static PyObject *__pyx_pf_5lidar_5lidar_4core_6ctools_range_corrected(CYTHON_UNU
  */
   __pyx_v_cdim = (__pyx_v_matrix->dimensions[1]);
 
-  /* "lidar/lidar/core/ctools.pyx":21
+  /* "lidar/lidar/core/ctools.pyx":23
  *     #cdef np.ndarray[DTYPE_t, ndim=2] result = np.empty_like(matrix, dtype=DTYPE)
  * 
  *     for i in range(rdim):             # <<<<<<<<<<<<<<
@@ -1628,7 +1639,7 @@ static PyObject *__pyx_pf_5lidar_5lidar_4core_6ctools_range_corrected(CYTHON_UNU
   for (__pyx_t_2 = 0; __pyx_t_2 < __pyx_t_1; __pyx_t_2+=1) {
     __pyx_v_i = __pyx_t_2;
 
-    /* "lidar/lidar/core/ctools.pyx":22
+    /* "lidar/lidar/core/ctools.pyx":24
  * 
  *     for i in range(rdim):
  *         for j in range(cdim):             # <<<<<<<<<<<<<<
@@ -1639,7 +1650,7 @@ static PyObject *__pyx_pf_5lidar_5lidar_4core_6ctools_range_corrected(CYTHON_UNU
     for (__pyx_t_4 = 0; __pyx_t_4 < __pyx_t_3; __pyx_t_4+=1) {
       __pyx_v_j = __pyx_t_4;
 
-      /* "lidar/lidar/core/ctools.pyx":23
+      /* "lidar/lidar/core/ctools.pyx":25
  *     for i in range(rdim):
  *         for j in range(cdim):
  *             matrix [i,j] *= rang[j]             # <<<<<<<<<<<<<<
@@ -1653,22 +1664,22 @@ static PyObject *__pyx_pf_5lidar_5lidar_4core_6ctools_range_corrected(CYTHON_UNU
     }
   }
 
-  /* "lidar/lidar/core/ctools.pyx":24
+  /* "lidar/lidar/core/ctools.pyx":26
  *         for j in range(cdim):
  *             matrix [i,j] *= rang[j]
  *     return matrix             # <<<<<<<<<<<<<<
  * 
- * 
+ * # """ Function to calculate mVolts from Lidar raw data"""
  */
   __Pyx_XDECREF(__pyx_r);
   __Pyx_INCREF(((PyObject *)__pyx_v_matrix));
   __pyx_r = ((PyObject *)__pyx_v_matrix);
   goto __pyx_L0;
 
-  /* "lidar/lidar/core/ctools.pyx":14
+  /* "lidar/lidar/core/ctools.pyx":16
  * @cython.boundscheck(False) # turn off bounds-checking for entire function
  * @cython.wraparound(False)
- * def range_corrected( np.ndarray [DTYPE_t, ndim=2] matrix,             # <<<<<<<<<<<<<<
+ * def cy_range_corrected( np.ndarray [DTYPE_t, ndim=2] matrix,             # <<<<<<<<<<<<<<
  *                     np.ndarray [DTYPE_t, ndim=1] rang):
  *     cdef int i,j
  */
@@ -1682,7 +1693,7 @@ static PyObject *__pyx_pf_5lidar_5lidar_4core_6ctools_range_corrected(CYTHON_UNU
     __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_matrix.rcbuffer->pybuffer);
     __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_rang.rcbuffer->pybuffer);
   __Pyx_ErrRestore(__pyx_type, __pyx_value, __pyx_tb);}
-  __Pyx_AddTraceback("lidar.lidar.core.ctools.range_corrected", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("lidar.lidar.core.ctools.cy_range_corrected", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   goto __pyx_L2;
   __pyx_L0:;
@@ -1694,25 +1705,25 @@ static PyObject *__pyx_pf_5lidar_5lidar_4core_6ctools_range_corrected(CYTHON_UNU
   return __pyx_r;
 }
 
-/* "lidar/lidar/core/ctools.pyx":29
+/* "lidar/lidar/core/ctools.pyx":31
  * @cython.boundscheck(False)
  * @cython.wraparound(False)
- * def mVolts ( np.ndarray [DTYPE_t, ndim=2] matrix,             # <<<<<<<<<<<<<<
+ * def cy_mVolts ( np.ndarray [DTYPE_t, ndim=2] matrix,             # <<<<<<<<<<<<<<
  *             np.ndarray[DTYPE_t, ndim=1] inputRange,
  *             np.ndarray[DTYPE_t, ndim=1] ADCBits,
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5lidar_5lidar_4core_6ctools_3mVolts(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_5lidar_5lidar_4core_6ctools_3mVolts = {"mVolts", (PyCFunction)__pyx_pw_5lidar_5lidar_4core_6ctools_3mVolts, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_5lidar_5lidar_4core_6ctools_3mVolts(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_5lidar_5lidar_4core_6ctools_3cy_mVolts(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_5lidar_5lidar_4core_6ctools_3cy_mVolts = {"cy_mVolts", (PyCFunction)__pyx_pw_5lidar_5lidar_4core_6ctools_3cy_mVolts, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_5lidar_5lidar_4core_6ctools_3cy_mVolts(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyArrayObject *__pyx_v_matrix = 0;
   PyArrayObject *__pyx_v_inputRange = 0;
   PyArrayObject *__pyx_v_ADCBits = 0;
   PyArrayObject *__pyx_v_shotNumber = 0;
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("mVolts (wrapper)", 0);
+  __Pyx_RefNannySetupContext("cy_mVolts (wrapper)", 0);
   {
     static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_matrix,&__pyx_n_s_inputRange,&__pyx_n_s_ADCBits,&__pyx_n_s_shotNumber,0};
     PyObject* values[4] = {0,0,0,0};
@@ -1735,21 +1746,21 @@ static PyObject *__pyx_pw_5lidar_5lidar_4core_6ctools_3mVolts(PyObject *__pyx_se
         case  1:
         if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_inputRange)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("mVolts", 1, 4, 4, 1); __PYX_ERR(0, 29, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("cy_mVolts", 1, 4, 4, 1); __PYX_ERR(0, 31, __pyx_L3_error)
         }
         case  2:
         if (likely((values[2] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_ADCBits)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("mVolts", 1, 4, 4, 2); __PYX_ERR(0, 29, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("cy_mVolts", 1, 4, 4, 2); __PYX_ERR(0, 31, __pyx_L3_error)
         }
         case  3:
         if (likely((values[3] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_shotNumber)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("mVolts", 1, 4, 4, 3); __PYX_ERR(0, 29, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("cy_mVolts", 1, 4, 4, 3); __PYX_ERR(0, 31, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "mVolts") < 0)) __PYX_ERR(0, 29, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "cy_mVolts") < 0)) __PYX_ERR(0, 31, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 4) {
       goto __pyx_L5_argtuple_error;
@@ -1766,17 +1777,17 @@ static PyObject *__pyx_pw_5lidar_5lidar_4core_6ctools_3mVolts(PyObject *__pyx_se
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("mVolts", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 29, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("cy_mVolts", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 31, __pyx_L3_error)
   __pyx_L3_error:;
-  __Pyx_AddTraceback("lidar.lidar.core.ctools.mVolts", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("lidar.lidar.core.ctools.cy_mVolts", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_matrix), __pyx_ptype_5numpy_ndarray, 1, "matrix", 0))) __PYX_ERR(0, 29, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_inputRange), __pyx_ptype_5numpy_ndarray, 1, "inputRange", 0))) __PYX_ERR(0, 30, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_ADCBits), __pyx_ptype_5numpy_ndarray, 1, "ADCBits", 0))) __PYX_ERR(0, 31, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_shotNumber), __pyx_ptype_5numpy_ndarray, 1, "shotNumber", 0))) __PYX_ERR(0, 32, __pyx_L1_error)
-  __pyx_r = __pyx_pf_5lidar_5lidar_4core_6ctools_2mVolts(__pyx_self, __pyx_v_matrix, __pyx_v_inputRange, __pyx_v_ADCBits, __pyx_v_shotNumber);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_matrix), __pyx_ptype_5numpy_ndarray, 1, "matrix", 0))) __PYX_ERR(0, 31, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_inputRange), __pyx_ptype_5numpy_ndarray, 1, "inputRange", 0))) __PYX_ERR(0, 32, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_ADCBits), __pyx_ptype_5numpy_ndarray, 1, "ADCBits", 0))) __PYX_ERR(0, 33, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_shotNumber), __pyx_ptype_5numpy_ndarray, 1, "shotNumber", 0))) __PYX_ERR(0, 34, __pyx_L1_error)
+  __pyx_r = __pyx_pf_5lidar_5lidar_4core_6ctools_2cy_mVolts(__pyx_self, __pyx_v_matrix, __pyx_v_inputRange, __pyx_v_ADCBits, __pyx_v_shotNumber);
 
   /* function exit code */
   goto __pyx_L0;
@@ -1787,7 +1798,7 @@ static PyObject *__pyx_pw_5lidar_5lidar_4core_6ctools_3mVolts(PyObject *__pyx_se
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5lidar_5lidar_4core_6ctools_2mVolts(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_matrix, PyArrayObject *__pyx_v_inputRange, PyArrayObject *__pyx_v_ADCBits, PyArrayObject *__pyx_v_shotNumber) {
+static PyObject *__pyx_pf_5lidar_5lidar_4core_6ctools_2cy_mVolts(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_matrix, PyArrayObject *__pyx_v_inputRange, PyArrayObject *__pyx_v_ADCBits, PyArrayObject *__pyx_v_shotNumber) {
   int __pyx_v_i;
   int __pyx_v_j;
   __pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t __pyx_v_power;
@@ -1816,7 +1827,7 @@ static PyObject *__pyx_pf_5lidar_5lidar_4core_6ctools_2mVolts(CYTHON_UNUSED PyOb
   __pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t __pyx_t_9;
   Py_ssize_t __pyx_t_10;
   Py_ssize_t __pyx_t_11;
-  __Pyx_RefNannySetupContext("mVolts", 0);
+  __Pyx_RefNannySetupContext("cy_mVolts", 0);
   __pyx_pybuffer_matrix.pybuffer.buf = NULL;
   __pyx_pybuffer_matrix.refcount = 0;
   __pyx_pybuffernd_matrix.data = NULL;
@@ -1835,26 +1846,26 @@ static PyObject *__pyx_pf_5lidar_5lidar_4core_6ctools_2mVolts(CYTHON_UNUSED PyOb
   __pyx_pybuffernd_shotNumber.rcbuffer = &__pyx_pybuffer_shotNumber;
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_matrix.rcbuffer->pybuffer, (PyObject*)__pyx_v_matrix, &__Pyx_TypeInfo_nn___pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES| PyBUF_WRITABLE, 2, 0, __pyx_stack) == -1)) __PYX_ERR(0, 29, __pyx_L1_error)
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_matrix.rcbuffer->pybuffer, (PyObject*)__pyx_v_matrix, &__Pyx_TypeInfo_nn___pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES| PyBUF_WRITABLE, 2, 0, __pyx_stack) == -1)) __PYX_ERR(0, 31, __pyx_L1_error)
   }
   __pyx_pybuffernd_matrix.diminfo[0].strides = __pyx_pybuffernd_matrix.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_matrix.diminfo[0].shape = __pyx_pybuffernd_matrix.rcbuffer->pybuffer.shape[0]; __pyx_pybuffernd_matrix.diminfo[1].strides = __pyx_pybuffernd_matrix.rcbuffer->pybuffer.strides[1]; __pyx_pybuffernd_matrix.diminfo[1].shape = __pyx_pybuffernd_matrix.rcbuffer->pybuffer.shape[1];
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_inputRange.rcbuffer->pybuffer, (PyObject*)__pyx_v_inputRange, &__Pyx_TypeInfo_nn___pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 29, __pyx_L1_error)
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_inputRange.rcbuffer->pybuffer, (PyObject*)__pyx_v_inputRange, &__Pyx_TypeInfo_nn___pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 31, __pyx_L1_error)
   }
   __pyx_pybuffernd_inputRange.diminfo[0].strides = __pyx_pybuffernd_inputRange.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_inputRange.diminfo[0].shape = __pyx_pybuffernd_inputRange.rcbuffer->pybuffer.shape[0];
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_ADCBits.rcbuffer->pybuffer, (PyObject*)__pyx_v_ADCBits, &__Pyx_TypeInfo_nn___pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 29, __pyx_L1_error)
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_ADCBits.rcbuffer->pybuffer, (PyObject*)__pyx_v_ADCBits, &__Pyx_TypeInfo_nn___pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 31, __pyx_L1_error)
   }
   __pyx_pybuffernd_ADCBits.diminfo[0].strides = __pyx_pybuffernd_ADCBits.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_ADCBits.diminfo[0].shape = __pyx_pybuffernd_ADCBits.rcbuffer->pybuffer.shape[0];
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_shotNumber.rcbuffer->pybuffer, (PyObject*)__pyx_v_shotNumber, &__Pyx_TypeInfo_nn___pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 29, __pyx_L1_error)
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_shotNumber.rcbuffer->pybuffer, (PyObject*)__pyx_v_shotNumber, &__Pyx_TypeInfo_nn___pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 31, __pyx_L1_error)
   }
   __pyx_pybuffernd_shotNumber.diminfo[0].strides = __pyx_pybuffernd_shotNumber.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_shotNumber.diminfo[0].shape = __pyx_pybuffernd_shotNumber.rcbuffer->pybuffer.shape[0];
 
-  /* "lidar/lidar/core/ctools.pyx":36
+  /* "lidar/lidar/core/ctools.pyx":38
  *     cdef int i,j
  *     cdef DTYPE_t power
  *     cdef int const1 = 1000             # <<<<<<<<<<<<<<
@@ -1863,7 +1874,7 @@ static PyObject *__pyx_pf_5lidar_5lidar_4core_6ctools_2mVolts(CYTHON_UNUSED PyOb
  */
   __pyx_v_const1 = 0x3E8;
 
-  /* "lidar/lidar/core/ctools.pyx":37
+  /* "lidar/lidar/core/ctools.pyx":39
  *     cdef DTYPE_t power
  *     cdef int const1 = 1000
  *     cdef int const2 = 2             # <<<<<<<<<<<<<<
@@ -1872,7 +1883,7 @@ static PyObject *__pyx_pf_5lidar_5lidar_4core_6ctools_2mVolts(CYTHON_UNUSED PyOb
  */
   __pyx_v_const2 = 2;
 
-  /* "lidar/lidar/core/ctools.pyx":38
+  /* "lidar/lidar/core/ctools.pyx":40
  *     cdef int const1 = 1000
  *     cdef int const2 = 2
  *     cdef int rdim = matrix.shape[0]             # <<<<<<<<<<<<<<
@@ -1881,7 +1892,7 @@ static PyObject *__pyx_pf_5lidar_5lidar_4core_6ctools_2mVolts(CYTHON_UNUSED PyOb
  */
   __pyx_v_rdim = (__pyx_v_matrix->dimensions[0]);
 
-  /* "lidar/lidar/core/ctools.pyx":39
+  /* "lidar/lidar/core/ctools.pyx":41
  *     cdef int const2 = 2
  *     cdef int rdim = matrix.shape[0]
  *     cdef int cdim = matrix.shape[1]             # <<<<<<<<<<<<<<
@@ -1890,7 +1901,7 @@ static PyObject *__pyx_pf_5lidar_5lidar_4core_6ctools_2mVolts(CYTHON_UNUSED PyOb
  */
   __pyx_v_cdim = (__pyx_v_matrix->dimensions[1]);
 
-  /* "lidar/lidar/core/ctools.pyx":42
+  /* "lidar/lidar/core/ctools.pyx":44
  *     #cdef np.ndarray[DTYPE_t, ndim=2] result = np.empty_like(matrix, dtype=DTYPE)
  * 
  *     for i in range(rdim):             # <<<<<<<<<<<<<<
@@ -1901,7 +1912,7 @@ static PyObject *__pyx_pf_5lidar_5lidar_4core_6ctools_2mVolts(CYTHON_UNUSED PyOb
   for (__pyx_t_2 = 0; __pyx_t_2 < __pyx_t_1; __pyx_t_2+=1) {
     __pyx_v_i = __pyx_t_2;
 
-    /* "lidar/lidar/core/ctools.pyx":43
+    /* "lidar/lidar/core/ctools.pyx":45
  * 
  *     for i in range(rdim):
  *         for j in range(cdim):             # <<<<<<<<<<<<<<
@@ -1912,7 +1923,7 @@ static PyObject *__pyx_pf_5lidar_5lidar_4core_6ctools_2mVolts(CYTHON_UNUSED PyOb
     for (__pyx_t_4 = 0; __pyx_t_4 < __pyx_t_3; __pyx_t_4+=1) {
       __pyx_v_j = __pyx_t_4;
 
-      /* "lidar/lidar/core/ctools.pyx":45
+      /* "lidar/lidar/core/ctools.pyx":47
  *         for j in range(cdim):
  *             #assert shotNumber[i] != 0
  *             power = const2 ** -ADCBits[i]             # <<<<<<<<<<<<<<
@@ -1922,7 +1933,7 @@ static PyObject *__pyx_pf_5lidar_5lidar_4core_6ctools_2mVolts(CYTHON_UNUSED PyOb
       __pyx_t_5 = __pyx_v_i;
       __pyx_v_power = pow(((__pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t)__pyx_v_const2), (-(*__Pyx_BufPtrStrided1d(__pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t *, __pyx_pybuffernd_ADCBits.rcbuffer->pybuffer.buf, __pyx_t_5, __pyx_pybuffernd_ADCBits.diminfo[0].strides))));
 
-      /* "lidar/lidar/core/ctools.pyx":46
+      /* "lidar/lidar/core/ctools.pyx":48
  *             #assert shotNumber[i] != 0
  *             power = const2 ** -ADCBits[i]
  *             matrix[i,j] *=  inputRange[i] * const1 *  power  / shotNumber[i]             # <<<<<<<<<<<<<<
@@ -1935,7 +1946,7 @@ static PyObject *__pyx_pf_5lidar_5lidar_4core_6ctools_2mVolts(CYTHON_UNUSED PyOb
       __pyx_t_9 = (*__Pyx_BufPtrStrided1d(__pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t *, __pyx_pybuffernd_shotNumber.rcbuffer->pybuffer.buf, __pyx_t_8, __pyx_pybuffernd_shotNumber.diminfo[0].strides));
       if (unlikely(__pyx_t_9 == 0)) {
         PyErr_SetString(PyExc_ZeroDivisionError, "float division");
-        __PYX_ERR(0, 46, __pyx_L1_error)
+        __PYX_ERR(0, 48, __pyx_L1_error)
       }
       __pyx_t_10 = __pyx_v_i;
       __pyx_t_11 = __pyx_v_j;
@@ -1943,22 +1954,22 @@ static PyObject *__pyx_pf_5lidar_5lidar_4core_6ctools_2mVolts(CYTHON_UNUSED PyOb
     }
   }
 
-  /* "lidar/lidar/core/ctools.pyx":47
+  /* "lidar/lidar/core/ctools.pyx":49
  *             power = const2 ** -ADCBits[i]
  *             matrix[i,j] *=  inputRange[i] * const1 *  power  / shotNumber[i]
  *     return matrix             # <<<<<<<<<<<<<<
  * 
- * @cython.boundscheck(False)
+ * 
  */
   __Pyx_XDECREF(__pyx_r);
   __Pyx_INCREF(((PyObject *)__pyx_v_matrix));
   __pyx_r = ((PyObject *)__pyx_v_matrix);
   goto __pyx_L0;
 
-  /* "lidar/lidar/core/ctools.pyx":29
+  /* "lidar/lidar/core/ctools.pyx":31
  * @cython.boundscheck(False)
  * @cython.wraparound(False)
- * def mVolts ( np.ndarray [DTYPE_t, ndim=2] matrix,             # <<<<<<<<<<<<<<
+ * def cy_mVolts ( np.ndarray [DTYPE_t, ndim=2] matrix,             # <<<<<<<<<<<<<<
  *             np.ndarray[DTYPE_t, ndim=1] inputRange,
  *             np.ndarray[DTYPE_t, ndim=1] ADCBits,
  */
@@ -1974,7 +1985,7 @@ static PyObject *__pyx_pf_5lidar_5lidar_4core_6ctools_2mVolts(CYTHON_UNUSED PyOb
     __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_matrix.rcbuffer->pybuffer);
     __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_shotNumber.rcbuffer->pybuffer);
   __Pyx_ErrRestore(__pyx_type, __pyx_value, __pyx_tb);}
-  __Pyx_AddTraceback("lidar.lidar.core.ctools.mVolts", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("lidar.lidar.core.ctools.cy_mVolts", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   goto __pyx_L2;
   __pyx_L0:;
@@ -1988,24 +1999,24 @@ static PyObject *__pyx_pf_5lidar_5lidar_4core_6ctools_2mVolts(CYTHON_UNUSED PyOb
   return __pyx_r;
 }
 
-/* "lidar/lidar/core/ctools.pyx":51
+/* "lidar/lidar/core/ctools.pyx":56
  * @cython.boundscheck(False)
  * @cython.wraparound(False)
- * def mHz ( np.ndarray [DTYPE_t, ndim=2] matrix,             # <<<<<<<<<<<<<<
+ * def cy_mHz ( np.ndarray [DTYPE_t, ndim=2] matrix,             # <<<<<<<<<<<<<<
  *             np.ndarray[DTYPE_t, ndim=1] binWidth,
  *             np.ndarray[DTYPE_t, ndim=1] shotNumber):
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5lidar_5lidar_4core_6ctools_5mHz(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_5lidar_5lidar_4core_6ctools_5mHz = {"mHz", (PyCFunction)__pyx_pw_5lidar_5lidar_4core_6ctools_5mHz, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_5lidar_5lidar_4core_6ctools_5mHz(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_5lidar_5lidar_4core_6ctools_5cy_mHz(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_5lidar_5lidar_4core_6ctools_5cy_mHz = {"cy_mHz", (PyCFunction)__pyx_pw_5lidar_5lidar_4core_6ctools_5cy_mHz, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_5lidar_5lidar_4core_6ctools_5cy_mHz(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyArrayObject *__pyx_v_matrix = 0;
   PyArrayObject *__pyx_v_binWidth = 0;
   PyArrayObject *__pyx_v_shotNumber = 0;
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("mHz (wrapper)", 0);
+  __Pyx_RefNannySetupContext("cy_mHz (wrapper)", 0);
   {
     static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_matrix,&__pyx_n_s_binWidth,&__pyx_n_s_shotNumber,0};
     PyObject* values[3] = {0,0,0};
@@ -2027,16 +2038,16 @@ static PyObject *__pyx_pw_5lidar_5lidar_4core_6ctools_5mHz(PyObject *__pyx_self,
         case  1:
         if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_binWidth)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("mHz", 1, 3, 3, 1); __PYX_ERR(0, 51, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("cy_mHz", 1, 3, 3, 1); __PYX_ERR(0, 56, __pyx_L3_error)
         }
         case  2:
         if (likely((values[2] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_shotNumber)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("mHz", 1, 3, 3, 2); __PYX_ERR(0, 51, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("cy_mHz", 1, 3, 3, 2); __PYX_ERR(0, 56, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "mHz") < 0)) __PYX_ERR(0, 51, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "cy_mHz") < 0)) __PYX_ERR(0, 56, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 3) {
       goto __pyx_L5_argtuple_error;
@@ -2051,16 +2062,16 @@ static PyObject *__pyx_pw_5lidar_5lidar_4core_6ctools_5mHz(PyObject *__pyx_self,
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("mHz", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 51, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("cy_mHz", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 56, __pyx_L3_error)
   __pyx_L3_error:;
-  __Pyx_AddTraceback("lidar.lidar.core.ctools.mHz", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("lidar.lidar.core.ctools.cy_mHz", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_matrix), __pyx_ptype_5numpy_ndarray, 1, "matrix", 0))) __PYX_ERR(0, 51, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_binWidth), __pyx_ptype_5numpy_ndarray, 1, "binWidth", 0))) __PYX_ERR(0, 52, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_shotNumber), __pyx_ptype_5numpy_ndarray, 1, "shotNumber", 0))) __PYX_ERR(0, 53, __pyx_L1_error)
-  __pyx_r = __pyx_pf_5lidar_5lidar_4core_6ctools_4mHz(__pyx_self, __pyx_v_matrix, __pyx_v_binWidth, __pyx_v_shotNumber);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_matrix), __pyx_ptype_5numpy_ndarray, 1, "matrix", 0))) __PYX_ERR(0, 56, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_binWidth), __pyx_ptype_5numpy_ndarray, 1, "binWidth", 0))) __PYX_ERR(0, 57, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_shotNumber), __pyx_ptype_5numpy_ndarray, 1, "shotNumber", 0))) __PYX_ERR(0, 58, __pyx_L1_error)
+  __pyx_r = __pyx_pf_5lidar_5lidar_4core_6ctools_4cy_mHz(__pyx_self, __pyx_v_matrix, __pyx_v_binWidth, __pyx_v_shotNumber);
 
   /* function exit code */
   goto __pyx_L0;
@@ -2071,7 +2082,7 @@ static PyObject *__pyx_pw_5lidar_5lidar_4core_6ctools_5mHz(PyObject *__pyx_self,
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5lidar_5lidar_4core_6ctools_4mHz(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_matrix, PyArrayObject *__pyx_v_binWidth, PyArrayObject *__pyx_v_shotNumber) {
+static PyObject *__pyx_pf_5lidar_5lidar_4core_6ctools_4cy_mHz(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_matrix, PyArrayObject *__pyx_v_binWidth, PyArrayObject *__pyx_v_shotNumber) {
   int __pyx_v_i;
   int __pyx_v_j;
   int __pyx_v_const1;
@@ -2095,7 +2106,7 @@ static PyObject *__pyx_pf_5lidar_5lidar_4core_6ctools_4mHz(CYTHON_UNUSED PyObjec
   Py_ssize_t __pyx_t_8;
   Py_ssize_t __pyx_t_9;
   Py_ssize_t __pyx_t_10;
-  __Pyx_RefNannySetupContext("mHz", 0);
+  __Pyx_RefNannySetupContext("cy_mHz", 0);
   __pyx_pybuffer_matrix.pybuffer.buf = NULL;
   __pyx_pybuffer_matrix.refcount = 0;
   __pyx_pybuffernd_matrix.data = NULL;
@@ -2110,21 +2121,21 @@ static PyObject *__pyx_pf_5lidar_5lidar_4core_6ctools_4mHz(CYTHON_UNUSED PyObjec
   __pyx_pybuffernd_shotNumber.rcbuffer = &__pyx_pybuffer_shotNumber;
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_matrix.rcbuffer->pybuffer, (PyObject*)__pyx_v_matrix, &__Pyx_TypeInfo_nn___pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES| PyBUF_WRITABLE, 2, 0, __pyx_stack) == -1)) __PYX_ERR(0, 51, __pyx_L1_error)
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_matrix.rcbuffer->pybuffer, (PyObject*)__pyx_v_matrix, &__Pyx_TypeInfo_nn___pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES| PyBUF_WRITABLE, 2, 0, __pyx_stack) == -1)) __PYX_ERR(0, 56, __pyx_L1_error)
   }
   __pyx_pybuffernd_matrix.diminfo[0].strides = __pyx_pybuffernd_matrix.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_matrix.diminfo[0].shape = __pyx_pybuffernd_matrix.rcbuffer->pybuffer.shape[0]; __pyx_pybuffernd_matrix.diminfo[1].strides = __pyx_pybuffernd_matrix.rcbuffer->pybuffer.strides[1]; __pyx_pybuffernd_matrix.diminfo[1].shape = __pyx_pybuffernd_matrix.rcbuffer->pybuffer.shape[1];
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_binWidth.rcbuffer->pybuffer, (PyObject*)__pyx_v_binWidth, &__Pyx_TypeInfo_nn___pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 51, __pyx_L1_error)
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_binWidth.rcbuffer->pybuffer, (PyObject*)__pyx_v_binWidth, &__Pyx_TypeInfo_nn___pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 56, __pyx_L1_error)
   }
   __pyx_pybuffernd_binWidth.diminfo[0].strides = __pyx_pybuffernd_binWidth.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_binWidth.diminfo[0].shape = __pyx_pybuffernd_binWidth.rcbuffer->pybuffer.shape[0];
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_shotNumber.rcbuffer->pybuffer, (PyObject*)__pyx_v_shotNumber, &__Pyx_TypeInfo_nn___pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 51, __pyx_L1_error)
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_shotNumber.rcbuffer->pybuffer, (PyObject*)__pyx_v_shotNumber, &__Pyx_TypeInfo_nn___pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 56, __pyx_L1_error)
   }
   __pyx_pybuffernd_shotNumber.diminfo[0].strides = __pyx_pybuffernd_shotNumber.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_shotNumber.diminfo[0].shape = __pyx_pybuffernd_shotNumber.rcbuffer->pybuffer.shape[0];
 
-  /* "lidar/lidar/core/ctools.pyx":56
+  /* "lidar/lidar/core/ctools.pyx":61
  * 
  *     cdef int i,j
  *     cdef int const1 = 150             # <<<<<<<<<<<<<<
@@ -2133,7 +2144,7 @@ static PyObject *__pyx_pf_5lidar_5lidar_4core_6ctools_4mHz(CYTHON_UNUSED PyObjec
  */
   __pyx_v_const1 = 0x96;
 
-  /* "lidar/lidar/core/ctools.pyx":57
+  /* "lidar/lidar/core/ctools.pyx":62
  *     cdef int i,j
  *     cdef int const1 = 150
  *     cdef int rdim = matrix.shape[0]             # <<<<<<<<<<<<<<
@@ -2142,7 +2153,7 @@ static PyObject *__pyx_pf_5lidar_5lidar_4core_6ctools_4mHz(CYTHON_UNUSED PyObjec
  */
   __pyx_v_rdim = (__pyx_v_matrix->dimensions[0]);
 
-  /* "lidar/lidar/core/ctools.pyx":58
+  /* "lidar/lidar/core/ctools.pyx":63
  *     cdef int const1 = 150
  *     cdef int rdim = matrix.shape[0]
  *     cdef int cdim = matrix.shape[1]             # <<<<<<<<<<<<<<
@@ -2151,7 +2162,7 @@ static PyObject *__pyx_pf_5lidar_5lidar_4core_6ctools_4mHz(CYTHON_UNUSED PyObjec
  */
   __pyx_v_cdim = (__pyx_v_matrix->dimensions[1]);
 
-  /* "lidar/lidar/core/ctools.pyx":61
+  /* "lidar/lidar/core/ctools.pyx":66
  *     #cdef np.ndarray[DTYPE_t, ndim=2] result = np.empty_like(matrix, dtype=DTYPE)
  * 
  *     for i in range(rdim):             # <<<<<<<<<<<<<<
@@ -2162,7 +2173,7 @@ static PyObject *__pyx_pf_5lidar_5lidar_4core_6ctools_4mHz(CYTHON_UNUSED PyObjec
   for (__pyx_t_2 = 0; __pyx_t_2 < __pyx_t_1; __pyx_t_2+=1) {
     __pyx_v_i = __pyx_t_2;
 
-    /* "lidar/lidar/core/ctools.pyx":62
+    /* "lidar/lidar/core/ctools.pyx":67
  * 
  *     for i in range(rdim):
  *         for j in range(cdim):             # <<<<<<<<<<<<<<
@@ -2173,24 +2184,25 @@ static PyObject *__pyx_pf_5lidar_5lidar_4core_6ctools_4mHz(CYTHON_UNUSED PyObjec
     for (__pyx_t_4 = 0; __pyx_t_4 < __pyx_t_3; __pyx_t_4+=1) {
       __pyx_v_j = __pyx_t_4;
 
-      /* "lidar/lidar/core/ctools.pyx":63
+      /* "lidar/lidar/core/ctools.pyx":68
  *     for i in range(rdim):
  *         for j in range(cdim):
  *             matrix[i,j] *=  ( const1 /  binWidth[i] ) / shotNumber[i]             # <<<<<<<<<<<<<<
  *     return matrix
+ * 
  */
       __pyx_t_5 = __pyx_v_i;
       __pyx_t_6 = (*__Pyx_BufPtrStrided1d(__pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t *, __pyx_pybuffernd_binWidth.rcbuffer->pybuffer.buf, __pyx_t_5, __pyx_pybuffernd_binWidth.diminfo[0].strides));
       if (unlikely(__pyx_t_6 == 0)) {
         PyErr_SetString(PyExc_ZeroDivisionError, "float division");
-        __PYX_ERR(0, 63, __pyx_L1_error)
+        __PYX_ERR(0, 68, __pyx_L1_error)
       }
       __pyx_t_7 = (__pyx_v_const1 / __pyx_t_6);
       __pyx_t_8 = __pyx_v_i;
       __pyx_t_6 = (*__Pyx_BufPtrStrided1d(__pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t *, __pyx_pybuffernd_shotNumber.rcbuffer->pybuffer.buf, __pyx_t_8, __pyx_pybuffernd_shotNumber.diminfo[0].strides));
       if (unlikely(__pyx_t_6 == 0)) {
         PyErr_SetString(PyExc_ZeroDivisionError, "float division");
-        __PYX_ERR(0, 63, __pyx_L1_error)
+        __PYX_ERR(0, 68, __pyx_L1_error)
       }
       __pyx_t_9 = __pyx_v_i;
       __pyx_t_10 = __pyx_v_j;
@@ -2198,20 +2210,22 @@ static PyObject *__pyx_pf_5lidar_5lidar_4core_6ctools_4mHz(CYTHON_UNUSED PyObjec
     }
   }
 
-  /* "lidar/lidar/core/ctools.pyx":64
+  /* "lidar/lidar/core/ctools.pyx":69
  *         for j in range(cdim):
  *             matrix[i,j] *=  ( const1 /  binWidth[i] ) / shotNumber[i]
  *     return matrix             # <<<<<<<<<<<<<<
+ * 
+ * 
  */
   __Pyx_XDECREF(__pyx_r);
   __Pyx_INCREF(((PyObject *)__pyx_v_matrix));
   __pyx_r = ((PyObject *)__pyx_v_matrix);
   goto __pyx_L0;
 
-  /* "lidar/lidar/core/ctools.pyx":51
+  /* "lidar/lidar/core/ctools.pyx":56
  * @cython.boundscheck(False)
  * @cython.wraparound(False)
- * def mHz ( np.ndarray [DTYPE_t, ndim=2] matrix,             # <<<<<<<<<<<<<<
+ * def cy_mHz ( np.ndarray [DTYPE_t, ndim=2] matrix,             # <<<<<<<<<<<<<<
  *             np.ndarray[DTYPE_t, ndim=1] binWidth,
  *             np.ndarray[DTYPE_t, ndim=1] shotNumber):
  */
@@ -2226,13 +2240,289 @@ static PyObject *__pyx_pf_5lidar_5lidar_4core_6ctools_4mHz(CYTHON_UNUSED PyObjec
     __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_matrix.rcbuffer->pybuffer);
     __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_shotNumber.rcbuffer->pybuffer);
   __Pyx_ErrRestore(__pyx_type, __pyx_value, __pyx_tb);}
-  __Pyx_AddTraceback("lidar.lidar.core.ctools.mHz", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("lidar.lidar.core.ctools.cy_mHz", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   goto __pyx_L2;
   __pyx_L0:;
   __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_binWidth.rcbuffer->pybuffer);
   __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_matrix.rcbuffer->pybuffer);
   __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_shotNumber.rcbuffer->pybuffer);
+  __pyx_L2:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "lidar/lidar/core/ctools.pyx":75
+ * @cython.boundscheck(False)
+ * @cython.wraparound(False)
+ * def cy_brackground ( np.ndarray [DTYPE_t, ndim=2] matrix,             # <<<<<<<<<<<<<<
+ *             np.ndarray[DTYPE_t, ndim=2] bkg):
+ * 
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_5lidar_5lidar_4core_6ctools_7cy_brackground(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_5lidar_5lidar_4core_6ctools_7cy_brackground = {"cy_brackground", (PyCFunction)__pyx_pw_5lidar_5lidar_4core_6ctools_7cy_brackground, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_5lidar_5lidar_4core_6ctools_7cy_brackground(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+  PyArrayObject *__pyx_v_matrix = 0;
+  PyArrayObject *__pyx_v_bkg = 0;
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("cy_brackground (wrapper)", 0);
+  {
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_matrix,&__pyx_n_s_bkg,0};
+    PyObject* values[2] = {0,0};
+    if (unlikely(__pyx_kwds)) {
+      Py_ssize_t kw_args;
+      const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
+      switch (pos_args) {
+        case  2: values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+        case  1: values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+        case  0: break;
+        default: goto __pyx_L5_argtuple_error;
+      }
+      kw_args = PyDict_Size(__pyx_kwds);
+      switch (pos_args) {
+        case  0:
+        if (likely((values[0] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_matrix)) != 0)) kw_args--;
+        else goto __pyx_L5_argtuple_error;
+        case  1:
+        if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_bkg)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("cy_brackground", 1, 2, 2, 1); __PYX_ERR(0, 75, __pyx_L3_error)
+        }
+      }
+      if (unlikely(kw_args > 0)) {
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "cy_brackground") < 0)) __PYX_ERR(0, 75, __pyx_L3_error)
+      }
+    } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
+      goto __pyx_L5_argtuple_error;
+    } else {
+      values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+      values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+    }
+    __pyx_v_matrix = ((PyArrayObject *)values[0]);
+    __pyx_v_bkg = ((PyArrayObject *)values[1]);
+  }
+  goto __pyx_L4_argument_unpacking_done;
+  __pyx_L5_argtuple_error:;
+  __Pyx_RaiseArgtupleInvalid("cy_brackground", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 75, __pyx_L3_error)
+  __pyx_L3_error:;
+  __Pyx_AddTraceback("lidar.lidar.core.ctools.cy_brackground", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_RefNannyFinishContext();
+  return NULL;
+  __pyx_L4_argument_unpacking_done:;
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_matrix), __pyx_ptype_5numpy_ndarray, 1, "matrix", 0))) __PYX_ERR(0, 75, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_bkg), __pyx_ptype_5numpy_ndarray, 1, "bkg", 0))) __PYX_ERR(0, 76, __pyx_L1_error)
+  __pyx_r = __pyx_pf_5lidar_5lidar_4core_6ctools_6cy_brackground(__pyx_self, __pyx_v_matrix, __pyx_v_bkg);
+
+  /* function exit code */
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_5lidar_5lidar_4core_6ctools_6cy_brackground(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_matrix, PyArrayObject *__pyx_v_bkg) {
+  int __pyx_v_i;
+  int __pyx_v_j;
+  int __pyx_v_c;
+  int __pyx_v_rdim;
+  int __pyx_v_cdim;
+  int __pyx_v_bkgdim;
+  __Pyx_LocalBuf_ND __pyx_pybuffernd_bkg;
+  __Pyx_Buffer __pyx_pybuffer_bkg;
+  __Pyx_LocalBuf_ND __pyx_pybuffernd_matrix;
+  __Pyx_Buffer __pyx_pybuffer_matrix;
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  int __pyx_t_1;
+  int __pyx_t_2;
+  int __pyx_t_3;
+  int __pyx_t_4;
+  Py_ssize_t __pyx_t_5;
+  Py_ssize_t __pyx_t_6;
+  Py_ssize_t __pyx_t_7;
+  Py_ssize_t __pyx_t_8;
+  int __pyx_t_9;
+  __Pyx_RefNannySetupContext("cy_brackground", 0);
+  __pyx_pybuffer_matrix.pybuffer.buf = NULL;
+  __pyx_pybuffer_matrix.refcount = 0;
+  __pyx_pybuffernd_matrix.data = NULL;
+  __pyx_pybuffernd_matrix.rcbuffer = &__pyx_pybuffer_matrix;
+  __pyx_pybuffer_bkg.pybuffer.buf = NULL;
+  __pyx_pybuffer_bkg.refcount = 0;
+  __pyx_pybuffernd_bkg.data = NULL;
+  __pyx_pybuffernd_bkg.rcbuffer = &__pyx_pybuffer_bkg;
+  {
+    __Pyx_BufFmt_StackElem __pyx_stack[1];
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_matrix.rcbuffer->pybuffer, (PyObject*)__pyx_v_matrix, &__Pyx_TypeInfo_nn___pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES| PyBUF_WRITABLE, 2, 0, __pyx_stack) == -1)) __PYX_ERR(0, 75, __pyx_L1_error)
+  }
+  __pyx_pybuffernd_matrix.diminfo[0].strides = __pyx_pybuffernd_matrix.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_matrix.diminfo[0].shape = __pyx_pybuffernd_matrix.rcbuffer->pybuffer.shape[0]; __pyx_pybuffernd_matrix.diminfo[1].strides = __pyx_pybuffernd_matrix.rcbuffer->pybuffer.strides[1]; __pyx_pybuffernd_matrix.diminfo[1].shape = __pyx_pybuffernd_matrix.rcbuffer->pybuffer.shape[1];
+  {
+    __Pyx_BufFmt_StackElem __pyx_stack[1];
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_bkg.rcbuffer->pybuffer, (PyObject*)__pyx_v_bkg, &__Pyx_TypeInfo_nn___pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES, 2, 0, __pyx_stack) == -1)) __PYX_ERR(0, 75, __pyx_L1_error)
+  }
+  __pyx_pybuffernd_bkg.diminfo[0].strides = __pyx_pybuffernd_bkg.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_bkg.diminfo[0].shape = __pyx_pybuffernd_bkg.rcbuffer->pybuffer.shape[0]; __pyx_pybuffernd_bkg.diminfo[1].strides = __pyx_pybuffernd_bkg.rcbuffer->pybuffer.strides[1]; __pyx_pybuffernd_bkg.diminfo[1].shape = __pyx_pybuffernd_bkg.rcbuffer->pybuffer.shape[1];
+
+  /* "lidar/lidar/core/ctools.pyx":79
+ * 
+ *     cdef int i,j
+ *     cdef int c = 0             # <<<<<<<<<<<<<<
+ *     cdef int rdim = matrix.shape[0]
+ *     cdef int cdim = matrix.shape[1]
+ */
+  __pyx_v_c = 0;
+
+  /* "lidar/lidar/core/ctools.pyx":80
+ *     cdef int i,j
+ *     cdef int c = 0
+ *     cdef int rdim = matrix.shape[0]             # <<<<<<<<<<<<<<
+ *     cdef int cdim = matrix.shape[1]
+ *     cdef int bkgdim = bkg.shape[1] - 1
+ */
+  __pyx_v_rdim = (__pyx_v_matrix->dimensions[0]);
+
+  /* "lidar/lidar/core/ctools.pyx":81
+ *     cdef int c = 0
+ *     cdef int rdim = matrix.shape[0]
+ *     cdef int cdim = matrix.shape[1]             # <<<<<<<<<<<<<<
+ *     cdef int bkgdim = bkg.shape[1] - 1
+ *     #cdef np.ndarray[DTYPE_t, ndim=2] result = np.empty_like(matrix, dtype=DTYPE)
+ */
+  __pyx_v_cdim = (__pyx_v_matrix->dimensions[1]);
+
+  /* "lidar/lidar/core/ctools.pyx":82
+ *     cdef int rdim = matrix.shape[0]
+ *     cdef int cdim = matrix.shape[1]
+ *     cdef int bkgdim = bkg.shape[1] - 1             # <<<<<<<<<<<<<<
+ *     #cdef np.ndarray[DTYPE_t, ndim=2] result = np.empty_like(matrix, dtype=DTYPE)
+ * 
+ */
+  __pyx_v_bkgdim = ((__pyx_v_bkg->dimensions[1]) - 1);
+
+  /* "lidar/lidar/core/ctools.pyx":85
+ *     #cdef np.ndarray[DTYPE_t, ndim=2] result = np.empty_like(matrix, dtype=DTYPE)
+ * 
+ *     for i in range(rdim):             # <<<<<<<<<<<<<<
+ *         c = 0
+ *         for j in range(cdim):
+ */
+  __pyx_t_1 = __pyx_v_rdim;
+  for (__pyx_t_2 = 0; __pyx_t_2 < __pyx_t_1; __pyx_t_2+=1) {
+    __pyx_v_i = __pyx_t_2;
+
+    /* "lidar/lidar/core/ctools.pyx":86
+ * 
+ *     for i in range(rdim):
+ *         c = 0             # <<<<<<<<<<<<<<
+ *         for j in range(cdim):
+ *             matrix[i,j] -= bkg[i,c]
+ */
+    __pyx_v_c = 0;
+
+    /* "lidar/lidar/core/ctools.pyx":87
+ *     for i in range(rdim):
+ *         c = 0
+ *         for j in range(cdim):             # <<<<<<<<<<<<<<
+ *             matrix[i,j] -= bkg[i,c]
+ *             if c < bkgdim:
+ */
+    __pyx_t_3 = __pyx_v_cdim;
+    for (__pyx_t_4 = 0; __pyx_t_4 < __pyx_t_3; __pyx_t_4+=1) {
+      __pyx_v_j = __pyx_t_4;
+
+      /* "lidar/lidar/core/ctools.pyx":88
+ *         c = 0
+ *         for j in range(cdim):
+ *             matrix[i,j] -= bkg[i,c]             # <<<<<<<<<<<<<<
+ *             if c < bkgdim:
+ *                 c += 1
+ */
+      __pyx_t_5 = __pyx_v_i;
+      __pyx_t_6 = __pyx_v_c;
+      __pyx_t_7 = __pyx_v_i;
+      __pyx_t_8 = __pyx_v_j;
+      *__Pyx_BufPtrStrided2d(__pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t *, __pyx_pybuffernd_matrix.rcbuffer->pybuffer.buf, __pyx_t_7, __pyx_pybuffernd_matrix.diminfo[0].strides, __pyx_t_8, __pyx_pybuffernd_matrix.diminfo[1].strides) -= (*__Pyx_BufPtrStrided2d(__pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t *, __pyx_pybuffernd_bkg.rcbuffer->pybuffer.buf, __pyx_t_5, __pyx_pybuffernd_bkg.diminfo[0].strides, __pyx_t_6, __pyx_pybuffernd_bkg.diminfo[1].strides));
+
+      /* "lidar/lidar/core/ctools.pyx":89
+ *         for j in range(cdim):
+ *             matrix[i,j] -= bkg[i,c]
+ *             if c < bkgdim:             # <<<<<<<<<<<<<<
+ *                 c += 1
+ *             else:
+ */
+      __pyx_t_9 = ((__pyx_v_c < __pyx_v_bkgdim) != 0);
+      if (__pyx_t_9) {
+
+        /* "lidar/lidar/core/ctools.pyx":90
+ *             matrix[i,j] -= bkg[i,c]
+ *             if c < bkgdim:
+ *                 c += 1             # <<<<<<<<<<<<<<
+ *             else:
+ *                 c = 0
+ */
+        __pyx_v_c = (__pyx_v_c + 1);
+
+        /* "lidar/lidar/core/ctools.pyx":89
+ *         for j in range(cdim):
+ *             matrix[i,j] -= bkg[i,c]
+ *             if c < bkgdim:             # <<<<<<<<<<<<<<
+ *                 c += 1
+ *             else:
+ */
+        goto __pyx_L7;
+      }
+
+      /* "lidar/lidar/core/ctools.pyx":92
+ *                 c += 1
+ *             else:
+ *                 c = 0             # <<<<<<<<<<<<<<
+ *     return matrix
+ */
+      /*else*/ {
+        __pyx_v_c = 0;
+      }
+      __pyx_L7:;
+    }
+  }
+
+  /* "lidar/lidar/core/ctools.pyx":93
+ *             else:
+ *                 c = 0
+ *     return matrix             # <<<<<<<<<<<<<<
+ */
+  __Pyx_XDECREF(__pyx_r);
+  __Pyx_INCREF(((PyObject *)__pyx_v_matrix));
+  __pyx_r = ((PyObject *)__pyx_v_matrix);
+  goto __pyx_L0;
+
+  /* "lidar/lidar/core/ctools.pyx":75
+ * @cython.boundscheck(False)
+ * @cython.wraparound(False)
+ * def cy_brackground ( np.ndarray [DTYPE_t, ndim=2] matrix,             # <<<<<<<<<<<<<<
+ *             np.ndarray[DTYPE_t, ndim=2] bkg):
+ * 
+ */
+
+  /* function exit code */
+  __pyx_L1_error:;
+  { PyObject *__pyx_type, *__pyx_value, *__pyx_tb;
+    __Pyx_PyThreadState_declare
+    __Pyx_PyThreadState_assign
+    __Pyx_ErrFetch(&__pyx_type, &__pyx_value, &__pyx_tb);
+    __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_bkg.rcbuffer->pybuffer);
+    __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_matrix.rcbuffer->pybuffer);
+  __Pyx_ErrRestore(__pyx_type, __pyx_value, __pyx_tb);}
+  __Pyx_AddTraceback("lidar.lidar.core.ctools.cy_brackground", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  goto __pyx_L2;
+  __pyx_L0:;
+  __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_bkg.rcbuffer->pybuffer);
+  __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_matrix.rcbuffer->pybuffer);
   __pyx_L2:;
   __Pyx_XGIVEREF(__pyx_r);
   __Pyx_RefNannyFinishContext();
@@ -4785,9 +5075,16 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_RuntimeError, __pyx_k_RuntimeError, sizeof(__pyx_k_RuntimeError), 0, 0, 1, 1},
   {&__pyx_n_s_ValueError, __pyx_k_ValueError, sizeof(__pyx_k_ValueError), 0, 0, 1, 1},
   {&__pyx_n_s_binWidth, __pyx_k_binWidth, sizeof(__pyx_k_binWidth), 0, 0, 1, 1},
+  {&__pyx_n_s_bkg, __pyx_k_bkg, sizeof(__pyx_k_bkg), 0, 0, 1, 1},
+  {&__pyx_n_s_bkgdim, __pyx_k_bkgdim, sizeof(__pyx_k_bkgdim), 0, 0, 1, 1},
+  {&__pyx_n_s_c, __pyx_k_c, sizeof(__pyx_k_c), 0, 0, 1, 1},
   {&__pyx_n_s_cdim, __pyx_k_cdim, sizeof(__pyx_k_cdim), 0, 0, 1, 1},
   {&__pyx_n_s_const1, __pyx_k_const1, sizeof(__pyx_k_const1), 0, 0, 1, 1},
   {&__pyx_n_s_const2, __pyx_k_const2, sizeof(__pyx_k_const2), 0, 0, 1, 1},
+  {&__pyx_n_s_cy_brackground, __pyx_k_cy_brackground, sizeof(__pyx_k_cy_brackground), 0, 0, 1, 1},
+  {&__pyx_n_s_cy_mHz, __pyx_k_cy_mHz, sizeof(__pyx_k_cy_mHz), 0, 0, 1, 1},
+  {&__pyx_n_s_cy_mVolts, __pyx_k_cy_mVolts, sizeof(__pyx_k_cy_mVolts), 0, 0, 1, 1},
+  {&__pyx_n_s_cy_range_corrected, __pyx_k_cy_range_corrected, sizeof(__pyx_k_cy_range_corrected), 0, 0, 1, 1},
   {&__pyx_n_s_float64, __pyx_k_float64, sizeof(__pyx_k_float64), 0, 0, 1, 1},
   {&__pyx_kp_s_home_jhernandezv_Documents_SIAT, __pyx_k_home_jhernandezv_Documents_SIAT, sizeof(__pyx_k_home_jhernandezv_Documents_SIAT), 0, 0, 1, 0},
   {&__pyx_n_s_i, __pyx_k_i, sizeof(__pyx_k_i), 0, 0, 1, 1},
@@ -4795,8 +5092,6 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_inputRange, __pyx_k_inputRange, sizeof(__pyx_k_inputRange), 0, 0, 1, 1},
   {&__pyx_n_s_j, __pyx_k_j, sizeof(__pyx_k_j), 0, 0, 1, 1},
   {&__pyx_n_s_lidar_lidar_core_ctools, __pyx_k_lidar_lidar_core_ctools, sizeof(__pyx_k_lidar_lidar_core_ctools), 0, 0, 1, 1},
-  {&__pyx_n_s_mHz, __pyx_k_mHz, sizeof(__pyx_k_mHz), 0, 0, 1, 1},
-  {&__pyx_n_s_mVolts, __pyx_k_mVolts, sizeof(__pyx_k_mVolts), 0, 0, 1, 1},
   {&__pyx_n_s_main, __pyx_k_main, sizeof(__pyx_k_main), 0, 0, 1, 1},
   {&__pyx_n_s_matrix, __pyx_k_matrix, sizeof(__pyx_k_matrix), 0, 0, 1, 1},
   {&__pyx_kp_u_ndarray_is_not_C_contiguous, __pyx_k_ndarray_is_not_C_contiguous, sizeof(__pyx_k_ndarray_is_not_C_contiguous), 0, 1, 0, 0},
@@ -4808,7 +5103,6 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_power, __pyx_k_power, sizeof(__pyx_k_power), 0, 0, 1, 1},
   {&__pyx_n_s_rang, __pyx_k_rang, sizeof(__pyx_k_rang), 0, 0, 1, 1},
   {&__pyx_n_s_range, __pyx_k_range, sizeof(__pyx_k_range), 0, 0, 1, 1},
-  {&__pyx_n_s_range_corrected, __pyx_k_range_corrected, sizeof(__pyx_k_range_corrected), 0, 0, 1, 1},
   {&__pyx_n_s_rdim, __pyx_k_rdim, sizeof(__pyx_k_rdim), 0, 0, 1, 1},
   {&__pyx_n_s_shotNumber, __pyx_k_shotNumber, sizeof(__pyx_k_shotNumber), 0, 0, 1, 1},
   {&__pyx_n_s_test, __pyx_k_test, sizeof(__pyx_k_test), 0, 0, 1, 1},
@@ -4816,7 +5110,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {0, 0, 0, 0, 0, 0, 0}
 };
 static int __Pyx_InitCachedBuiltins(void) {
-  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) __PYX_ERR(0, 21, __pyx_L1_error)
+  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) __PYX_ERR(0, 23, __pyx_L1_error)
   __pyx_builtin_ValueError = __Pyx_GetBuiltinName(__pyx_n_s_ValueError); if (!__pyx_builtin_ValueError) __PYX_ERR(1, 218, __pyx_L1_error)
   __pyx_builtin_RuntimeError = __Pyx_GetBuiltinName(__pyx_n_s_RuntimeError); if (!__pyx_builtin_RuntimeError) __PYX_ERR(1, 799, __pyx_L1_error)
   __pyx_builtin_ImportError = __Pyx_GetBuiltinName(__pyx_n_s_ImportError); if (!__pyx_builtin_ImportError) __PYX_ERR(1, 989, __pyx_L1_error)
@@ -4926,41 +5220,53 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GOTREF(__pyx_tuple__9);
   __Pyx_GIVEREF(__pyx_tuple__9);
 
-  /* "lidar/lidar/core/ctools.pyx":14
+  /* "lidar/lidar/core/ctools.pyx":16
  * @cython.boundscheck(False) # turn off bounds-checking for entire function
  * @cython.wraparound(False)
- * def range_corrected( np.ndarray [DTYPE_t, ndim=2] matrix,             # <<<<<<<<<<<<<<
+ * def cy_range_corrected( np.ndarray [DTYPE_t, ndim=2] matrix,             # <<<<<<<<<<<<<<
  *                     np.ndarray [DTYPE_t, ndim=1] rang):
  *     cdef int i,j
  */
-  __pyx_tuple__10 = PyTuple_Pack(6, __pyx_n_s_matrix, __pyx_n_s_rang, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_rdim, __pyx_n_s_cdim); if (unlikely(!__pyx_tuple__10)) __PYX_ERR(0, 14, __pyx_L1_error)
+  __pyx_tuple__10 = PyTuple_Pack(6, __pyx_n_s_matrix, __pyx_n_s_rang, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_rdim, __pyx_n_s_cdim); if (unlikely(!__pyx_tuple__10)) __PYX_ERR(0, 16, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__10);
   __Pyx_GIVEREF(__pyx_tuple__10);
-  __pyx_codeobj__11 = (PyObject*)__Pyx_PyCode_New(2, 0, 6, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__10, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_jhernandezv_Documents_SIAT, __pyx_n_s_range_corrected, 14, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__11)) __PYX_ERR(0, 14, __pyx_L1_error)
+  __pyx_codeobj__11 = (PyObject*)__Pyx_PyCode_New(2, 0, 6, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__10, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_jhernandezv_Documents_SIAT, __pyx_n_s_cy_range_corrected, 16, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__11)) __PYX_ERR(0, 16, __pyx_L1_error)
 
-  /* "lidar/lidar/core/ctools.pyx":29
+  /* "lidar/lidar/core/ctools.pyx":31
  * @cython.boundscheck(False)
  * @cython.wraparound(False)
- * def mVolts ( np.ndarray [DTYPE_t, ndim=2] matrix,             # <<<<<<<<<<<<<<
+ * def cy_mVolts ( np.ndarray [DTYPE_t, ndim=2] matrix,             # <<<<<<<<<<<<<<
  *             np.ndarray[DTYPE_t, ndim=1] inputRange,
  *             np.ndarray[DTYPE_t, ndim=1] ADCBits,
  */
-  __pyx_tuple__12 = PyTuple_Pack(11, __pyx_n_s_matrix, __pyx_n_s_inputRange, __pyx_n_s_ADCBits, __pyx_n_s_shotNumber, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_power, __pyx_n_s_const1, __pyx_n_s_const2, __pyx_n_s_rdim, __pyx_n_s_cdim); if (unlikely(!__pyx_tuple__12)) __PYX_ERR(0, 29, __pyx_L1_error)
+  __pyx_tuple__12 = PyTuple_Pack(11, __pyx_n_s_matrix, __pyx_n_s_inputRange, __pyx_n_s_ADCBits, __pyx_n_s_shotNumber, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_power, __pyx_n_s_const1, __pyx_n_s_const2, __pyx_n_s_rdim, __pyx_n_s_cdim); if (unlikely(!__pyx_tuple__12)) __PYX_ERR(0, 31, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__12);
   __Pyx_GIVEREF(__pyx_tuple__12);
-  __pyx_codeobj__13 = (PyObject*)__Pyx_PyCode_New(4, 0, 11, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__12, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_jhernandezv_Documents_SIAT, __pyx_n_s_mVolts, 29, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__13)) __PYX_ERR(0, 29, __pyx_L1_error)
+  __pyx_codeobj__13 = (PyObject*)__Pyx_PyCode_New(4, 0, 11, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__12, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_jhernandezv_Documents_SIAT, __pyx_n_s_cy_mVolts, 31, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__13)) __PYX_ERR(0, 31, __pyx_L1_error)
 
-  /* "lidar/lidar/core/ctools.pyx":51
+  /* "lidar/lidar/core/ctools.pyx":56
  * @cython.boundscheck(False)
  * @cython.wraparound(False)
- * def mHz ( np.ndarray [DTYPE_t, ndim=2] matrix,             # <<<<<<<<<<<<<<
+ * def cy_mHz ( np.ndarray [DTYPE_t, ndim=2] matrix,             # <<<<<<<<<<<<<<
  *             np.ndarray[DTYPE_t, ndim=1] binWidth,
  *             np.ndarray[DTYPE_t, ndim=1] shotNumber):
  */
-  __pyx_tuple__14 = PyTuple_Pack(8, __pyx_n_s_matrix, __pyx_n_s_binWidth, __pyx_n_s_shotNumber, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_const1, __pyx_n_s_rdim, __pyx_n_s_cdim); if (unlikely(!__pyx_tuple__14)) __PYX_ERR(0, 51, __pyx_L1_error)
+  __pyx_tuple__14 = PyTuple_Pack(8, __pyx_n_s_matrix, __pyx_n_s_binWidth, __pyx_n_s_shotNumber, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_const1, __pyx_n_s_rdim, __pyx_n_s_cdim); if (unlikely(!__pyx_tuple__14)) __PYX_ERR(0, 56, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__14);
   __Pyx_GIVEREF(__pyx_tuple__14);
-  __pyx_codeobj__15 = (PyObject*)__Pyx_PyCode_New(3, 0, 8, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__14, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_jhernandezv_Documents_SIAT, __pyx_n_s_mHz, 51, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__15)) __PYX_ERR(0, 51, __pyx_L1_error)
+  __pyx_codeobj__15 = (PyObject*)__Pyx_PyCode_New(3, 0, 8, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__14, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_jhernandezv_Documents_SIAT, __pyx_n_s_cy_mHz, 56, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__15)) __PYX_ERR(0, 56, __pyx_L1_error)
+
+  /* "lidar/lidar/core/ctools.pyx":75
+ * @cython.boundscheck(False)
+ * @cython.wraparound(False)
+ * def cy_brackground ( np.ndarray [DTYPE_t, ndim=2] matrix,             # <<<<<<<<<<<<<<
+ *             np.ndarray[DTYPE_t, ndim=2] bkg):
+ * 
+ */
+  __pyx_tuple__16 = PyTuple_Pack(8, __pyx_n_s_matrix, __pyx_n_s_bkg, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_c, __pyx_n_s_rdim, __pyx_n_s_cdim, __pyx_n_s_bkgdim); if (unlikely(!__pyx_tuple__16)) __PYX_ERR(0, 75, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__16);
+  __Pyx_GIVEREF(__pyx_tuple__16);
+  __pyx_codeobj__17 = (PyObject*)__Pyx_PyCode_New(2, 0, 8, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__16, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_jhernandezv_Documents_SIAT, __pyx_n_s_cy_brackground, 75, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__17)) __PYX_ERR(0, 75, __pyx_L1_error)
   __Pyx_RefNannyFinishContext();
   return 0;
   __pyx_L1_error:;
@@ -5107,40 +5413,52 @@ PyMODINIT_FUNC PyInit_ctools(void)
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_DTYPE, __pyx_t_2) < 0) __PYX_ERR(0, 9, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "lidar/lidar/core/ctools.pyx":14
+  /* "lidar/lidar/core/ctools.pyx":16
  * @cython.boundscheck(False) # turn off bounds-checking for entire function
  * @cython.wraparound(False)
- * def range_corrected( np.ndarray [DTYPE_t, ndim=2] matrix,             # <<<<<<<<<<<<<<
+ * def cy_range_corrected( np.ndarray [DTYPE_t, ndim=2] matrix,             # <<<<<<<<<<<<<<
  *                     np.ndarray [DTYPE_t, ndim=1] rang):
  *     cdef int i,j
  */
-  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_5lidar_5lidar_4core_6ctools_1range_corrected, NULL, __pyx_n_s_lidar_lidar_core_ctools); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 14, __pyx_L1_error)
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_5lidar_5lidar_4core_6ctools_1cy_range_corrected, NULL, __pyx_n_s_lidar_lidar_core_ctools); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 16, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_range_corrected, __pyx_t_2) < 0) __PYX_ERR(0, 14, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_cy_range_corrected, __pyx_t_2) < 0) __PYX_ERR(0, 16, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "lidar/lidar/core/ctools.pyx":29
+  /* "lidar/lidar/core/ctools.pyx":31
  * @cython.boundscheck(False)
  * @cython.wraparound(False)
- * def mVolts ( np.ndarray [DTYPE_t, ndim=2] matrix,             # <<<<<<<<<<<<<<
+ * def cy_mVolts ( np.ndarray [DTYPE_t, ndim=2] matrix,             # <<<<<<<<<<<<<<
  *             np.ndarray[DTYPE_t, ndim=1] inputRange,
  *             np.ndarray[DTYPE_t, ndim=1] ADCBits,
  */
-  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_5lidar_5lidar_4core_6ctools_3mVolts, NULL, __pyx_n_s_lidar_lidar_core_ctools); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 29, __pyx_L1_error)
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_5lidar_5lidar_4core_6ctools_3cy_mVolts, NULL, __pyx_n_s_lidar_lidar_core_ctools); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 31, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_mVolts, __pyx_t_2) < 0) __PYX_ERR(0, 29, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_cy_mVolts, __pyx_t_2) < 0) __PYX_ERR(0, 31, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "lidar/lidar/core/ctools.pyx":51
+  /* "lidar/lidar/core/ctools.pyx":56
  * @cython.boundscheck(False)
  * @cython.wraparound(False)
- * def mHz ( np.ndarray [DTYPE_t, ndim=2] matrix,             # <<<<<<<<<<<<<<
+ * def cy_mHz ( np.ndarray [DTYPE_t, ndim=2] matrix,             # <<<<<<<<<<<<<<
  *             np.ndarray[DTYPE_t, ndim=1] binWidth,
  *             np.ndarray[DTYPE_t, ndim=1] shotNumber):
  */
-  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_5lidar_5lidar_4core_6ctools_5mHz, NULL, __pyx_n_s_lidar_lidar_core_ctools); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 51, __pyx_L1_error)
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_5lidar_5lidar_4core_6ctools_5cy_mHz, NULL, __pyx_n_s_lidar_lidar_core_ctools); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 56, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_mHz, __pyx_t_2) < 0) __PYX_ERR(0, 51, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_cy_mHz, __pyx_t_2) < 0) __PYX_ERR(0, 56, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+
+  /* "lidar/lidar/core/ctools.pyx":75
+ * @cython.boundscheck(False)
+ * @cython.wraparound(False)
+ * def cy_brackground ( np.ndarray [DTYPE_t, ndim=2] matrix,             # <<<<<<<<<<<<<<
+ *             np.ndarray[DTYPE_t, ndim=2] bkg):
+ * 
+ */
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_5lidar_5lidar_4core_6ctools_7cy_brackground, NULL, __pyx_n_s_lidar_lidar_core_ctools); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 75, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_cy_brackground, __pyx_t_2) < 0) __PYX_ERR(0, 75, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
   /* "lidar/lidar/core/ctools.pyx":4

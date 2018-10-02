@@ -10,8 +10,8 @@ import pandas as pd
 import struct
 import sys, os, glob, locale
 
-from .core.plotbook import PlotBook
-from .core.ctools import (range_corrected, mVolts, mHz)
+from lidar.core.plotbook import PlotBook
+from lidar._libs.ctools import (cy_range_corrected, cy_mVolts, cy_mHz, cy_brackground)
 from dateutil.relativedelta import relativedelta
 from matplotlib.pyplot import register_cmap, get_cmap
 from matplotlib.dates import DateFormatter
@@ -337,22 +337,22 @@ class Lidar(PlotBook):
                 'Zenith' ] *= -1
 
             #Filter by repeated measures at Zenith 90
-            duplicated =  dataInfo.index[dataInfo.Zenith == 90]
-            print duplicated#duplicated('Zenith',keep=False)
-
-            if duplicated.size >1 :
-                print "\n Deleting duplicated"
-                data.loc[:, duplicated[0] ] = data[ duplicated ].groupby(
-                    axis=1,
-                    level=1).mean().values
-                data.drop(
-                    duplicated[1:],
-                    axis=1,
-                    level=0,
-                    inplace=True)
-                dataInfo.drop(
-                    duplicated[1:],
-                    inplace=True)
+            # duplicated =  dataInfo.index[dataInfo.Zenith == 90]
+            # print duplicated#duplicated('Zenith',keep=False)
+            #
+            # if duplicated.size >1 :
+            #     print "\n Deleting duplicated"
+            #     data.loc[:, duplicated[0] ] = data[ duplicated ].groupby(
+            #         axis=1,
+            #         level=1).mean().values
+            #     data.drop(
+            #         duplicated[1:],
+            #         axis=1,
+            #         level=0,
+            #         inplace=True)
+            #     dataInfo.drop(
+            #         duplicated[1:],
+            #         inplace=True)
 
         elif self.scan in ['Zenith','Azimuth','FixedPoint']:
             dataInfo.loc[:,'Zenith']   *= -1
@@ -414,10 +414,11 @@ class Lidar(PlotBook):
         self.datos.index        = pd.to_datetime( self.datos.index )
 
         self.datos.astype(np.float64)
+        self.datosInfo.astype(np.float64)
         self.datosInfo.sort_index(inplace=True)
-        self.datos.index.name   = 'Dates'
+        self.datos.index.name       = 'Dates'
         self.datosInfo.index.name   = 'Dates'
-        self.raw                = self.datos.copy()
+        self.raw                    = self.datos.copy()
         self.derived_output(**kwargs)
 
 
@@ -764,13 +765,13 @@ class Lidar(PlotBook):
 
             tmpList.append(
                 pd.DataFrame(
-                    mVolts(tmp.values,
+                    cy_mVolts(tmp.values,
                         self.datosInfo[ 'InputRange_'+col ].values,
                         self.datosInfo[ 'ADCBits_'+col ].values,
                         self.datosInfo[ 'ShotNumber_'+col ].values
                         )
                     if 'analog' in col else
-                    mHz(tmp.values,
+                    cy_mHz(tmp.values,
                         self.datosInfo['BinWidth_'+col ].values,
                         self.datosInfo[ 'ShotNumber_'+col ].values
                         )
@@ -797,16 +798,21 @@ class Lidar(PlotBook):
 
     @property
     def background(self):
-        y   = self.datos.loc(axis=1) [
+        bkg   = self.datos.loc(axis=1) [
                 self.datos.columns.levels[0] [
                     (self.datos.columns.levels[0] > 18) &
                     (self.datos.columns.levels[0] < 21)
                 ]
             ].groupby(level=(1,2), axis=1).mean()
-        y [y.isnull()] = 0
+        bkg [bkg.isnull()] = 0
 
+        return  pd.DataFrame(
+                    cy_brackground(self.datos.values, bkg.values)
+                    index = self.datos.index,
+                    columns = self.datos.columns
+                )
 
-        return self.datos.apply(lambda x: x - y[ (x.name[1],x.name[2]) ])
+        # self.datos.apply(lambda x: x - y[ (x.name[1],x.name[2]) ])
         # self.datos       = self.datos.apply(lambda x: x - self.bkg[x.name[-1]])
         # print self.datos.shape
         # return self.datos.apply(lambda x: x - self.bkg[x.name[-1]])
@@ -814,7 +820,7 @@ class Lidar(PlotBook):
 
     @property
     def RCS(self):
-        tmp     =   range_corrected(
+        tmp     =   cy_range_corrected(
                         self.datos.values,
                         self.datos.columns.get_level_values(0).values
                     )

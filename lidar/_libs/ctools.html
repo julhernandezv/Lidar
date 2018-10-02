@@ -398,18 +398,20 @@ body.cython { font-family: courier; font-size: 12; }
   <span class='pyx_macro_api'>__Pyx_DECREF</span>(__pyx_t_2); __pyx_t_2 = 0;
 </pre><pre class="cython line score-0">&#xA0;<span class="">10</span>: <span class="k">ctypedef</span> <span class="n">np</span><span class="o">.</span><span class="n">float64_t</span> <span class="n">DTYPE_t</span></pre>
 <pre class="cython line score-0">&#xA0;<span class="">11</span>: </pre>
-<pre class="cython line score-0">&#xA0;<span class="">12</span>: <span class="nd">@cython</span><span class="o">.</span><span class="n">boundscheck</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span> <span class="c"># turn off bounds-checking for entire function</span></pre>
-<pre class="cython line score-0">&#xA0;<span class="">13</span>: <span class="nd">@cython</span><span class="o">.</span><span class="n">wraparound</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span></pre>
-<pre class="cython line score-65" onclick='toggleDiv(this)'>+<span class="">14</span>: <span class="k">def</span> <span class="nf">range_corrected</span><span class="p">(</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="p">[</span><span class="n">DTYPE_t</span><span class="p">,</span> <span class="n">ndim</span><span class="o">=</span><span class="mf">2</span><span class="p">]</span> <span class="n">matrix</span><span class="p">,</span></pre>
+<pre class="cython line score-0">&#xA0;<span class="">12</span>: </pre>
+<pre class="cython line score-0">&#xA0;<span class="">13</span>: <span class="c"># &quot;&quot;&quot; Function to calculate range_corrected from Lidar data&quot;&quot;&quot;</span></pre>
+<pre class="cython line score-0">&#xA0;<span class="">14</span>: <span class="nd">@cython</span><span class="o">.</span><span class="n">boundscheck</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span> <span class="c"># turn off bounds-checking for entire function</span></pre>
+<pre class="cython line score-0">&#xA0;<span class="">15</span>: <span class="nd">@cython</span><span class="o">.</span><span class="n">wraparound</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span></pre>
+<pre class="cython line score-65" onclick='toggleDiv(this)'>+<span class="">16</span>: <span class="k">def</span> <span class="nf">cy_range_corrected</span><span class="p">(</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="p">[</span><span class="n">DTYPE_t</span><span class="p">,</span> <span class="n">ndim</span><span class="o">=</span><span class="mf">2</span><span class="p">]</span> <span class="n">matrix</span><span class="p">,</span></pre>
 <pre class='cython code score-65 '>/* Python wrapper */
-static PyObject *__pyx_pw_5lidar_5lidar_4core_6ctools_1range_corrected(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_5lidar_5lidar_4core_6ctools_1range_corrected = {"range_corrected", (PyCFunction)__pyx_pw_5lidar_5lidar_4core_6ctools_1range_corrected, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_5lidar_5lidar_4core_6ctools_1range_corrected(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_5lidar_5lidar_4core_6ctools_1cy_range_corrected(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_5lidar_5lidar_4core_6ctools_1cy_range_corrected = {"cy_range_corrected", (PyCFunction)__pyx_pw_5lidar_5lidar_4core_6ctools_1cy_range_corrected, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_5lidar_5lidar_4core_6ctools_1cy_range_corrected(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyArrayObject *__pyx_v_matrix = 0;
   PyArrayObject *__pyx_v_rang = 0;
   PyObject *__pyx_r = 0;
   <span class='refnanny'>__Pyx_RefNannyDeclarations</span>
-  <span class='refnanny'>__Pyx_RefNannySetupContext</span>("range_corrected (wrapper)", 0);
+  <span class='refnanny'>__Pyx_RefNannySetupContext</span>("cy_range_corrected (wrapper)", 0);
   {
     static PyObject **__pyx_pyargnames[] = {&amp;__pyx_n_s_matrix,&amp;__pyx_n_s_rang,0};
     PyObject* values[2] = {0,0};
@@ -430,11 +432,11 @@ static PyObject *__pyx_pw_5lidar_5lidar_4core_6ctools_1range_corrected(PyObject 
         case  1:
         if (likely((values[1] = <span class='py_c_api'>PyDict_GetItem</span>(__pyx_kwds, __pyx_n_s_rang)) != 0)) kw_args--;
         else {
-          <span class='pyx_c_api'>__Pyx_RaiseArgtupleInvalid</span>("range_corrected", 1, 2, 2, 1); __PYX_ERR(0, 14, __pyx_L3_error)
+          <span class='pyx_c_api'>__Pyx_RaiseArgtupleInvalid</span>("cy_range_corrected", 1, 2, 2, 1); __PYX_ERR(0, 16, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args &gt; 0)) {
-        if (unlikely(<span class='pyx_c_api'>__Pyx_ParseOptionalKeywords</span>(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "range_corrected") &lt; 0)) __PYX_ERR(0, 14, __pyx_L3_error)
+        if (unlikely(<span class='pyx_c_api'>__Pyx_ParseOptionalKeywords</span>(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "cy_range_corrected") &lt; 0)) __PYX_ERR(0, 16, __pyx_L3_error)
       }
     } else if (<span class='py_macro_api'>PyTuple_GET_SIZE</span>(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -447,15 +449,15 @@ static PyObject *__pyx_pw_5lidar_5lidar_4core_6ctools_1range_corrected(PyObject 
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  <span class='pyx_c_api'>__Pyx_RaiseArgtupleInvalid</span>("range_corrected", 1, 2, 2, <span class='py_macro_api'>PyTuple_GET_SIZE</span>(__pyx_args)); __PYX_ERR(0, 14, __pyx_L3_error)
+  <span class='pyx_c_api'>__Pyx_RaiseArgtupleInvalid</span>("cy_range_corrected", 1, 2, 2, <span class='py_macro_api'>PyTuple_GET_SIZE</span>(__pyx_args)); __PYX_ERR(0, 16, __pyx_L3_error)
   __pyx_L3_error:;
-  <span class='pyx_c_api'>__Pyx_AddTraceback</span>("lidar.lidar.core.ctools.range_corrected", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  <span class='pyx_c_api'>__Pyx_AddTraceback</span>("lidar.lidar.core.ctools.cy_range_corrected", __pyx_clineno, __pyx_lineno, __pyx_filename);
   <span class='refnanny'>__Pyx_RefNannyFinishContext</span>();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!<span class='pyx_c_api'>__Pyx_ArgTypeTest</span>(((PyObject *)__pyx_v_matrix), __pyx_ptype_5numpy_ndarray, 1, "matrix", 0))) __PYX_ERR(0, 14, __pyx_L1_error)
-  if (unlikely(!<span class='pyx_c_api'>__Pyx_ArgTypeTest</span>(((PyObject *)__pyx_v_rang), __pyx_ptype_5numpy_ndarray, 1, "rang", 0))) __PYX_ERR(0, 15, __pyx_L1_error)
-  __pyx_r = __pyx_pf_5lidar_5lidar_4core_6ctools_range_corrected(__pyx_self, __pyx_v_matrix, __pyx_v_rang);
+  if (unlikely(!<span class='pyx_c_api'>__Pyx_ArgTypeTest</span>(((PyObject *)__pyx_v_matrix), __pyx_ptype_5numpy_ndarray, 1, "matrix", 0))) __PYX_ERR(0, 16, __pyx_L1_error)
+  if (unlikely(!<span class='pyx_c_api'>__Pyx_ArgTypeTest</span>(((PyObject *)__pyx_v_rang), __pyx_ptype_5numpy_ndarray, 1, "rang", 0))) __PYX_ERR(0, 17, __pyx_L1_error)
+  __pyx_r = __pyx_pf_5lidar_5lidar_4core_6ctools_cy_range_corrected(__pyx_self, __pyx_v_matrix, __pyx_v_rang);
 
   /* function exit code */
   goto __pyx_L0;
@@ -466,7 +468,7 @@ static PyObject *__pyx_pw_5lidar_5lidar_4core_6ctools_1range_corrected(PyObject 
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5lidar_5lidar_4core_6ctools_range_corrected(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_matrix, PyArrayObject *__pyx_v_rang) {
+static PyObject *__pyx_pf_5lidar_5lidar_4core_6ctools_cy_range_corrected(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_matrix, PyArrayObject *__pyx_v_rang) {
   int __pyx_v_i;
   int __pyx_v_j;
   int __pyx_v_rdim;
@@ -477,7 +479,7 @@ static PyObject *__pyx_pf_5lidar_5lidar_4core_6ctools_range_corrected(CYTHON_UNU
   __Pyx_Buffer __pyx_pybuffer_rang;
   PyObject *__pyx_r = NULL;
   <span class='refnanny'>__Pyx_RefNannyDeclarations</span>
-  <span class='refnanny'>__Pyx_RefNannySetupContext</span>("range_corrected", 0);
+  <span class='refnanny'>__Pyx_RefNannySetupContext</span>("cy_range_corrected", 0);
   __pyx_pybuffer_matrix.pybuffer.buf = NULL;
   __pyx_pybuffer_matrix.refcount = 0;
   __pyx_pybuffernd_matrix.data = NULL;
@@ -488,12 +490,12 @@ static PyObject *__pyx_pf_5lidar_5lidar_4core_6ctools_range_corrected(CYTHON_UNU
   __pyx_pybuffernd_rang.rcbuffer = &amp;__pyx_pybuffer_rang;
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(<span class='pyx_c_api'>__Pyx_GetBufferAndValidate</span>(&amp;__pyx_pybuffernd_matrix.rcbuffer-&gt;pybuffer, (PyObject*)__pyx_v_matrix, &amp;__Pyx_TypeInfo_nn___pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES| PyBUF_WRITABLE, 2, 0, __pyx_stack) == -1)) __PYX_ERR(0, 14, __pyx_L1_error)
+    if (unlikely(<span class='pyx_c_api'>__Pyx_GetBufferAndValidate</span>(&amp;__pyx_pybuffernd_matrix.rcbuffer-&gt;pybuffer, (PyObject*)__pyx_v_matrix, &amp;__Pyx_TypeInfo_nn___pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES| PyBUF_WRITABLE, 2, 0, __pyx_stack) == -1)) __PYX_ERR(0, 16, __pyx_L1_error)
   }
   __pyx_pybuffernd_matrix.diminfo[0].strides = __pyx_pybuffernd_matrix.rcbuffer-&gt;pybuffer.strides[0]; __pyx_pybuffernd_matrix.diminfo[0].shape = __pyx_pybuffernd_matrix.rcbuffer-&gt;pybuffer.shape[0]; __pyx_pybuffernd_matrix.diminfo[1].strides = __pyx_pybuffernd_matrix.rcbuffer-&gt;pybuffer.strides[1]; __pyx_pybuffernd_matrix.diminfo[1].shape = __pyx_pybuffernd_matrix.rcbuffer-&gt;pybuffer.shape[1];
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(<span class='pyx_c_api'>__Pyx_GetBufferAndValidate</span>(&amp;__pyx_pybuffernd_rang.rcbuffer-&gt;pybuffer, (PyObject*)__pyx_v_rang, &amp;__Pyx_TypeInfo_nn___pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 14, __pyx_L1_error)
+    if (unlikely(<span class='pyx_c_api'>__Pyx_GetBufferAndValidate</span>(&amp;__pyx_pybuffernd_rang.rcbuffer-&gt;pybuffer, (PyObject*)__pyx_v_rang, &amp;__Pyx_TypeInfo_nn___pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 16, __pyx_L1_error)
   }
   __pyx_pybuffernd_rang.diminfo[0].strides = __pyx_pybuffernd_rang.rcbuffer-&gt;pybuffer.strides[0]; __pyx_pybuffernd_rang.diminfo[0].shape = __pyx_pybuffernd_rang.rcbuffer-&gt;pybuffer.shape[0];
 /* … */
@@ -506,7 +508,7 @@ static PyObject *__pyx_pf_5lidar_5lidar_4core_6ctools_range_corrected(CYTHON_UNU
     <span class='pyx_c_api'>__Pyx_SafeReleaseBuffer</span>(&amp;__pyx_pybuffernd_matrix.rcbuffer-&gt;pybuffer);
     <span class='pyx_c_api'>__Pyx_SafeReleaseBuffer</span>(&amp;__pyx_pybuffernd_rang.rcbuffer-&gt;pybuffer);
   <span class='pyx_c_api'>__Pyx_ErrRestore</span>(__pyx_type, __pyx_value, __pyx_tb);}
-  <span class='pyx_c_api'>__Pyx_AddTraceback</span>("lidar.lidar.core.ctools.range_corrected", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  <span class='pyx_c_api'>__Pyx_AddTraceback</span>("lidar.lidar.core.ctools.cy_range_corrected", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   goto __pyx_L2;
   __pyx_L0:;
@@ -518,59 +520,59 @@ static PyObject *__pyx_pf_5lidar_5lidar_4core_6ctools_range_corrected(CYTHON_UNU
   return __pyx_r;
 }
 /* … */
-  __pyx_tuple__10 = <span class='py_c_api'>PyTuple_Pack</span>(6, __pyx_n_s_matrix, __pyx_n_s_rang, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_rdim, __pyx_n_s_cdim); if (unlikely(!__pyx_tuple__10)) __PYX_ERR(0, 14, __pyx_L1_error)
+  __pyx_tuple__10 = <span class='py_c_api'>PyTuple_Pack</span>(6, __pyx_n_s_matrix, __pyx_n_s_rang, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_rdim, __pyx_n_s_cdim); if (unlikely(!__pyx_tuple__10)) __PYX_ERR(0, 16, __pyx_L1_error)
   <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_tuple__10);
   <span class='refnanny'>__Pyx_GIVEREF</span>(__pyx_tuple__10);
 /* … */
-  __pyx_t_2 = PyCFunction_NewEx(&amp;__pyx_mdef_5lidar_5lidar_4core_6ctools_1range_corrected, NULL, __pyx_n_s_lidar_lidar_core_ctools); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 14, __pyx_L1_error)
+  __pyx_t_2 = PyCFunction_NewEx(&amp;__pyx_mdef_5lidar_5lidar_4core_6ctools_1cy_range_corrected, NULL, __pyx_n_s_lidar_lidar_core_ctools); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 16, __pyx_L1_error)
   <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_2);
-  if (<span class='py_c_api'>PyDict_SetItem</span>(__pyx_d, __pyx_n_s_range_corrected, __pyx_t_2) &lt; 0) __PYX_ERR(0, 14, __pyx_L1_error)
+  if (<span class='py_c_api'>PyDict_SetItem</span>(__pyx_d, __pyx_n_s_cy_range_corrected, __pyx_t_2) &lt; 0) __PYX_ERR(0, 16, __pyx_L1_error)
   <span class='pyx_macro_api'>__Pyx_DECREF</span>(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_codeobj__11 = (PyObject*)<span class='pyx_c_api'>__Pyx_PyCode_New</span>(2, 0, 6, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__10, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_jhernandezv_Documents_SIAT, __pyx_n_s_range_corrected, 14, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__11)) __PYX_ERR(0, 14, __pyx_L1_error)
-</pre><pre class="cython line score-0">&#xA0;<span class="">15</span>:                     <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="p">[</span><span class="n">DTYPE_t</span><span class="p">,</span> <span class="n">ndim</span><span class="o">=</span><span class="mf">1</span><span class="p">]</span> <span class="n">rang</span><span class="p">):</span></pre>
-<pre class="cython line score-0">&#xA0;<span class="">16</span>:     <span class="k">cdef</span> <span class="kt">int</span> <span class="nf">i</span><span class="p">,</span><span class="nf">j</span></pre>
-<pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">17</span>:     <span class="k">cdef</span> <span class="kt">int</span> <span class="nf">rdim</span> <span class="o">=</span> <span class="n">matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span></pre>
+  __pyx_codeobj__11 = (PyObject*)<span class='pyx_c_api'>__Pyx_PyCode_New</span>(2, 0, 6, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__10, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_jhernandezv_Documents_SIAT, __pyx_n_s_cy_range_corrected, 16, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__11)) __PYX_ERR(0, 16, __pyx_L1_error)
+</pre><pre class="cython line score-0">&#xA0;<span class="">17</span>:                     <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="p">[</span><span class="n">DTYPE_t</span><span class="p">,</span> <span class="n">ndim</span><span class="o">=</span><span class="mf">1</span><span class="p">]</span> <span class="n">rang</span><span class="p">):</span></pre>
+<pre class="cython line score-0">&#xA0;<span class="">18</span>:     <span class="k">cdef</span> <span class="kt">int</span> <span class="nf">i</span><span class="p">,</span><span class="nf">j</span></pre>
+<pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">19</span>:     <span class="k">cdef</span> <span class="kt">int</span> <span class="nf">rdim</span> <span class="o">=</span> <span class="n">matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span></pre>
 <pre class='cython code score-0 '>  __pyx_v_rdim = (__pyx_v_matrix-&gt;dimensions[0]);
-</pre><pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">18</span>:     <span class="k">cdef</span> <span class="kt">int</span> <span class="nf">cdim</span> <span class="o">=</span> <span class="n">matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mf">1</span><span class="p">]</span></pre>
+</pre><pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">20</span>:     <span class="k">cdef</span> <span class="kt">int</span> <span class="nf">cdim</span> <span class="o">=</span> <span class="n">matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mf">1</span><span class="p">]</span></pre>
 <pre class='cython code score-0 '>  __pyx_v_cdim = (__pyx_v_matrix-&gt;dimensions[1]);
-</pre><pre class="cython line score-0">&#xA0;<span class="">19</span>:     <span class="c">#cdef np.ndarray[DTYPE_t, ndim=2] result = np.empty_like(matrix, dtype=DTYPE)</span></pre>
-<pre class="cython line score-0">&#xA0;<span class="">20</span>: </pre>
-<pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">21</span>:     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">rdim</span><span class="p">):</span></pre>
+</pre><pre class="cython line score-0">&#xA0;<span class="">21</span>:     <span class="c">#cdef np.ndarray[DTYPE_t, ndim=2] result = np.empty_like(matrix, dtype=DTYPE)</span></pre>
+<pre class="cython line score-0">&#xA0;<span class="">22</span>: </pre>
+<pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">23</span>:     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">rdim</span><span class="p">):</span></pre>
 <pre class='cython code score-0 '>  __pyx_t_1 = __pyx_v_rdim;
   for (__pyx_t_2 = 0; __pyx_t_2 &lt; __pyx_t_1; __pyx_t_2+=1) {
     __pyx_v_i = __pyx_t_2;
-</pre><pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">22</span>:         <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">cdim</span><span class="p">):</span></pre>
+</pre><pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">24</span>:         <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">cdim</span><span class="p">):</span></pre>
 <pre class='cython code score-0 '>    __pyx_t_3 = __pyx_v_cdim;
     for (__pyx_t_4 = 0; __pyx_t_4 &lt; __pyx_t_3; __pyx_t_4+=1) {
       __pyx_v_j = __pyx_t_4;
-</pre><pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">23</span>:             <span class="n">matrix</span> <span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">*=</span> <span class="n">rang</span><span class="p">[</span><span class="n">j</span><span class="p">]</span></pre>
+</pre><pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">25</span>:             <span class="n">matrix</span> <span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">*=</span> <span class="n">rang</span><span class="p">[</span><span class="n">j</span><span class="p">]</span></pre>
 <pre class='cython code score-0 '>      __pyx_t_5 = __pyx_v_j;
       __pyx_t_6 = __pyx_v_i;
       __pyx_t_7 = __pyx_v_j;
       *__Pyx_BufPtrStrided2d(__pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t *, __pyx_pybuffernd_matrix.rcbuffer-&gt;pybuffer.buf, __pyx_t_6, __pyx_pybuffernd_matrix.diminfo[0].strides, __pyx_t_7, __pyx_pybuffernd_matrix.diminfo[1].strides) *= (*__Pyx_BufPtrStrided1d(__pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t *, __pyx_pybuffernd_rang.rcbuffer-&gt;pybuffer.buf, __pyx_t_5, __pyx_pybuffernd_rang.diminfo[0].strides));
     }
   }
-</pre><pre class="cython line score-2" onclick='toggleDiv(this)'>+<span class="">24</span>:     <span class="k">return</span> <span class="n">matrix</span></pre>
+</pre><pre class="cython line score-2" onclick='toggleDiv(this)'>+<span class="">26</span>:     <span class="k">return</span> <span class="n">matrix</span></pre>
 <pre class='cython code score-2 '>  <span class='pyx_macro_api'>__Pyx_XDECREF</span>(__pyx_r);
   <span class='pyx_macro_api'>__Pyx_INCREF</span>(((PyObject *)__pyx_v_matrix));
   __pyx_r = ((PyObject *)__pyx_v_matrix);
   goto __pyx_L0;
-</pre><pre class="cython line score-0">&#xA0;<span class="">25</span>: </pre>
-<pre class="cython line score-0">&#xA0;<span class="">26</span>: </pre>
-<pre class="cython line score-0">&#xA0;<span class="">27</span>: <span class="nd">@cython</span><span class="o">.</span><span class="n">boundscheck</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span></pre>
-<pre class="cython line score-0">&#xA0;<span class="">28</span>: <span class="nd">@cython</span><span class="o">.</span><span class="n">wraparound</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span></pre>
-<pre class="cython line score-99" onclick='toggleDiv(this)'>+<span class="">29</span>: <span class="k">def</span> <span class="nf">mVolts</span> <span class="p">(</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="p">[</span><span class="n">DTYPE_t</span><span class="p">,</span> <span class="n">ndim</span><span class="o">=</span><span class="mf">2</span><span class="p">]</span> <span class="n">matrix</span><span class="p">,</span></pre>
+</pre><pre class="cython line score-0">&#xA0;<span class="">27</span>: </pre>
+<pre class="cython line score-0">&#xA0;<span class="">28</span>: <span class="c"># &quot;&quot;&quot; Function to calculate mVolts from Lidar raw data&quot;&quot;&quot;</span></pre>
+<pre class="cython line score-0">&#xA0;<span class="">29</span>: <span class="nd">@cython</span><span class="o">.</span><span class="n">boundscheck</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span></pre>
+<pre class="cython line score-0">&#xA0;<span class="">30</span>: <span class="nd">@cython</span><span class="o">.</span><span class="n">wraparound</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span></pre>
+<pre class="cython line score-99" onclick='toggleDiv(this)'>+<span class="">31</span>: <span class="k">def</span> <span class="nf">cy_mVolts</span> <span class="p">(</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="p">[</span><span class="n">DTYPE_t</span><span class="p">,</span> <span class="n">ndim</span><span class="o">=</span><span class="mf">2</span><span class="p">]</span> <span class="n">matrix</span><span class="p">,</span></pre>
 <pre class='cython code score-99 '>/* Python wrapper */
-static PyObject *__pyx_pw_5lidar_5lidar_4core_6ctools_3mVolts(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_5lidar_5lidar_4core_6ctools_3mVolts = {"mVolts", (PyCFunction)__pyx_pw_5lidar_5lidar_4core_6ctools_3mVolts, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_5lidar_5lidar_4core_6ctools_3mVolts(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_5lidar_5lidar_4core_6ctools_3cy_mVolts(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_5lidar_5lidar_4core_6ctools_3cy_mVolts = {"cy_mVolts", (PyCFunction)__pyx_pw_5lidar_5lidar_4core_6ctools_3cy_mVolts, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_5lidar_5lidar_4core_6ctools_3cy_mVolts(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyArrayObject *__pyx_v_matrix = 0;
   PyArrayObject *__pyx_v_inputRange = 0;
   PyArrayObject *__pyx_v_ADCBits = 0;
   PyArrayObject *__pyx_v_shotNumber = 0;
   PyObject *__pyx_r = 0;
   <span class='refnanny'>__Pyx_RefNannyDeclarations</span>
-  <span class='refnanny'>__Pyx_RefNannySetupContext</span>("mVolts (wrapper)", 0);
+  <span class='refnanny'>__Pyx_RefNannySetupContext</span>("cy_mVolts (wrapper)", 0);
   {
     static PyObject **__pyx_pyargnames[] = {&amp;__pyx_n_s_matrix,&amp;__pyx_n_s_inputRange,&amp;__pyx_n_s_ADCBits,&amp;__pyx_n_s_shotNumber,0};
     PyObject* values[4] = {0,0,0,0};
@@ -593,21 +595,21 @@ static PyObject *__pyx_pw_5lidar_5lidar_4core_6ctools_3mVolts(PyObject *__pyx_se
         case  1:
         if (likely((values[1] = <span class='py_c_api'>PyDict_GetItem</span>(__pyx_kwds, __pyx_n_s_inputRange)) != 0)) kw_args--;
         else {
-          <span class='pyx_c_api'>__Pyx_RaiseArgtupleInvalid</span>("mVolts", 1, 4, 4, 1); __PYX_ERR(0, 29, __pyx_L3_error)
+          <span class='pyx_c_api'>__Pyx_RaiseArgtupleInvalid</span>("cy_mVolts", 1, 4, 4, 1); __PYX_ERR(0, 31, __pyx_L3_error)
         }
         case  2:
         if (likely((values[2] = <span class='py_c_api'>PyDict_GetItem</span>(__pyx_kwds, __pyx_n_s_ADCBits)) != 0)) kw_args--;
         else {
-          <span class='pyx_c_api'>__Pyx_RaiseArgtupleInvalid</span>("mVolts", 1, 4, 4, 2); __PYX_ERR(0, 29, __pyx_L3_error)
+          <span class='pyx_c_api'>__Pyx_RaiseArgtupleInvalid</span>("cy_mVolts", 1, 4, 4, 2); __PYX_ERR(0, 31, __pyx_L3_error)
         }
         case  3:
         if (likely((values[3] = <span class='py_c_api'>PyDict_GetItem</span>(__pyx_kwds, __pyx_n_s_shotNumber)) != 0)) kw_args--;
         else {
-          <span class='pyx_c_api'>__Pyx_RaiseArgtupleInvalid</span>("mVolts", 1, 4, 4, 3); __PYX_ERR(0, 29, __pyx_L3_error)
+          <span class='pyx_c_api'>__Pyx_RaiseArgtupleInvalid</span>("cy_mVolts", 1, 4, 4, 3); __PYX_ERR(0, 31, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args &gt; 0)) {
-        if (unlikely(<span class='pyx_c_api'>__Pyx_ParseOptionalKeywords</span>(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "mVolts") &lt; 0)) __PYX_ERR(0, 29, __pyx_L3_error)
+        if (unlikely(<span class='pyx_c_api'>__Pyx_ParseOptionalKeywords</span>(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "cy_mVolts") &lt; 0)) __PYX_ERR(0, 31, __pyx_L3_error)
       }
     } else if (<span class='py_macro_api'>PyTuple_GET_SIZE</span>(__pyx_args) != 4) {
       goto __pyx_L5_argtuple_error;
@@ -624,17 +626,17 @@ static PyObject *__pyx_pw_5lidar_5lidar_4core_6ctools_3mVolts(PyObject *__pyx_se
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  <span class='pyx_c_api'>__Pyx_RaiseArgtupleInvalid</span>("mVolts", 1, 4, 4, <span class='py_macro_api'>PyTuple_GET_SIZE</span>(__pyx_args)); __PYX_ERR(0, 29, __pyx_L3_error)
+  <span class='pyx_c_api'>__Pyx_RaiseArgtupleInvalid</span>("cy_mVolts", 1, 4, 4, <span class='py_macro_api'>PyTuple_GET_SIZE</span>(__pyx_args)); __PYX_ERR(0, 31, __pyx_L3_error)
   __pyx_L3_error:;
-  <span class='pyx_c_api'>__Pyx_AddTraceback</span>("lidar.lidar.core.ctools.mVolts", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  <span class='pyx_c_api'>__Pyx_AddTraceback</span>("lidar.lidar.core.ctools.cy_mVolts", __pyx_clineno, __pyx_lineno, __pyx_filename);
   <span class='refnanny'>__Pyx_RefNannyFinishContext</span>();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!<span class='pyx_c_api'>__Pyx_ArgTypeTest</span>(((PyObject *)__pyx_v_matrix), __pyx_ptype_5numpy_ndarray, 1, "matrix", 0))) __PYX_ERR(0, 29, __pyx_L1_error)
-  if (unlikely(!<span class='pyx_c_api'>__Pyx_ArgTypeTest</span>(((PyObject *)__pyx_v_inputRange), __pyx_ptype_5numpy_ndarray, 1, "inputRange", 0))) __PYX_ERR(0, 30, __pyx_L1_error)
-  if (unlikely(!<span class='pyx_c_api'>__Pyx_ArgTypeTest</span>(((PyObject *)__pyx_v_ADCBits), __pyx_ptype_5numpy_ndarray, 1, "ADCBits", 0))) __PYX_ERR(0, 31, __pyx_L1_error)
-  if (unlikely(!<span class='pyx_c_api'>__Pyx_ArgTypeTest</span>(((PyObject *)__pyx_v_shotNumber), __pyx_ptype_5numpy_ndarray, 1, "shotNumber", 0))) __PYX_ERR(0, 32, __pyx_L1_error)
-  __pyx_r = __pyx_pf_5lidar_5lidar_4core_6ctools_2mVolts(__pyx_self, __pyx_v_matrix, __pyx_v_inputRange, __pyx_v_ADCBits, __pyx_v_shotNumber);
+  if (unlikely(!<span class='pyx_c_api'>__Pyx_ArgTypeTest</span>(((PyObject *)__pyx_v_matrix), __pyx_ptype_5numpy_ndarray, 1, "matrix", 0))) __PYX_ERR(0, 31, __pyx_L1_error)
+  if (unlikely(!<span class='pyx_c_api'>__Pyx_ArgTypeTest</span>(((PyObject *)__pyx_v_inputRange), __pyx_ptype_5numpy_ndarray, 1, "inputRange", 0))) __PYX_ERR(0, 32, __pyx_L1_error)
+  if (unlikely(!<span class='pyx_c_api'>__Pyx_ArgTypeTest</span>(((PyObject *)__pyx_v_ADCBits), __pyx_ptype_5numpy_ndarray, 1, "ADCBits", 0))) __PYX_ERR(0, 33, __pyx_L1_error)
+  if (unlikely(!<span class='pyx_c_api'>__Pyx_ArgTypeTest</span>(((PyObject *)__pyx_v_shotNumber), __pyx_ptype_5numpy_ndarray, 1, "shotNumber", 0))) __PYX_ERR(0, 34, __pyx_L1_error)
+  __pyx_r = __pyx_pf_5lidar_5lidar_4core_6ctools_2cy_mVolts(__pyx_self, __pyx_v_matrix, __pyx_v_inputRange, __pyx_v_ADCBits, __pyx_v_shotNumber);
 
   /* function exit code */
   goto __pyx_L0;
@@ -645,7 +647,7 @@ static PyObject *__pyx_pw_5lidar_5lidar_4core_6ctools_3mVolts(PyObject *__pyx_se
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5lidar_5lidar_4core_6ctools_2mVolts(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_matrix, PyArrayObject *__pyx_v_inputRange, PyArrayObject *__pyx_v_ADCBits, PyArrayObject *__pyx_v_shotNumber) {
+static PyObject *__pyx_pf_5lidar_5lidar_4core_6ctools_2cy_mVolts(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_matrix, PyArrayObject *__pyx_v_inputRange, PyArrayObject *__pyx_v_ADCBits, PyArrayObject *__pyx_v_shotNumber) {
   int __pyx_v_i;
   int __pyx_v_j;
   __pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t __pyx_v_power;
@@ -663,7 +665,7 @@ static PyObject *__pyx_pf_5lidar_5lidar_4core_6ctools_2mVolts(CYTHON_UNUSED PyOb
   __Pyx_Buffer __pyx_pybuffer_shotNumber;
   PyObject *__pyx_r = NULL;
   <span class='refnanny'>__Pyx_RefNannyDeclarations</span>
-  <span class='refnanny'>__Pyx_RefNannySetupContext</span>("mVolts", 0);
+  <span class='refnanny'>__Pyx_RefNannySetupContext</span>("cy_mVolts", 0);
   __pyx_pybuffer_matrix.pybuffer.buf = NULL;
   __pyx_pybuffer_matrix.refcount = 0;
   __pyx_pybuffernd_matrix.data = NULL;
@@ -682,22 +684,22 @@ static PyObject *__pyx_pf_5lidar_5lidar_4core_6ctools_2mVolts(CYTHON_UNUSED PyOb
   __pyx_pybuffernd_shotNumber.rcbuffer = &amp;__pyx_pybuffer_shotNumber;
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(<span class='pyx_c_api'>__Pyx_GetBufferAndValidate</span>(&amp;__pyx_pybuffernd_matrix.rcbuffer-&gt;pybuffer, (PyObject*)__pyx_v_matrix, &amp;__Pyx_TypeInfo_nn___pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES| PyBUF_WRITABLE, 2, 0, __pyx_stack) == -1)) __PYX_ERR(0, 29, __pyx_L1_error)
+    if (unlikely(<span class='pyx_c_api'>__Pyx_GetBufferAndValidate</span>(&amp;__pyx_pybuffernd_matrix.rcbuffer-&gt;pybuffer, (PyObject*)__pyx_v_matrix, &amp;__Pyx_TypeInfo_nn___pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES| PyBUF_WRITABLE, 2, 0, __pyx_stack) == -1)) __PYX_ERR(0, 31, __pyx_L1_error)
   }
   __pyx_pybuffernd_matrix.diminfo[0].strides = __pyx_pybuffernd_matrix.rcbuffer-&gt;pybuffer.strides[0]; __pyx_pybuffernd_matrix.diminfo[0].shape = __pyx_pybuffernd_matrix.rcbuffer-&gt;pybuffer.shape[0]; __pyx_pybuffernd_matrix.diminfo[1].strides = __pyx_pybuffernd_matrix.rcbuffer-&gt;pybuffer.strides[1]; __pyx_pybuffernd_matrix.diminfo[1].shape = __pyx_pybuffernd_matrix.rcbuffer-&gt;pybuffer.shape[1];
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(<span class='pyx_c_api'>__Pyx_GetBufferAndValidate</span>(&amp;__pyx_pybuffernd_inputRange.rcbuffer-&gt;pybuffer, (PyObject*)__pyx_v_inputRange, &amp;__Pyx_TypeInfo_nn___pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 29, __pyx_L1_error)
+    if (unlikely(<span class='pyx_c_api'>__Pyx_GetBufferAndValidate</span>(&amp;__pyx_pybuffernd_inputRange.rcbuffer-&gt;pybuffer, (PyObject*)__pyx_v_inputRange, &amp;__Pyx_TypeInfo_nn___pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 31, __pyx_L1_error)
   }
   __pyx_pybuffernd_inputRange.diminfo[0].strides = __pyx_pybuffernd_inputRange.rcbuffer-&gt;pybuffer.strides[0]; __pyx_pybuffernd_inputRange.diminfo[0].shape = __pyx_pybuffernd_inputRange.rcbuffer-&gt;pybuffer.shape[0];
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(<span class='pyx_c_api'>__Pyx_GetBufferAndValidate</span>(&amp;__pyx_pybuffernd_ADCBits.rcbuffer-&gt;pybuffer, (PyObject*)__pyx_v_ADCBits, &amp;__Pyx_TypeInfo_nn___pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 29, __pyx_L1_error)
+    if (unlikely(<span class='pyx_c_api'>__Pyx_GetBufferAndValidate</span>(&amp;__pyx_pybuffernd_ADCBits.rcbuffer-&gt;pybuffer, (PyObject*)__pyx_v_ADCBits, &amp;__Pyx_TypeInfo_nn___pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 31, __pyx_L1_error)
   }
   __pyx_pybuffernd_ADCBits.diminfo[0].strides = __pyx_pybuffernd_ADCBits.rcbuffer-&gt;pybuffer.strides[0]; __pyx_pybuffernd_ADCBits.diminfo[0].shape = __pyx_pybuffernd_ADCBits.rcbuffer-&gt;pybuffer.shape[0];
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(<span class='pyx_c_api'>__Pyx_GetBufferAndValidate</span>(&amp;__pyx_pybuffernd_shotNumber.rcbuffer-&gt;pybuffer, (PyObject*)__pyx_v_shotNumber, &amp;__Pyx_TypeInfo_nn___pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 29, __pyx_L1_error)
+    if (unlikely(<span class='pyx_c_api'>__Pyx_GetBufferAndValidate</span>(&amp;__pyx_pybuffernd_shotNumber.rcbuffer-&gt;pybuffer, (PyObject*)__pyx_v_shotNumber, &amp;__Pyx_TypeInfo_nn___pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 31, __pyx_L1_error)
   }
   __pyx_pybuffernd_shotNumber.diminfo[0].strides = __pyx_pybuffernd_shotNumber.rcbuffer-&gt;pybuffer.strides[0]; __pyx_pybuffernd_shotNumber.diminfo[0].shape = __pyx_pybuffernd_shotNumber.rcbuffer-&gt;pybuffer.shape[0];
 /* … */
@@ -712,7 +714,7 @@ static PyObject *__pyx_pf_5lidar_5lidar_4core_6ctools_2mVolts(CYTHON_UNUSED PyOb
     <span class='pyx_c_api'>__Pyx_SafeReleaseBuffer</span>(&amp;__pyx_pybuffernd_matrix.rcbuffer-&gt;pybuffer);
     <span class='pyx_c_api'>__Pyx_SafeReleaseBuffer</span>(&amp;__pyx_pybuffernd_shotNumber.rcbuffer-&gt;pybuffer);
   <span class='pyx_c_api'>__Pyx_ErrRestore</span>(__pyx_type, __pyx_value, __pyx_tb);}
-  <span class='pyx_c_api'>__Pyx_AddTraceback</span>("lidar.lidar.core.ctools.mVolts", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  <span class='pyx_c_api'>__Pyx_AddTraceback</span>("lidar.lidar.core.ctools.cy_mVolts", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   goto __pyx_L2;
   __pyx_L0:;
@@ -726,76 +728,79 @@ static PyObject *__pyx_pf_5lidar_5lidar_4core_6ctools_2mVolts(CYTHON_UNUSED PyOb
   return __pyx_r;
 }
 /* … */
-  __pyx_tuple__12 = <span class='py_c_api'>PyTuple_Pack</span>(11, __pyx_n_s_matrix, __pyx_n_s_inputRange, __pyx_n_s_ADCBits, __pyx_n_s_shotNumber, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_power, __pyx_n_s_const1, __pyx_n_s_const2, __pyx_n_s_rdim, __pyx_n_s_cdim); if (unlikely(!__pyx_tuple__12)) __PYX_ERR(0, 29, __pyx_L1_error)
+  __pyx_tuple__12 = <span class='py_c_api'>PyTuple_Pack</span>(11, __pyx_n_s_matrix, __pyx_n_s_inputRange, __pyx_n_s_ADCBits, __pyx_n_s_shotNumber, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_power, __pyx_n_s_const1, __pyx_n_s_const2, __pyx_n_s_rdim, __pyx_n_s_cdim); if (unlikely(!__pyx_tuple__12)) __PYX_ERR(0, 31, __pyx_L1_error)
   <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_tuple__12);
   <span class='refnanny'>__Pyx_GIVEREF</span>(__pyx_tuple__12);
 /* … */
-  __pyx_t_2 = PyCFunction_NewEx(&amp;__pyx_mdef_5lidar_5lidar_4core_6ctools_3mVolts, NULL, __pyx_n_s_lidar_lidar_core_ctools); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 29, __pyx_L1_error)
+  __pyx_t_2 = PyCFunction_NewEx(&amp;__pyx_mdef_5lidar_5lidar_4core_6ctools_3cy_mVolts, NULL, __pyx_n_s_lidar_lidar_core_ctools); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 31, __pyx_L1_error)
   <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_2);
-  if (<span class='py_c_api'>PyDict_SetItem</span>(__pyx_d, __pyx_n_s_mVolts, __pyx_t_2) &lt; 0) __PYX_ERR(0, 29, __pyx_L1_error)
+  if (<span class='py_c_api'>PyDict_SetItem</span>(__pyx_d, __pyx_n_s_cy_mVolts, __pyx_t_2) &lt; 0) __PYX_ERR(0, 31, __pyx_L1_error)
   <span class='pyx_macro_api'>__Pyx_DECREF</span>(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_codeobj__13 = (PyObject*)<span class='pyx_c_api'>__Pyx_PyCode_New</span>(4, 0, 11, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__12, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_jhernandezv_Documents_SIAT, __pyx_n_s_mVolts, 29, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__13)) __PYX_ERR(0, 29, __pyx_L1_error)
-</pre><pre class="cython line score-0">&#xA0;<span class="">30</span>:             <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[</span><span class="n">DTYPE_t</span><span class="p">,</span> <span class="n">ndim</span><span class="o">=</span><span class="mf">1</span><span class="p">]</span> <span class="n">inputRange</span><span class="p">,</span></pre>
-<pre class="cython line score-0">&#xA0;<span class="">31</span>:             <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[</span><span class="n">DTYPE_t</span><span class="p">,</span> <span class="n">ndim</span><span class="o">=</span><span class="mf">1</span><span class="p">]</span> <span class="n">ADCBits</span><span class="p">,</span></pre>
-<pre class="cython line score-0">&#xA0;<span class="">32</span>:             <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[</span><span class="n">DTYPE_t</span><span class="p">,</span> <span class="n">ndim</span><span class="o">=</span><span class="mf">1</span><span class="p">]</span> <span class="n">shotNumber</span><span class="p">):</span></pre>
-<pre class="cython line score-0">&#xA0;<span class="">33</span>: </pre>
-<pre class="cython line score-0">&#xA0;<span class="">34</span>:     <span class="k">cdef</span> <span class="kt">int</span> <span class="nf">i</span><span class="p">,</span><span class="nf">j</span></pre>
-<pre class="cython line score-0">&#xA0;<span class="">35</span>:     <span class="k">cdef</span> <span class="kt">DTYPE_t</span> <span class="nf">power</span></pre>
-<pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">36</span>:     <span class="k">cdef</span> <span class="kt">int</span> <span class="nf">const1</span> <span class="o">=</span> <span class="mf">1000</span></pre>
+  __pyx_codeobj__13 = (PyObject*)<span class='pyx_c_api'>__Pyx_PyCode_New</span>(4, 0, 11, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__12, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_jhernandezv_Documents_SIAT, __pyx_n_s_cy_mVolts, 31, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__13)) __PYX_ERR(0, 31, __pyx_L1_error)
+</pre><pre class="cython line score-0">&#xA0;<span class="">32</span>:             <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[</span><span class="n">DTYPE_t</span><span class="p">,</span> <span class="n">ndim</span><span class="o">=</span><span class="mf">1</span><span class="p">]</span> <span class="n">inputRange</span><span class="p">,</span></pre>
+<pre class="cython line score-0">&#xA0;<span class="">33</span>:             <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[</span><span class="n">DTYPE_t</span><span class="p">,</span> <span class="n">ndim</span><span class="o">=</span><span class="mf">1</span><span class="p">]</span> <span class="n">ADCBits</span><span class="p">,</span></pre>
+<pre class="cython line score-0">&#xA0;<span class="">34</span>:             <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[</span><span class="n">DTYPE_t</span><span class="p">,</span> <span class="n">ndim</span><span class="o">=</span><span class="mf">1</span><span class="p">]</span> <span class="n">shotNumber</span><span class="p">):</span></pre>
+<pre class="cython line score-0">&#xA0;<span class="">35</span>: </pre>
+<pre class="cython line score-0">&#xA0;<span class="">36</span>:     <span class="k">cdef</span> <span class="kt">int</span> <span class="nf">i</span><span class="p">,</span><span class="nf">j</span></pre>
+<pre class="cython line score-0">&#xA0;<span class="">37</span>:     <span class="k">cdef</span> <span class="kt">DTYPE_t</span> <span class="nf">power</span></pre>
+<pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">38</span>:     <span class="k">cdef</span> <span class="kt">int</span> <span class="nf">const1</span> <span class="o">=</span> <span class="mf">1000</span></pre>
 <pre class='cython code score-0 '>  __pyx_v_const1 = 0x3E8;
-</pre><pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">37</span>:     <span class="k">cdef</span> <span class="kt">int</span> <span class="nf">const2</span> <span class="o">=</span> <span class="mf">2</span></pre>
+</pre><pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">39</span>:     <span class="k">cdef</span> <span class="kt">int</span> <span class="nf">const2</span> <span class="o">=</span> <span class="mf">2</span></pre>
 <pre class='cython code score-0 '>  __pyx_v_const2 = 2;
-</pre><pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">38</span>:     <span class="k">cdef</span> <span class="kt">int</span> <span class="nf">rdim</span> <span class="o">=</span> <span class="n">matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span></pre>
+</pre><pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">40</span>:     <span class="k">cdef</span> <span class="kt">int</span> <span class="nf">rdim</span> <span class="o">=</span> <span class="n">matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span></pre>
 <pre class='cython code score-0 '>  __pyx_v_rdim = (__pyx_v_matrix-&gt;dimensions[0]);
-</pre><pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">39</span>:     <span class="k">cdef</span> <span class="kt">int</span> <span class="nf">cdim</span> <span class="o">=</span> <span class="n">matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mf">1</span><span class="p">]</span></pre>
+</pre><pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">41</span>:     <span class="k">cdef</span> <span class="kt">int</span> <span class="nf">cdim</span> <span class="o">=</span> <span class="n">matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mf">1</span><span class="p">]</span></pre>
 <pre class='cython code score-0 '>  __pyx_v_cdim = (__pyx_v_matrix-&gt;dimensions[1]);
-</pre><pre class="cython line score-0">&#xA0;<span class="">40</span>:     <span class="c">#cdef np.ndarray[DTYPE_t, ndim=2] result = np.empty_like(matrix, dtype=DTYPE)</span></pre>
-<pre class="cython line score-0">&#xA0;<span class="">41</span>: </pre>
-<pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">42</span>:     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">rdim</span><span class="p">):</span></pre>
+</pre><pre class="cython line score-0">&#xA0;<span class="">42</span>:     <span class="c">#cdef np.ndarray[DTYPE_t, ndim=2] result = np.empty_like(matrix, dtype=DTYPE)</span></pre>
+<pre class="cython line score-0">&#xA0;<span class="">43</span>: </pre>
+<pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">44</span>:     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">rdim</span><span class="p">):</span></pre>
 <pre class='cython code score-0 '>  __pyx_t_1 = __pyx_v_rdim;
   for (__pyx_t_2 = 0; __pyx_t_2 &lt; __pyx_t_1; __pyx_t_2+=1) {
     __pyx_v_i = __pyx_t_2;
-</pre><pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">43</span>:         <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">cdim</span><span class="p">):</span></pre>
+</pre><pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">45</span>:         <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">cdim</span><span class="p">):</span></pre>
 <pre class='cython code score-0 '>    __pyx_t_3 = __pyx_v_cdim;
     for (__pyx_t_4 = 0; __pyx_t_4 &lt; __pyx_t_3; __pyx_t_4+=1) {
       __pyx_v_j = __pyx_t_4;
-</pre><pre class="cython line score-0">&#xA0;<span class="">44</span>:             <span class="c">#assert shotNumber[i] != 0</span></pre>
-<pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">45</span>:             <span class="n">power</span> <span class="o">=</span> <span class="n">const2</span> <span class="o">**</span> <span class="o">-</span><span class="n">ADCBits</span><span class="p">[</span><span class="n">i</span><span class="p">]</span></pre>
+</pre><pre class="cython line score-0">&#xA0;<span class="">46</span>:             <span class="c">#assert shotNumber[i] != 0</span></pre>
+<pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">47</span>:             <span class="n">power</span> <span class="o">=</span> <span class="n">const2</span> <span class="o">**</span> <span class="o">-</span><span class="n">ADCBits</span><span class="p">[</span><span class="n">i</span><span class="p">]</span></pre>
 <pre class='cython code score-0 '>      __pyx_t_5 = __pyx_v_i;
       __pyx_v_power = pow(((__pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t)__pyx_v_const2), (-(*__Pyx_BufPtrStrided1d(__pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t *, __pyx_pybuffernd_ADCBits.rcbuffer-&gt;pybuffer.buf, __pyx_t_5, __pyx_pybuffernd_ADCBits.diminfo[0].strides))));
-</pre><pre class="cython line score-5" onclick='toggleDiv(this)'>+<span class="">46</span>:             <span class="n">matrix</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">*=</span>  <span class="n">inputRange</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">const1</span> <span class="o">*</span>  <span class="n">power</span>  <span class="o">/</span> <span class="n">shotNumber</span><span class="p">[</span><span class="n">i</span><span class="p">]</span></pre>
+</pre><pre class="cython line score-5" onclick='toggleDiv(this)'>+<span class="">48</span>:             <span class="n">matrix</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">*=</span>  <span class="n">inputRange</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">const1</span> <span class="o">*</span>  <span class="n">power</span>  <span class="o">/</span> <span class="n">shotNumber</span><span class="p">[</span><span class="n">i</span><span class="p">]</span></pre>
 <pre class='cython code score-5 '>      __pyx_t_6 = __pyx_v_i;
       __pyx_t_7 = (((*__Pyx_BufPtrStrided1d(__pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t *, __pyx_pybuffernd_inputRange.rcbuffer-&gt;pybuffer.buf, __pyx_t_6, __pyx_pybuffernd_inputRange.diminfo[0].strides)) * __pyx_v_const1) * __pyx_v_power);
       __pyx_t_8 = __pyx_v_i;
       __pyx_t_9 = (*__Pyx_BufPtrStrided1d(__pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t *, __pyx_pybuffernd_shotNumber.rcbuffer-&gt;pybuffer.buf, __pyx_t_8, __pyx_pybuffernd_shotNumber.diminfo[0].strides));
       if (unlikely(__pyx_t_9 == 0)) {
         <span class='py_c_api'>PyErr_SetString</span>(PyExc_ZeroDivisionError, "float division");
-        __PYX_ERR(0, 46, __pyx_L1_error)
+        __PYX_ERR(0, 48, __pyx_L1_error)
       }
       __pyx_t_10 = __pyx_v_i;
       __pyx_t_11 = __pyx_v_j;
       *__Pyx_BufPtrStrided2d(__pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t *, __pyx_pybuffernd_matrix.rcbuffer-&gt;pybuffer.buf, __pyx_t_10, __pyx_pybuffernd_matrix.diminfo[0].strides, __pyx_t_11, __pyx_pybuffernd_matrix.diminfo[1].strides) *= (__pyx_t_7 / __pyx_t_9);
     }
   }
-</pre><pre class="cython line score-2" onclick='toggleDiv(this)'>+<span class="">47</span>:     <span class="k">return</span> <span class="n">matrix</span></pre>
+</pre><pre class="cython line score-2" onclick='toggleDiv(this)'>+<span class="">49</span>:     <span class="k">return</span> <span class="n">matrix</span></pre>
 <pre class='cython code score-2 '>  <span class='pyx_macro_api'>__Pyx_XDECREF</span>(__pyx_r);
   <span class='pyx_macro_api'>__Pyx_INCREF</span>(((PyObject *)__pyx_v_matrix));
   __pyx_r = ((PyObject *)__pyx_v_matrix);
   goto __pyx_L0;
-</pre><pre class="cython line score-0">&#xA0;<span class="">48</span>: </pre>
-<pre class="cython line score-0">&#xA0;<span class="">49</span>: <span class="nd">@cython</span><span class="o">.</span><span class="n">boundscheck</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span></pre>
-<pre class="cython line score-0">&#xA0;<span class="">50</span>: <span class="nd">@cython</span><span class="o">.</span><span class="n">wraparound</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span></pre>
-<pre class="cython line score-80" onclick='toggleDiv(this)'>+<span class="">51</span>: <span class="k">def</span> <span class="nf">mHz</span> <span class="p">(</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="p">[</span><span class="n">DTYPE_t</span><span class="p">,</span> <span class="n">ndim</span><span class="o">=</span><span class="mf">2</span><span class="p">]</span> <span class="n">matrix</span><span class="p">,</span></pre>
-<pre class='cython code score-80 '>/* Python wrapper */
-static PyObject *__pyx_pw_5lidar_5lidar_4core_6ctools_5mHz(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_5lidar_5lidar_4core_6ctools_5mHz = {"mHz", (PyCFunction)__pyx_pw_5lidar_5lidar_4core_6ctools_5mHz, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_5lidar_5lidar_4core_6ctools_5mHz(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+</pre><pre class="cython line score-0">&#xA0;<span class="">50</span>: </pre>
+<pre class="cython line score-0">&#xA0;<span class="">51</span>: </pre>
+<pre class="cython line score-0">&#xA0;<span class="">52</span>: </pre>
+<pre class="cython line score-0">&#xA0;<span class="">53</span>: <span class="c"># &quot;&quot;&quot; Function to calculate mHz from Lidar raw data&quot;&quot;&quot;</span></pre>
+<pre class="cython line score-0">&#xA0;<span class="">54</span>: <span class="nd">@cython</span><span class="o">.</span><span class="n">boundscheck</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span></pre>
+<pre class="cython line score-0">&#xA0;<span class="">55</span>: <span class="nd">@cython</span><span class="o">.</span><span class="n">wraparound</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span></pre>
+<pre class="cython line score-82" onclick='toggleDiv(this)'>+<span class="">56</span>: <span class="k">def</span> <span class="nf">cy_mHz</span> <span class="p">(</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="p">[</span><span class="n">DTYPE_t</span><span class="p">,</span> <span class="n">ndim</span><span class="o">=</span><span class="mf">2</span><span class="p">]</span> <span class="n">matrix</span><span class="p">,</span></pre>
+<pre class='cython code score-82 '>/* Python wrapper */
+static PyObject *__pyx_pw_5lidar_5lidar_4core_6ctools_5cy_mHz(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_5lidar_5lidar_4core_6ctools_5cy_mHz = {"cy_mHz", (PyCFunction)__pyx_pw_5lidar_5lidar_4core_6ctools_5cy_mHz, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_5lidar_5lidar_4core_6ctools_5cy_mHz(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyArrayObject *__pyx_v_matrix = 0;
   PyArrayObject *__pyx_v_binWidth = 0;
   PyArrayObject *__pyx_v_shotNumber = 0;
   PyObject *__pyx_r = 0;
   <span class='refnanny'>__Pyx_RefNannyDeclarations</span>
-  <span class='refnanny'>__Pyx_RefNannySetupContext</span>("mHz (wrapper)", 0);
+  <span class='refnanny'>__Pyx_RefNannySetupContext</span>("cy_mHz (wrapper)", 0);
   {
     static PyObject **__pyx_pyargnames[] = {&amp;__pyx_n_s_matrix,&amp;__pyx_n_s_binWidth,&amp;__pyx_n_s_shotNumber,0};
     PyObject* values[3] = {0,0,0};
@@ -817,16 +822,16 @@ static PyObject *__pyx_pw_5lidar_5lidar_4core_6ctools_5mHz(PyObject *__pyx_self,
         case  1:
         if (likely((values[1] = <span class='py_c_api'>PyDict_GetItem</span>(__pyx_kwds, __pyx_n_s_binWidth)) != 0)) kw_args--;
         else {
-          <span class='pyx_c_api'>__Pyx_RaiseArgtupleInvalid</span>("mHz", 1, 3, 3, 1); __PYX_ERR(0, 51, __pyx_L3_error)
+          <span class='pyx_c_api'>__Pyx_RaiseArgtupleInvalid</span>("cy_mHz", 1, 3, 3, 1); __PYX_ERR(0, 56, __pyx_L3_error)
         }
         case  2:
         if (likely((values[2] = <span class='py_c_api'>PyDict_GetItem</span>(__pyx_kwds, __pyx_n_s_shotNumber)) != 0)) kw_args--;
         else {
-          <span class='pyx_c_api'>__Pyx_RaiseArgtupleInvalid</span>("mHz", 1, 3, 3, 2); __PYX_ERR(0, 51, __pyx_L3_error)
+          <span class='pyx_c_api'>__Pyx_RaiseArgtupleInvalid</span>("cy_mHz", 1, 3, 3, 2); __PYX_ERR(0, 56, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args &gt; 0)) {
-        if (unlikely(<span class='pyx_c_api'>__Pyx_ParseOptionalKeywords</span>(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "mHz") &lt; 0)) __PYX_ERR(0, 51, __pyx_L3_error)
+        if (unlikely(<span class='pyx_c_api'>__Pyx_ParseOptionalKeywords</span>(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "cy_mHz") &lt; 0)) __PYX_ERR(0, 56, __pyx_L3_error)
       }
     } else if (<span class='py_macro_api'>PyTuple_GET_SIZE</span>(__pyx_args) != 3) {
       goto __pyx_L5_argtuple_error;
@@ -841,16 +846,16 @@ static PyObject *__pyx_pw_5lidar_5lidar_4core_6ctools_5mHz(PyObject *__pyx_self,
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  <span class='pyx_c_api'>__Pyx_RaiseArgtupleInvalid</span>("mHz", 1, 3, 3, <span class='py_macro_api'>PyTuple_GET_SIZE</span>(__pyx_args)); __PYX_ERR(0, 51, __pyx_L3_error)
+  <span class='pyx_c_api'>__Pyx_RaiseArgtupleInvalid</span>("cy_mHz", 1, 3, 3, <span class='py_macro_api'>PyTuple_GET_SIZE</span>(__pyx_args)); __PYX_ERR(0, 56, __pyx_L3_error)
   __pyx_L3_error:;
-  <span class='pyx_c_api'>__Pyx_AddTraceback</span>("lidar.lidar.core.ctools.mHz", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  <span class='pyx_c_api'>__Pyx_AddTraceback</span>("lidar.lidar.core.ctools.cy_mHz", __pyx_clineno, __pyx_lineno, __pyx_filename);
   <span class='refnanny'>__Pyx_RefNannyFinishContext</span>();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!<span class='pyx_c_api'>__Pyx_ArgTypeTest</span>(((PyObject *)__pyx_v_matrix), __pyx_ptype_5numpy_ndarray, 1, "matrix", 0))) __PYX_ERR(0, 51, __pyx_L1_error)
-  if (unlikely(!<span class='pyx_c_api'>__Pyx_ArgTypeTest</span>(((PyObject *)__pyx_v_binWidth), __pyx_ptype_5numpy_ndarray, 1, "binWidth", 0))) __PYX_ERR(0, 52, __pyx_L1_error)
-  if (unlikely(!<span class='pyx_c_api'>__Pyx_ArgTypeTest</span>(((PyObject *)__pyx_v_shotNumber), __pyx_ptype_5numpy_ndarray, 1, "shotNumber", 0))) __PYX_ERR(0, 53, __pyx_L1_error)
-  __pyx_r = __pyx_pf_5lidar_5lidar_4core_6ctools_4mHz(__pyx_self, __pyx_v_matrix, __pyx_v_binWidth, __pyx_v_shotNumber);
+  if (unlikely(!<span class='pyx_c_api'>__Pyx_ArgTypeTest</span>(((PyObject *)__pyx_v_matrix), __pyx_ptype_5numpy_ndarray, 1, "matrix", 0))) __PYX_ERR(0, 56, __pyx_L1_error)
+  if (unlikely(!<span class='pyx_c_api'>__Pyx_ArgTypeTest</span>(((PyObject *)__pyx_v_binWidth), __pyx_ptype_5numpy_ndarray, 1, "binWidth", 0))) __PYX_ERR(0, 57, __pyx_L1_error)
+  if (unlikely(!<span class='pyx_c_api'>__Pyx_ArgTypeTest</span>(((PyObject *)__pyx_v_shotNumber), __pyx_ptype_5numpy_ndarray, 1, "shotNumber", 0))) __PYX_ERR(0, 58, __pyx_L1_error)
+  __pyx_r = __pyx_pf_5lidar_5lidar_4core_6ctools_4cy_mHz(__pyx_self, __pyx_v_matrix, __pyx_v_binWidth, __pyx_v_shotNumber);
 
   /* function exit code */
   goto __pyx_L0;
@@ -861,7 +866,7 @@ static PyObject *__pyx_pw_5lidar_5lidar_4core_6ctools_5mHz(PyObject *__pyx_self,
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5lidar_5lidar_4core_6ctools_4mHz(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_matrix, PyArrayObject *__pyx_v_binWidth, PyArrayObject *__pyx_v_shotNumber) {
+static PyObject *__pyx_pf_5lidar_5lidar_4core_6ctools_4cy_mHz(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_matrix, PyArrayObject *__pyx_v_binWidth, PyArrayObject *__pyx_v_shotNumber) {
   int __pyx_v_i;
   int __pyx_v_j;
   int __pyx_v_const1;
@@ -875,7 +880,7 @@ static PyObject *__pyx_pf_5lidar_5lidar_4core_6ctools_4mHz(CYTHON_UNUSED PyObjec
   __Pyx_Buffer __pyx_pybuffer_shotNumber;
   PyObject *__pyx_r = NULL;
   <span class='refnanny'>__Pyx_RefNannyDeclarations</span>
-  <span class='refnanny'>__Pyx_RefNannySetupContext</span>("mHz", 0);
+  <span class='refnanny'>__Pyx_RefNannySetupContext</span>("cy_mHz", 0);
   __pyx_pybuffer_matrix.pybuffer.buf = NULL;
   __pyx_pybuffer_matrix.refcount = 0;
   __pyx_pybuffernd_matrix.data = NULL;
@@ -890,17 +895,17 @@ static PyObject *__pyx_pf_5lidar_5lidar_4core_6ctools_4mHz(CYTHON_UNUSED PyObjec
   __pyx_pybuffernd_shotNumber.rcbuffer = &amp;__pyx_pybuffer_shotNumber;
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(<span class='pyx_c_api'>__Pyx_GetBufferAndValidate</span>(&amp;__pyx_pybuffernd_matrix.rcbuffer-&gt;pybuffer, (PyObject*)__pyx_v_matrix, &amp;__Pyx_TypeInfo_nn___pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES| PyBUF_WRITABLE, 2, 0, __pyx_stack) == -1)) __PYX_ERR(0, 51, __pyx_L1_error)
+    if (unlikely(<span class='pyx_c_api'>__Pyx_GetBufferAndValidate</span>(&amp;__pyx_pybuffernd_matrix.rcbuffer-&gt;pybuffer, (PyObject*)__pyx_v_matrix, &amp;__Pyx_TypeInfo_nn___pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES| PyBUF_WRITABLE, 2, 0, __pyx_stack) == -1)) __PYX_ERR(0, 56, __pyx_L1_error)
   }
   __pyx_pybuffernd_matrix.diminfo[0].strides = __pyx_pybuffernd_matrix.rcbuffer-&gt;pybuffer.strides[0]; __pyx_pybuffernd_matrix.diminfo[0].shape = __pyx_pybuffernd_matrix.rcbuffer-&gt;pybuffer.shape[0]; __pyx_pybuffernd_matrix.diminfo[1].strides = __pyx_pybuffernd_matrix.rcbuffer-&gt;pybuffer.strides[1]; __pyx_pybuffernd_matrix.diminfo[1].shape = __pyx_pybuffernd_matrix.rcbuffer-&gt;pybuffer.shape[1];
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(<span class='pyx_c_api'>__Pyx_GetBufferAndValidate</span>(&amp;__pyx_pybuffernd_binWidth.rcbuffer-&gt;pybuffer, (PyObject*)__pyx_v_binWidth, &amp;__Pyx_TypeInfo_nn___pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 51, __pyx_L1_error)
+    if (unlikely(<span class='pyx_c_api'>__Pyx_GetBufferAndValidate</span>(&amp;__pyx_pybuffernd_binWidth.rcbuffer-&gt;pybuffer, (PyObject*)__pyx_v_binWidth, &amp;__Pyx_TypeInfo_nn___pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 56, __pyx_L1_error)
   }
   __pyx_pybuffernd_binWidth.diminfo[0].strides = __pyx_pybuffernd_binWidth.rcbuffer-&gt;pybuffer.strides[0]; __pyx_pybuffernd_binWidth.diminfo[0].shape = __pyx_pybuffernd_binWidth.rcbuffer-&gt;pybuffer.shape[0];
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(<span class='pyx_c_api'>__Pyx_GetBufferAndValidate</span>(&amp;__pyx_pybuffernd_shotNumber.rcbuffer-&gt;pybuffer, (PyObject*)__pyx_v_shotNumber, &amp;__Pyx_TypeInfo_nn___pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 51, __pyx_L1_error)
+    if (unlikely(<span class='pyx_c_api'>__Pyx_GetBufferAndValidate</span>(&amp;__pyx_pybuffernd_shotNumber.rcbuffer-&gt;pybuffer, (PyObject*)__pyx_v_shotNumber, &amp;__Pyx_TypeInfo_nn___pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 56, __pyx_L1_error)
   }
   __pyx_pybuffernd_shotNumber.diminfo[0].strides = __pyx_pybuffernd_shotNumber.rcbuffer-&gt;pybuffer.strides[0]; __pyx_pybuffernd_shotNumber.diminfo[0].shape = __pyx_pybuffernd_shotNumber.rcbuffer-&gt;pybuffer.shape[0];
 /* … */
@@ -914,7 +919,7 @@ static PyObject *__pyx_pf_5lidar_5lidar_4core_6ctools_4mHz(CYTHON_UNUSED PyObjec
     <span class='pyx_c_api'>__Pyx_SafeReleaseBuffer</span>(&amp;__pyx_pybuffernd_matrix.rcbuffer-&gt;pybuffer);
     <span class='pyx_c_api'>__Pyx_SafeReleaseBuffer</span>(&amp;__pyx_pybuffernd_shotNumber.rcbuffer-&gt;pybuffer);
   <span class='pyx_c_api'>__Pyx_ErrRestore</span>(__pyx_type, __pyx_value, __pyx_tb);}
-  <span class='pyx_c_api'>__Pyx_AddTraceback</span>("lidar.lidar.core.ctools.mHz", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  <span class='pyx_c_api'>__Pyx_AddTraceback</span>("lidar.lidar.core.ctools.cy_mHz", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   goto __pyx_L2;
   __pyx_L0:;
@@ -927,54 +932,238 @@ static PyObject *__pyx_pf_5lidar_5lidar_4core_6ctools_4mHz(CYTHON_UNUSED PyObjec
   return __pyx_r;
 }
 /* … */
-  __pyx_tuple__14 = <span class='py_c_api'>PyTuple_Pack</span>(8, __pyx_n_s_matrix, __pyx_n_s_binWidth, __pyx_n_s_shotNumber, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_const1, __pyx_n_s_rdim, __pyx_n_s_cdim); if (unlikely(!__pyx_tuple__14)) __PYX_ERR(0, 51, __pyx_L1_error)
+  __pyx_tuple__14 = <span class='py_c_api'>PyTuple_Pack</span>(8, __pyx_n_s_matrix, __pyx_n_s_binWidth, __pyx_n_s_shotNumber, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_const1, __pyx_n_s_rdim, __pyx_n_s_cdim); if (unlikely(!__pyx_tuple__14)) __PYX_ERR(0, 56, __pyx_L1_error)
   <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_tuple__14);
   <span class='refnanny'>__Pyx_GIVEREF</span>(__pyx_tuple__14);
 /* … */
-  __pyx_t_2 = PyCFunction_NewEx(&amp;__pyx_mdef_5lidar_5lidar_4core_6ctools_5mHz, NULL, __pyx_n_s_lidar_lidar_core_ctools); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 51, __pyx_L1_error)
+  __pyx_t_2 = PyCFunction_NewEx(&amp;__pyx_mdef_5lidar_5lidar_4core_6ctools_5cy_mHz, NULL, __pyx_n_s_lidar_lidar_core_ctools); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 56, __pyx_L1_error)
   <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_2);
-  if (<span class='py_c_api'>PyDict_SetItem</span>(__pyx_d, __pyx_n_s_mHz, __pyx_t_2) &lt; 0) __PYX_ERR(0, 51, __pyx_L1_error)
+  if (<span class='py_c_api'>PyDict_SetItem</span>(__pyx_d, __pyx_n_s_cy_mHz, __pyx_t_2) &lt; 0) __PYX_ERR(0, 56, __pyx_L1_error)
   <span class='pyx_macro_api'>__Pyx_DECREF</span>(__pyx_t_2); __pyx_t_2 = 0;
-</pre><pre class="cython line score-0">&#xA0;<span class="">52</span>:             <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[</span><span class="n">DTYPE_t</span><span class="p">,</span> <span class="n">ndim</span><span class="o">=</span><span class="mf">1</span><span class="p">]</span> <span class="n">binWidth</span><span class="p">,</span></pre>
-<pre class="cython line score-0">&#xA0;<span class="">53</span>:             <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[</span><span class="n">DTYPE_t</span><span class="p">,</span> <span class="n">ndim</span><span class="o">=</span><span class="mf">1</span><span class="p">]</span> <span class="n">shotNumber</span><span class="p">):</span></pre>
-<pre class="cython line score-0">&#xA0;<span class="">54</span>: </pre>
-<pre class="cython line score-0">&#xA0;<span class="">55</span>:     <span class="k">cdef</span> <span class="kt">int</span> <span class="nf">i</span><span class="p">,</span><span class="nf">j</span></pre>
-<pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">56</span>:     <span class="k">cdef</span> <span class="kt">int</span> <span class="nf">const1</span> <span class="o">=</span> <span class="mf">150</span></pre>
+  __pyx_codeobj__15 = (PyObject*)<span class='pyx_c_api'>__Pyx_PyCode_New</span>(3, 0, 8, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__14, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_jhernandezv_Documents_SIAT, __pyx_n_s_cy_mHz, 56, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__15)) __PYX_ERR(0, 56, __pyx_L1_error)
+</pre><pre class="cython line score-0">&#xA0;<span class="">57</span>:             <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[</span><span class="n">DTYPE_t</span><span class="p">,</span> <span class="n">ndim</span><span class="o">=</span><span class="mf">1</span><span class="p">]</span> <span class="n">binWidth</span><span class="p">,</span></pre>
+<pre class="cython line score-0">&#xA0;<span class="">58</span>:             <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[</span><span class="n">DTYPE_t</span><span class="p">,</span> <span class="n">ndim</span><span class="o">=</span><span class="mf">1</span><span class="p">]</span> <span class="n">shotNumber</span><span class="p">):</span></pre>
+<pre class="cython line score-0">&#xA0;<span class="">59</span>: </pre>
+<pre class="cython line score-0">&#xA0;<span class="">60</span>:     <span class="k">cdef</span> <span class="kt">int</span> <span class="nf">i</span><span class="p">,</span><span class="nf">j</span></pre>
+<pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">61</span>:     <span class="k">cdef</span> <span class="kt">int</span> <span class="nf">const1</span> <span class="o">=</span> <span class="mf">150</span></pre>
 <pre class='cython code score-0 '>  __pyx_v_const1 = 0x96;
-</pre><pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">57</span>:     <span class="k">cdef</span> <span class="kt">int</span> <span class="nf">rdim</span> <span class="o">=</span> <span class="n">matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span></pre>
+</pre><pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">62</span>:     <span class="k">cdef</span> <span class="kt">int</span> <span class="nf">rdim</span> <span class="o">=</span> <span class="n">matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span></pre>
 <pre class='cython code score-0 '>  __pyx_v_rdim = (__pyx_v_matrix-&gt;dimensions[0]);
-</pre><pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">58</span>:     <span class="k">cdef</span> <span class="kt">int</span> <span class="nf">cdim</span> <span class="o">=</span> <span class="n">matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mf">1</span><span class="p">]</span></pre>
+</pre><pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">63</span>:     <span class="k">cdef</span> <span class="kt">int</span> <span class="nf">cdim</span> <span class="o">=</span> <span class="n">matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mf">1</span><span class="p">]</span></pre>
 <pre class='cython code score-0 '>  __pyx_v_cdim = (__pyx_v_matrix-&gt;dimensions[1]);
-</pre><pre class="cython line score-0">&#xA0;<span class="">59</span>:     <span class="c">#cdef np.ndarray[DTYPE_t, ndim=2] result = np.empty_like(matrix, dtype=DTYPE)</span></pre>
-<pre class="cython line score-0">&#xA0;<span class="">60</span>: </pre>
-<pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">61</span>:     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">rdim</span><span class="p">):</span></pre>
+</pre><pre class="cython line score-0">&#xA0;<span class="">64</span>:     <span class="c">#cdef np.ndarray[DTYPE_t, ndim=2] result = np.empty_like(matrix, dtype=DTYPE)</span></pre>
+<pre class="cython line score-0">&#xA0;<span class="">65</span>: </pre>
+<pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">66</span>:     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">rdim</span><span class="p">):</span></pre>
 <pre class='cython code score-0 '>  __pyx_t_1 = __pyx_v_rdim;
   for (__pyx_t_2 = 0; __pyx_t_2 &lt; __pyx_t_1; __pyx_t_2+=1) {
     __pyx_v_i = __pyx_t_2;
-</pre><pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">62</span>:         <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">cdim</span><span class="p">):</span></pre>
+</pre><pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">67</span>:         <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">cdim</span><span class="p">):</span></pre>
 <pre class='cython code score-0 '>    __pyx_t_3 = __pyx_v_cdim;
     for (__pyx_t_4 = 0; __pyx_t_4 &lt; __pyx_t_3; __pyx_t_4+=1) {
       __pyx_v_j = __pyx_t_4;
-</pre><pre class="cython line score-10" onclick='toggleDiv(this)'>+<span class="">63</span>:             <span class="n">matrix</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">*=</span>  <span class="p">(</span> <span class="n">const1</span> <span class="o">/</span>  <span class="n">binWidth</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="p">)</span> <span class="o">/</span> <span class="n">shotNumber</span><span class="p">[</span><span class="n">i</span><span class="p">]</span></pre>
+</pre><pre class="cython line score-10" onclick='toggleDiv(this)'>+<span class="">68</span>:             <span class="n">matrix</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">*=</span>  <span class="p">(</span> <span class="n">const1</span> <span class="o">/</span>  <span class="n">binWidth</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="p">)</span> <span class="o">/</span> <span class="n">shotNumber</span><span class="p">[</span><span class="n">i</span><span class="p">]</span></pre>
 <pre class='cython code score-10 '>      __pyx_t_5 = __pyx_v_i;
       __pyx_t_6 = (*__Pyx_BufPtrStrided1d(__pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t *, __pyx_pybuffernd_binWidth.rcbuffer-&gt;pybuffer.buf, __pyx_t_5, __pyx_pybuffernd_binWidth.diminfo[0].strides));
       if (unlikely(__pyx_t_6 == 0)) {
         <span class='py_c_api'>PyErr_SetString</span>(PyExc_ZeroDivisionError, "float division");
-        __PYX_ERR(0, 63, __pyx_L1_error)
+        __PYX_ERR(0, 68, __pyx_L1_error)
       }
       __pyx_t_7 = (__pyx_v_const1 / __pyx_t_6);
       __pyx_t_8 = __pyx_v_i;
       __pyx_t_6 = (*__Pyx_BufPtrStrided1d(__pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t *, __pyx_pybuffernd_shotNumber.rcbuffer-&gt;pybuffer.buf, __pyx_t_8, __pyx_pybuffernd_shotNumber.diminfo[0].strides));
       if (unlikely(__pyx_t_6 == 0)) {
         <span class='py_c_api'>PyErr_SetString</span>(PyExc_ZeroDivisionError, "float division");
-        __PYX_ERR(0, 63, __pyx_L1_error)
+        __PYX_ERR(0, 68, __pyx_L1_error)
       }
       __pyx_t_9 = __pyx_v_i;
       __pyx_t_10 = __pyx_v_j;
       *__Pyx_BufPtrStrided2d(__pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t *, __pyx_pybuffernd_matrix.rcbuffer-&gt;pybuffer.buf, __pyx_t_9, __pyx_pybuffernd_matrix.diminfo[0].strides, __pyx_t_10, __pyx_pybuffernd_matrix.diminfo[1].strides) *= (__pyx_t_7 / __pyx_t_6);
     }
   }
-</pre><pre class="cython line score-2" onclick='toggleDiv(this)'>+<span class="">64</span>:     <span class="k">return</span> <span class="n">matrix</span></pre>
+</pre><pre class="cython line score-2" onclick='toggleDiv(this)'>+<span class="">69</span>:     <span class="k">return</span> <span class="n">matrix</span></pre>
+<pre class='cython code score-2 '>  <span class='pyx_macro_api'>__Pyx_XDECREF</span>(__pyx_r);
+  <span class='pyx_macro_api'>__Pyx_INCREF</span>(((PyObject *)__pyx_v_matrix));
+  __pyx_r = ((PyObject *)__pyx_v_matrix);
+  goto __pyx_L0;
+</pre><pre class="cython line score-0">&#xA0;<span class="">70</span>: </pre>
+<pre class="cython line score-0">&#xA0;<span class="">71</span>: </pre>
+<pre class="cython line score-0">&#xA0;<span class="">72</span>: <span class="c"># &quot;&quot;&quot; Function to substrac  Lidar&#39;s background&quot;&quot;&quot;</span></pre>
+<pre class="cython line score-0">&#xA0;<span class="">73</span>: <span class="nd">@cython</span><span class="o">.</span><span class="n">boundscheck</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span></pre>
+<pre class="cython line score-0">&#xA0;<span class="">74</span>: <span class="nd">@cython</span><span class="o">.</span><span class="n">wraparound</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span></pre>
+<pre class="cython line score-63" onclick='toggleDiv(this)'>+<span class="">75</span>: <span class="k">def</span> <span class="nf">cy_brackground</span> <span class="p">(</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="p">[</span><span class="n">DTYPE_t</span><span class="p">,</span> <span class="n">ndim</span><span class="o">=</span><span class="mf">2</span><span class="p">]</span> <span class="n">matrix</span><span class="p">,</span></pre>
+<pre class='cython code score-63 '>/* Python wrapper */
+static PyObject *__pyx_pw_5lidar_5lidar_4core_6ctools_7cy_brackground(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_5lidar_5lidar_4core_6ctools_7cy_brackground = {"cy_brackground", (PyCFunction)__pyx_pw_5lidar_5lidar_4core_6ctools_7cy_brackground, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_5lidar_5lidar_4core_6ctools_7cy_brackground(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+  PyArrayObject *__pyx_v_matrix = 0;
+  PyArrayObject *__pyx_v_bkg = 0;
+  PyObject *__pyx_r = 0;
+  <span class='refnanny'>__Pyx_RefNannyDeclarations</span>
+  <span class='refnanny'>__Pyx_RefNannySetupContext</span>("cy_brackground (wrapper)", 0);
+  {
+    static PyObject **__pyx_pyargnames[] = {&amp;__pyx_n_s_matrix,&amp;__pyx_n_s_bkg,0};
+    PyObject* values[2] = {0,0};
+    if (unlikely(__pyx_kwds)) {
+      Py_ssize_t kw_args;
+      const Py_ssize_t pos_args = <span class='py_macro_api'>PyTuple_GET_SIZE</span>(__pyx_args);
+      switch (pos_args) {
+        case  2: values[1] = <span class='py_macro_api'>PyTuple_GET_ITEM</span>(__pyx_args, 1);
+        case  1: values[0] = <span class='py_macro_api'>PyTuple_GET_ITEM</span>(__pyx_args, 0);
+        case  0: break;
+        default: goto __pyx_L5_argtuple_error;
+      }
+      kw_args = <span class='py_c_api'>PyDict_Size</span>(__pyx_kwds);
+      switch (pos_args) {
+        case  0:
+        if (likely((values[0] = <span class='py_c_api'>PyDict_GetItem</span>(__pyx_kwds, __pyx_n_s_matrix)) != 0)) kw_args--;
+        else goto __pyx_L5_argtuple_error;
+        case  1:
+        if (likely((values[1] = <span class='py_c_api'>PyDict_GetItem</span>(__pyx_kwds, __pyx_n_s_bkg)) != 0)) kw_args--;
+        else {
+          <span class='pyx_c_api'>__Pyx_RaiseArgtupleInvalid</span>("cy_brackground", 1, 2, 2, 1); __PYX_ERR(0, 75, __pyx_L3_error)
+        }
+      }
+      if (unlikely(kw_args &gt; 0)) {
+        if (unlikely(<span class='pyx_c_api'>__Pyx_ParseOptionalKeywords</span>(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "cy_brackground") &lt; 0)) __PYX_ERR(0, 75, __pyx_L3_error)
+      }
+    } else if (<span class='py_macro_api'>PyTuple_GET_SIZE</span>(__pyx_args) != 2) {
+      goto __pyx_L5_argtuple_error;
+    } else {
+      values[0] = <span class='py_macro_api'>PyTuple_GET_ITEM</span>(__pyx_args, 0);
+      values[1] = <span class='py_macro_api'>PyTuple_GET_ITEM</span>(__pyx_args, 1);
+    }
+    __pyx_v_matrix = ((PyArrayObject *)values[0]);
+    __pyx_v_bkg = ((PyArrayObject *)values[1]);
+  }
+  goto __pyx_L4_argument_unpacking_done;
+  __pyx_L5_argtuple_error:;
+  <span class='pyx_c_api'>__Pyx_RaiseArgtupleInvalid</span>("cy_brackground", 1, 2, 2, <span class='py_macro_api'>PyTuple_GET_SIZE</span>(__pyx_args)); __PYX_ERR(0, 75, __pyx_L3_error)
+  __pyx_L3_error:;
+  <span class='pyx_c_api'>__Pyx_AddTraceback</span>("lidar.lidar.core.ctools.cy_brackground", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  <span class='refnanny'>__Pyx_RefNannyFinishContext</span>();
+  return NULL;
+  __pyx_L4_argument_unpacking_done:;
+  if (unlikely(!<span class='pyx_c_api'>__Pyx_ArgTypeTest</span>(((PyObject *)__pyx_v_matrix), __pyx_ptype_5numpy_ndarray, 1, "matrix", 0))) __PYX_ERR(0, 75, __pyx_L1_error)
+  if (unlikely(!<span class='pyx_c_api'>__Pyx_ArgTypeTest</span>(((PyObject *)__pyx_v_bkg), __pyx_ptype_5numpy_ndarray, 1, "bkg", 0))) __PYX_ERR(0, 76, __pyx_L1_error)
+  __pyx_r = __pyx_pf_5lidar_5lidar_4core_6ctools_6cy_brackground(__pyx_self, __pyx_v_matrix, __pyx_v_bkg);
+
+  /* function exit code */
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __pyx_r = NULL;
+  __pyx_L0:;
+  <span class='refnanny'>__Pyx_RefNannyFinishContext</span>();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_5lidar_5lidar_4core_6ctools_6cy_brackground(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_matrix, PyArrayObject *__pyx_v_bkg) {
+  int __pyx_v_i;
+  int __pyx_v_j;
+  int __pyx_v_c;
+  int __pyx_v_rdim;
+  int __pyx_v_cdim;
+  int __pyx_v_bkgdim;
+  __Pyx_LocalBuf_ND __pyx_pybuffernd_bkg;
+  __Pyx_Buffer __pyx_pybuffer_bkg;
+  __Pyx_LocalBuf_ND __pyx_pybuffernd_matrix;
+  __Pyx_Buffer __pyx_pybuffer_matrix;
+  PyObject *__pyx_r = NULL;
+  <span class='refnanny'>__Pyx_RefNannyDeclarations</span>
+  <span class='refnanny'>__Pyx_RefNannySetupContext</span>("cy_brackground", 0);
+  __pyx_pybuffer_matrix.pybuffer.buf = NULL;
+  __pyx_pybuffer_matrix.refcount = 0;
+  __pyx_pybuffernd_matrix.data = NULL;
+  __pyx_pybuffernd_matrix.rcbuffer = &amp;__pyx_pybuffer_matrix;
+  __pyx_pybuffer_bkg.pybuffer.buf = NULL;
+  __pyx_pybuffer_bkg.refcount = 0;
+  __pyx_pybuffernd_bkg.data = NULL;
+  __pyx_pybuffernd_bkg.rcbuffer = &amp;__pyx_pybuffer_bkg;
+  {
+    __Pyx_BufFmt_StackElem __pyx_stack[1];
+    if (unlikely(<span class='pyx_c_api'>__Pyx_GetBufferAndValidate</span>(&amp;__pyx_pybuffernd_matrix.rcbuffer-&gt;pybuffer, (PyObject*)__pyx_v_matrix, &amp;__Pyx_TypeInfo_nn___pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES| PyBUF_WRITABLE, 2, 0, __pyx_stack) == -1)) __PYX_ERR(0, 75, __pyx_L1_error)
+  }
+  __pyx_pybuffernd_matrix.diminfo[0].strides = __pyx_pybuffernd_matrix.rcbuffer-&gt;pybuffer.strides[0]; __pyx_pybuffernd_matrix.diminfo[0].shape = __pyx_pybuffernd_matrix.rcbuffer-&gt;pybuffer.shape[0]; __pyx_pybuffernd_matrix.diminfo[1].strides = __pyx_pybuffernd_matrix.rcbuffer-&gt;pybuffer.strides[1]; __pyx_pybuffernd_matrix.diminfo[1].shape = __pyx_pybuffernd_matrix.rcbuffer-&gt;pybuffer.shape[1];
+  {
+    __Pyx_BufFmt_StackElem __pyx_stack[1];
+    if (unlikely(<span class='pyx_c_api'>__Pyx_GetBufferAndValidate</span>(&amp;__pyx_pybuffernd_bkg.rcbuffer-&gt;pybuffer, (PyObject*)__pyx_v_bkg, &amp;__Pyx_TypeInfo_nn___pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES, 2, 0, __pyx_stack) == -1)) __PYX_ERR(0, 75, __pyx_L1_error)
+  }
+  __pyx_pybuffernd_bkg.diminfo[0].strides = __pyx_pybuffernd_bkg.rcbuffer-&gt;pybuffer.strides[0]; __pyx_pybuffernd_bkg.diminfo[0].shape = __pyx_pybuffernd_bkg.rcbuffer-&gt;pybuffer.shape[0]; __pyx_pybuffernd_bkg.diminfo[1].strides = __pyx_pybuffernd_bkg.rcbuffer-&gt;pybuffer.strides[1]; __pyx_pybuffernd_bkg.diminfo[1].shape = __pyx_pybuffernd_bkg.rcbuffer-&gt;pybuffer.shape[1];
+/* … */
+  /* function exit code */
+  __pyx_L1_error:;
+  { PyObject *__pyx_type, *__pyx_value, *__pyx_tb;
+    __Pyx_PyThreadState_declare
+    __Pyx_PyThreadState_assign
+    <span class='pyx_c_api'>__Pyx_ErrFetch</span>(&amp;__pyx_type, &amp;__pyx_value, &amp;__pyx_tb);
+    <span class='pyx_c_api'>__Pyx_SafeReleaseBuffer</span>(&amp;__pyx_pybuffernd_bkg.rcbuffer-&gt;pybuffer);
+    <span class='pyx_c_api'>__Pyx_SafeReleaseBuffer</span>(&amp;__pyx_pybuffernd_matrix.rcbuffer-&gt;pybuffer);
+  <span class='pyx_c_api'>__Pyx_ErrRestore</span>(__pyx_type, __pyx_value, __pyx_tb);}
+  <span class='pyx_c_api'>__Pyx_AddTraceback</span>("lidar.lidar.core.ctools.cy_brackground", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  goto __pyx_L2;
+  __pyx_L0:;
+  <span class='pyx_c_api'>__Pyx_SafeReleaseBuffer</span>(&amp;__pyx_pybuffernd_bkg.rcbuffer-&gt;pybuffer);
+  <span class='pyx_c_api'>__Pyx_SafeReleaseBuffer</span>(&amp;__pyx_pybuffernd_matrix.rcbuffer-&gt;pybuffer);
+  __pyx_L2:;
+  <span class='refnanny'>__Pyx_XGIVEREF</span>(__pyx_r);
+  <span class='refnanny'>__Pyx_RefNannyFinishContext</span>();
+  return __pyx_r;
+}
+/* … */
+  __pyx_tuple__16 = <span class='py_c_api'>PyTuple_Pack</span>(8, __pyx_n_s_matrix, __pyx_n_s_bkg, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_c, __pyx_n_s_rdim, __pyx_n_s_cdim, __pyx_n_s_bkgdim); if (unlikely(!__pyx_tuple__16)) __PYX_ERR(0, 75, __pyx_L1_error)
+  <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_tuple__16);
+  <span class='refnanny'>__Pyx_GIVEREF</span>(__pyx_tuple__16);
+/* … */
+  __pyx_t_2 = PyCFunction_NewEx(&amp;__pyx_mdef_5lidar_5lidar_4core_6ctools_7cy_brackground, NULL, __pyx_n_s_lidar_lidar_core_ctools); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 75, __pyx_L1_error)
+  <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_2);
+  if (<span class='py_c_api'>PyDict_SetItem</span>(__pyx_d, __pyx_n_s_cy_brackground, __pyx_t_2) &lt; 0) __PYX_ERR(0, 75, __pyx_L1_error)
+  <span class='pyx_macro_api'>__Pyx_DECREF</span>(__pyx_t_2); __pyx_t_2 = 0;
+</pre><pre class="cython line score-0">&#xA0;<span class="">76</span>:             <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[</span><span class="n">DTYPE_t</span><span class="p">,</span> <span class="n">ndim</span><span class="o">=</span><span class="mf">2</span><span class="p">]</span> <span class="n">bkg</span><span class="p">):</span></pre>
+<pre class="cython line score-0">&#xA0;<span class="">77</span>: </pre>
+<pre class="cython line score-0">&#xA0;<span class="">78</span>:     <span class="k">cdef</span> <span class="kt">int</span> <span class="nf">i</span><span class="p">,</span><span class="nf">j</span></pre>
+<pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">79</span>:     <span class="k">cdef</span> <span class="kt">int</span> <span class="nf">c</span> <span class="o">=</span> <span class="mf">0</span></pre>
+<pre class='cython code score-0 '>  __pyx_v_c = 0;
+</pre><pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">80</span>:     <span class="k">cdef</span> <span class="kt">int</span> <span class="nf">rdim</span> <span class="o">=</span> <span class="n">matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span></pre>
+<pre class='cython code score-0 '>  __pyx_v_rdim = (__pyx_v_matrix-&gt;dimensions[0]);
+</pre><pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">81</span>:     <span class="k">cdef</span> <span class="kt">int</span> <span class="nf">cdim</span> <span class="o">=</span> <span class="n">matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mf">1</span><span class="p">]</span></pre>
+<pre class='cython code score-0 '>  __pyx_v_cdim = (__pyx_v_matrix-&gt;dimensions[1]);
+</pre><pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">82</span>:     <span class="k">cdef</span> <span class="kt">int</span> <span class="nf">bkgdim</span> <span class="o">=</span> <span class="n">bkg</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mf">1</span><span class="p">]</span> <span class="o">-</span> <span class="mf">1</span></pre>
+<pre class='cython code score-0 '>  __pyx_v_bkgdim = ((__pyx_v_bkg-&gt;dimensions[1]) - 1);
+</pre><pre class="cython line score-0">&#xA0;<span class="">83</span>:     <span class="c">#cdef np.ndarray[DTYPE_t, ndim=2] result = np.empty_like(matrix, dtype=DTYPE)</span></pre>
+<pre class="cython line score-0">&#xA0;<span class="">84</span>: </pre>
+<pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">85</span>:     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">rdim</span><span class="p">):</span></pre>
+<pre class='cython code score-0 '>  __pyx_t_1 = __pyx_v_rdim;
+  for (__pyx_t_2 = 0; __pyx_t_2 &lt; __pyx_t_1; __pyx_t_2+=1) {
+    __pyx_v_i = __pyx_t_2;
+</pre><pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">86</span>:         <span class="n">c</span> <span class="o">=</span> <span class="mf">0</span></pre>
+<pre class='cython code score-0 '>    __pyx_v_c = 0;
+</pre><pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">87</span>:         <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">cdim</span><span class="p">):</span></pre>
+<pre class='cython code score-0 '>    __pyx_t_3 = __pyx_v_cdim;
+    for (__pyx_t_4 = 0; __pyx_t_4 &lt; __pyx_t_3; __pyx_t_4+=1) {
+      __pyx_v_j = __pyx_t_4;
+</pre><pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">88</span>:             <span class="n">matrix</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">-=</span> <span class="n">bkg</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">c</span><span class="p">]</span></pre>
+<pre class='cython code score-0 '>      __pyx_t_5 = __pyx_v_i;
+      __pyx_t_6 = __pyx_v_c;
+      __pyx_t_7 = __pyx_v_i;
+      __pyx_t_8 = __pyx_v_j;
+      *__Pyx_BufPtrStrided2d(__pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t *, __pyx_pybuffernd_matrix.rcbuffer-&gt;pybuffer.buf, __pyx_t_7, __pyx_pybuffernd_matrix.diminfo[0].strides, __pyx_t_8, __pyx_pybuffernd_matrix.diminfo[1].strides) -= (*__Pyx_BufPtrStrided2d(__pyx_t_5lidar_5lidar_4core_6ctools_DTYPE_t *, __pyx_pybuffernd_bkg.rcbuffer-&gt;pybuffer.buf, __pyx_t_5, __pyx_pybuffernd_bkg.diminfo[0].strides, __pyx_t_6, __pyx_pybuffernd_bkg.diminfo[1].strides));
+</pre><pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">89</span>:             <span class="k">if</span> <span class="n">c</span> <span class="o">&lt;</span> <span class="n">bkgdim</span><span class="p">:</span></pre>
+<pre class='cython code score-0 '>      __pyx_t_9 = ((__pyx_v_c &lt; __pyx_v_bkgdim) != 0);
+      if (__pyx_t_9) {
+/* … */
+        goto __pyx_L7;
+      }
+</pre><pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">90</span>:                 <span class="n">c</span> <span class="o">+=</span> <span class="mf">1</span></pre>
+<pre class='cython code score-0 '>        __pyx_v_c = (__pyx_v_c + 1);
+</pre><pre class="cython line score-0">&#xA0;<span class="">91</span>:             <span class="k">else</span><span class="p">:</span></pre>
+<pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">92</span>:                 <span class="n">c</span> <span class="o">=</span> <span class="mf">0</span></pre>
+<pre class='cython code score-0 '>      /*else*/ {
+        __pyx_v_c = 0;
+      }
+      __pyx_L7:;
+    }
+  }
+</pre><pre class="cython line score-2" onclick='toggleDiv(this)'>+<span class="">93</span>:     <span class="k">return</span> <span class="n">matrix</span></pre>
 <pre class='cython code score-2 '>  <span class='pyx_macro_api'>__Pyx_XDECREF</span>(__pyx_r);
   <span class='pyx_macro_api'>__Pyx_INCREF</span>(((PyObject *)__pyx_v_matrix));
   __pyx_r = ((PyObject *)__pyx_v_matrix);
