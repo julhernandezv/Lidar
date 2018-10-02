@@ -4,15 +4,25 @@ from distutils.extension import Extension
 from Cython.Build import cythonize
 import numpy as np
 
-# ext_modules = [
-#     Extension("tools",
-#         sources=["tools.pyx"],
-#         # libraries=["m"]  # Unix-like specific
-#         )
-# ]
+ext_modules = [
+    Extension("ctools",
+        sources=["lidar/core/tools.pyx"],
+        # libraries=["m"]  # Unix-like specific
+        )
+]
 
 setup(
-ext_modules=cythonize("core/ctools.pyx"),
+    name='lidar',
+    version='0.0.1',
+    author='Julian Hernandez Velasquez',
+    author_email='jhernandezv@unal.edu.co',
+    packages=['lidar'],
+    package_data={'cpr':['Nivel.py','SqlDb.py','static.py','information.py']},
+    url='https://github.com/julhernandezv/Lidar.git',
+    license='LICENSE.txt',
+    description="Class for manipulating SIATA's Scanning Lidar",
+    long_description=open('README.md').read(),
+    ext_modules=cythonize(ext_modules),
     include_dirs=[np.get_include()],
 )
 
