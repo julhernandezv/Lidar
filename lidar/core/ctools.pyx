@@ -26,7 +26,7 @@ def range_corrected( np.ndarray [DTYPE_t, ndim=2] matrix,
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
-def mVolts ( np.ndarray [np.int64_t, ndim=2] matrix,
+def mVolts ( np.ndarray [DTYPE_t, ndim=2] matrix,
             np.ndarray[DTYPE_t, ndim=1] inputRange,
             np.ndarray[DTYPE_t, ndim=1] ADCBits,
             np.ndarray[DTYPE_t, ndim=1] shotNumber):
@@ -37,18 +37,18 @@ def mVolts ( np.ndarray [np.int64_t, ndim=2] matrix,
     cdef int const2 = 2
     cdef int rdim = matrix.shape[0]
     cdef int cdim = matrix.shape[1]
-    cdef np.ndarray[DTYPE_t, ndim=2] result = np.empty_like(matrix, dtype=DTYPE)
+    #cdef np.ndarray[DTYPE_t, ndim=2] result = np.empty_like(matrix, dtype=DTYPE)
 
     for i in range(rdim):
         for j in range(cdim):
             #assert shotNumber[i] != 0
             power = const2 ** -ADCBits[i]
-            result[i,j] = matrix[i,j] * inputRange[i] * const1 *  power  / shotNumber[i]
-    return result
+            matrix[i,j] *=  inputRange[i] * const1 *  power  / shotNumber[i]
+    return matrix
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
-def mHz ( np.ndarray [np.int64_t, ndim=2] matrix,
+def mHz ( np.ndarray [DTYPE_t, ndim=2] matrix,
             np.ndarray[DTYPE_t, ndim=1] binWidth,
             np.ndarray[DTYPE_t, ndim=1] shotNumber):
 
@@ -56,9 +56,9 @@ def mHz ( np.ndarray [np.int64_t, ndim=2] matrix,
     cdef int const1 = 150
     cdef int rdim = matrix.shape[0]
     cdef int cdim = matrix.shape[1]
-    cdef np.ndarray[DTYPE_t, ndim=2] result = np.empty_like(matrix, dtype=DTYPE)
+    #cdef np.ndarray[DTYPE_t, ndim=2] result = np.empty_like(matrix, dtype=DTYPE)
 
     for i in range(rdim):
         for j in range(cdim):
-            result[i,j] = matrix[i,j] * ( const1 /  binWidth[i] ) / shotNumber[i]
+            matrix[i,j] *=  ( const1 /  binWidth[i] ) / shotNumber[i]
     return matrix
