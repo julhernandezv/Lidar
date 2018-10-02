@@ -10,9 +10,9 @@ import pandas as pd
 import struct
 import sys, os, glob, locale
 
-from .plotbook import PlotBook
+from core.plotbook import PlotBook
 from dateutil.relativedelta import relativedelta
-from matplotlib.pyplot import register_cmap
+from matplotlib.pyplot import register_cmap, get_cmap
 from matplotlib.dates import DateFormatter
 # reload (sys)
 # sys.setdefaultencoding ("utf-8")
@@ -45,9 +45,12 @@ def shiftedColorMap(cmap, start=0, midpoint=0.5, stop=1.0, name='shiftedcmap'):
     register_cmap(cmap=newcmap)
     return newcmap
 
-shrunkCmap = shiftedColorMap(cm.jet, start=0.15,midpoint=0.45, stop=0.85, name='shrunk')
+shrunkCmap  = shiftedColorMap(cm.jet, start=0.15,midpoint=0.45, stop=0.85, name='shrunk')
 shrunkCmap2 = shiftedColorMap(cm.jet, start=0.0,midpoint=0.65, stop=0.85, name='shrunk_ceil')
-
+shrunkCmap3 = shiftedColorMap(cm.jet, start=0.15,midpoint=0.45, stop=.85, name='shrunk_LDV')
+shrunkCmap3 = get_cmap('shrunk_LDV', 28)
+shrunkCmap3.set_under(cm.jet(0))
+shrunkCmap3.set_over(cm.jet(1000))
 
 class Lidar(PlotBook):
     """
@@ -75,7 +78,7 @@ class Lidar(PlotBook):
                     'colorbarKind':'Linear'},
                 'LVD': {'analog':r'LVD $(\delta^v)$',
                     'photon':r'LVD $(\delta^v)$',
-                    'cmap':shrunkCmap,
+                    'cmap':shrunkCmap3,
                     'colorbarKind':'Linear'},
                 'LPD': {'analog':r'LPD $(\delta^p)$',
                     'photon':r'LPD $(\delta^p)$',
@@ -84,7 +87,7 @@ class Lidar(PlotBook):
                 'RCS': {'analog':r'RCS $[mV*Km^2]$',
                     'photon':r'RCS $[MHz*Km^2]$',
                     'cmap':shrunkCmap,
-                    'colorbarKind':'Linear'},
+                    'colorbarKind':'Log'},
                 'Ln(RCS)': {'analog':r'Ln(RCS) $[Ln(mV*Km^2)]$',
                     'photon':r'Ln(RCS) $[Ln(MHz*Km^2)]$',
                     'cmap':shrunkCmap,
@@ -115,7 +118,8 @@ class Lidar(PlotBook):
 
     bkg = {'analog-p':5.29, 'analog-s':4.984, 'photon-p':0.13289, 'photon-s':0.13289} #0.26578
 
-    V0 = 0.051
+    vAn = 0.525
+    vPc = 0.534
 
     def __init__(self, fechaI=None, fechaF=None, ascii=False, scan='3D', output='P(r)', **kwargs):
 
@@ -124,10 +128,10 @@ class Lidar(PlotBook):
         self.scan       = scan
         self.output     = output
         self.fechaI     = (dt.datetime.now() - relativedelta(months=1)
-                        ).strftime('%Y-%m-') + '01 01:00' if (fechaI == None) else fechaI
+                        ).strftime('%Y-%m-') + '01 01:00' if fechaI is None else fechaI
         self.fechaF     = (pd.to_datetime(self.fechaI)+ relativedelta(months=1
                             ) - dt.timedelta(hours=1)
-                        ).strftime('%Y-%m-%d %H:%M') if (fechaF == None) else fechaF #
+                        ).strftime('%Y-%m-%d %H:%M') if fechaF is None else fechaF #
 
         self.degreeVariable    = 'Zenith' if self.scan in ['FixedPoint','3D'] else self.scan
         self.degreeFixed       = 'Azimuth'  if self.scan in ['FixedPoint','3D','Zenith'] else 'Zenith'
@@ -315,11 +319,21 @@ class Lidar(PlotBook):
             if np.abs(dataInfo.Zenith.iloc[1] - dataInfo.Zenith.iloc[0]) > 10:
                 print dataInfo.index[0]
                 # dataInfo.loc[dataInfo.index[0],'Zenith'] = dataInfo.Zenith.iloc[1] + 5
-                data.drop(dataInfo.index[0],axis=1,level=0,inplace=True)
-                dataInfo.drop(dataInfo.index[0],inplace=True)
+                data.drop(
+                    dataInfo.index[0],
+                    axis=1,
+                    level=0,
+                    inplace=True)
+                dataInfo.drop(
+                    dataInfo.index[0],
+                    inplace=True)
 
-            dataInfo.loc[ dataInfo.Azimuth != dataInfo.Azimuth.iloc[0], ['Azimuth','Zenith'] ] += 180
-            dataInfo.loc[ dataInfo.Azimuth == dataInfo.Azimuth.iloc[0], 'Zenith' ] *= -1
+            dataInfo.loc[
+                dataInfo.Azimuth != dataInfo.Azimuth.iloc[0],
+                ['Azimuth','Zenith'] ] += 180
+            dataInfo.loc[
+                dataInfo.Azimuth == dataInfo.Azimuth.iloc[0],
+                'Zenith' ] *= -1
 
             #Filter by repeated measures at Zenith 90
             duplicated =  dataInfo.index[dataInfo.Zenith == 90]
@@ -395,10 +409,13 @@ class Lidar(PlotBook):
                     df4.loc[df4.index[0], 'Fecha_fin'] = df4.index[-1]
                     self.datosInfo = self.datosInfo.append(df4.iloc[0])
 
-        self.datos           = pd.concat(self.datos,axis=1).T
-        self.datos.index     = pd.to_datetime( self.datos.index )
+        self.datos              = pd.concat(self.datos,axis=1).T
+        self.datos.index        = pd.to_datetime( self.datos.index )
+
         self.datosInfo.sort_index(inplace=True)
-        self.raw       = self.datos.copy()
+        self.datos.index.name   = 'Dates'
+        self.datosInfo.index.name   = 'Dates'
+        self.raw                = self.datos.copy()
         self.derived_output(**kwargs)
 
 
@@ -423,25 +440,24 @@ class Lidar(PlotBook):
                 print '{}\nGetting P(r) \n{}'.format('-'*50,'-'*50)
                 self.datos       = self.Pr
 
+                if totalSignal:
+                    print '{}\nGetting Depolarization Signal \n{}'.format('-'*50,'-'*50)
+                    self.datos = self.total_signal
+
                 if self.output not in ['P(r)']:
-
-                    if self.output == 'LVD':
-                        print '{}\nGetting Linear Volume Depolarization Ratio \n{}'.format('-'*50,'-'*50)
-                        self.datos = self.LVD
-
-                    elif totalSignal:
-                        print '{}\nGetting Depolarization Signal \n{}'.format('-'*50,'-'*50)
-                        self.datos = self.total_signal
-
                     print '{}\nRemoving Background \n{}'.format('-'*50,'-'*50)
                     self.datos      = self.background
 
 
-            if self.output in ['RCS', 'Ln(RCS)', 'fLn(RCS)',
+            if self.output in ['RCS','LVD', 'Ln(RCS)', 'fLn(RCS)',
                         'dLn(RCS)', 'fdLn(RCS)', 'dfLn(RCS)', 'fdfLn(RCS)']:
 
                 print '{}\nGetting RCS \n{}'.format('-'*50,'-'*50)
                 self.datos      = self.RCS
+
+                if self.output == 'LVD':
+                    print '{}\nGetting Linear Volume Depolarization Ratio \n{}'.format('-'*50,'-'*50)
+                    self.datos = self.LVD
 
                 if self.output not in ['RCS']:
                     # self.datos.mask(self.datos<=0,inplace=True)
@@ -724,21 +740,36 @@ class Lidar(PlotBook):
 
         return vlim
 
+    @staticmethod
+    def mVolts(inputRange, ADCBits, shotNumber):
+        # print name
+        tmp     =   inputRange * 1000 * ( 2. ** (-ADCBits) ) / shotNumber
+        # tmp.index.name = 'Dates'
+        return tmp
+
+    @staticmethod
+    def mHz(binWidth, shotNumber):
+        """Parameters are pandas.Series used to multiply by raw data"""
+        tmp     = ( 150 /  binWidth ) / shotNumber
+        # tmp.index.name = 'Dates'
+        return tmp
+
     @property
     def Pr(self):
 
-        mvolts  = lambda x:  x * self.datosInfo[ 'InputRange_'+x.name[-1] ] * (
-            2. ** (-self.datosInfo[ 'ADCBits_'+x.name[-1] ])
-            ) / self.datosInfo[ 'ShotNumber_'+x.name[-1] ] * 1000
-
-        mHz     = lambda x:  x * ( 150 /  self.datosInfo['BinWidth_'+x.name[-1] ]
-            ) / self.datosInfo[ 'ShotNumber_'+x.name[-1] ]
-
-        return  self.datos.apply(
+        return  self.datos.stack([0,1]).apply(
                     lambda serie:
-                        mvolts(serie)
-                        if 'analog' in serie.name[-1] else
-                        mHz(serie) )
+                        serie * self.mVolts(
+                            self.datosInfo[ 'InputRange_'+serie.name ],
+                            self.datosInfo[ 'ADCBits_'+serie.name ],
+                            self.datosInfo[ 'ShotNumber_'+serie.name ]
+                        )
+                        if 'analog' in serie.name else
+                        serie * self.mHz(
+                            self.datosInfo['BinWidth_'+serie.name ],
+                            self.datosInfo[ 'ShotNumber_'+serie.name ]
+                        )
+                    ).stack().unstack([1,2,3])
 
     @property
     def background(self):
@@ -748,24 +779,30 @@ class Lidar(PlotBook):
                     (self.datos.columns.levels[0] < 21)
                 ]
             ].groupby(level=(1,2), axis=1).mean()
+        y [y.isnull()] = 0
+
 
         return self.datos.apply(lambda x: x - y[ (x.name[1],x.name[2]) ])
         # self.datos       = self.datos.apply(lambda x: x - self.bkg[x.name[-1]])
         # print self.datos.shape
         # return self.datos.apply(lambda x: x - self.bkg[x.name[-1]])
 
+    cpdef
+
     @property
     def RCS(self):
         # self.datos       = self.datos.apply(lambda x: x - self.bkg[x.name[-1]])
-        # print self.datos.shape
-        return self.datos.apply(lambda x: x*( x.name[0]**2) )
+        #self.datos.apply(lambda x: x*( x.name[0]**2) )
+        return self.datos.stack([1,2]).apply(
+                    lambda x: x*(x.name**2)).unstack([1,2])
+
 
     @property
     def total_signal(self):
-        an =    self.datos.xs('analog-s',axis=1,level=2
-                ) + self.datos.xs('analog-p',axis=1,level=2) * self.V0
-        pc =    self.datos.xs('photon-s',axis=1,level=2
-                ) + self.datos.xs('photon-p',axis=1,level=2)
+        an =    self.datos.xs('analog-p',axis=1,level=2
+                ) + self.datos.xs('analog-s',axis=1,level=2) * self.vAn
+        pc =    self.datos.xs('photon-p',axis=1,level=2
+                ) + self.datos.xs('photon-s',axis=1,level=2) * self.vPc
         return  pd.concat(
                     [ self.datos, pd.concat({'analog-b':an,'photon-b':pc}).unstack(0) ],
                     axis=1 ).sort_index(axis=1)
@@ -773,10 +810,11 @@ class Lidar(PlotBook):
     @property
     def LVD(self):
 
-        an =    self.datos.xs('analog-p',axis=1,level=2
-                ) / self.datos.xs('analog-s',axis=1,level=2)
-        pc =    self.datos.xs('photon-p',axis=1,level=2
-                ) / self.datos.xs('photon-s',axis=1,level=2)
+        an =   ( self.datos.xs('analog-s',axis=1,level=2
+                ) / self.datos.xs('analog-p',axis=1,level=2) ) #*self.vAn
+        pc =   ( self.datos.xs('photon-s',axis=1,level=2
+                ) / self.datos.xs('photon-p',axis=1,level=2) ) #*self.vPc
+        pc [(pc==np.inf) | (pc==-np.inf)] = np.NaN
         return pd.concat({'analog':an,'photon':pc}).unstack(0)
 
     @property

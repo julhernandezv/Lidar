@@ -129,21 +129,22 @@ os.system('rm lidar/*.pyc')
 from lidar.lidar import Lidar
 locale.setlocale(locale.LC_TIME, ('en_GB','utf-8'))
 
-vlim = {'analog-s':[0.1,16],'analog-p':[0.1,16] }
+# vlim = {'analog-s':[0.2,16],'analog-p':[0.2,16],'analog':[0,0.7] }
 
 
 # for date in pd.date_range('2018-08-01','2018-08-31',freq='d'): #'2018-06-27','2018-07-14',freq='d'):
     # try:
-date = pd.date_range('2018-08-28','2018-08-28',freq='d')[0] #'2018-06-27','2018-07-14',freq='d'):
+date = pd.date_range('2018-08-03','2018-08-07',freq='d') #'2018-06-27','2018-07-14',freq='d'):
         #
 binario =   Lidar(
-    fechaI=date.strftime('%Y-%m-%d'),
-    fechaF=date.strftime('%Y-%m-%d'),
+    fechaI=date.strftime('%Y-%m-%d')[0],
+    fechaF=date.strftime('%Y-%m-%d')[-1],
     scan='FixedPoint',
     output='raw'
 )
 binario.read()
 
+# binario.datos.loc(axis=1)[:,:,'photon-p'] * binario.datosInfo.loc[0,'BinWidth_photon-p']
 # backup = [binario.datos, binario.datosInfo]
 # binario.datos        = backup[0]
 # binario.raw    = backup[0].copy()
@@ -172,21 +173,32 @@ binario.datosInfo = binario.datosInfo.resample('30s').mean()
 # #
 kwgs = dict(
     height=4.5,
-    # path=date.strftime(''),
-    textSave='_s-p',
-    # parameters=['analog-s','analog-p','analog-b'],
-    vlim=[0.,0.7]
+    path=date.strftime('%m-%d'),
+    textSave='',
 )
-binario.plot(output = 'LVD',**kwgs )
-# binario.plot(output = 'P(r)',**kwgs )
-#
-# binario.plot( output='RCS', total_signal=False, **kwgs )
-# binario.plot( output='RCS', total_signal=True, **kwgs )
+
+binario.plot(output = 'LVD',vlim=[0.,0.7],**kwgs )
+
+binario.plot(output = 'S(r)',totalSignal=True,**kwgs )
 
 binario.plot(
     output='RCS',
-    colorbarKind='Log',
-    textSave='_log' + kwgs.pop('textSave',''),
+    parameters=['analog-b'],
+    vlim = [0.25,20],
+    **kwgs
+)
+kwgs['parameters'] = ['analog-s','analog-p']
+kwgs['vlim'] = [0.15,16]
+
+
+binario.plot(
+    output='RCS',
+    **kwgs
+)
+kwgs['parameters'] = ['photon-s','photon-p','photon-b']
+kwgs['vlim'] = [10,400]
+binario.plot(
+    output='RCS',
     **kwgs
 )
 
@@ -287,21 +299,52 @@ binario.plot_lidar(ceil.index,ceil.columns,ceil.T,textSave='Ceilometro_AMVA',col
 # bkg.loc[:,pd.IndexSlice[:,'analog-p']]  =
 # ################################################################################
 #### Informe de Actividades
-# altura = 4.5
-# # # for date in pd.date_range('2018-06-30','2018-06-30',freq='d'): #'2018-06-27','2018-07-14',freq='d'):
-# # # try:
-# date = pd.date_range('2018-06-30','2018-06-30',freq='d')[0] #'2018-06-27','2018-07-14',freq='d'):
-#
-# binario = Lidar(fechaI=date.strftime('%Y-%m-%d'),Fechaf=date.strftime('%Y-%m-%d'),scan='3D')
-# binario.read()
+altura = 4.5
+# # for date in pd.date_range('2018-06-30','2018-06-30',freq='d'): #'2018-06-27','2018-07-14',freq='d'):
+# # try:
+date = pd.date_range('2018-06-30','2018-06-30',freq='d')[0] #'2018-06-27','2018-07-14',freq='d'):
+
+binario = Lidar(
+    fechaI=date.strftime('%Y-%m-%d'),
+    fechaF=date.strftime('%Y-%m-%d'),
+    scan='3D',
+    output='raw')
+binario.read()
 # # backup = [binario.raw, binario.dataInfo]
 # # binario.data        = backup[0]
 # # binario.raw    = backup[0]
 # # binario.dataInfo   = backup[1]
 #
 #
-# # kwgs = dict(parameters=['photon-p'], dates=binario.dataInfo.index, make_gif=True, path= date.strftime('%Y-%m-%d-bkg-nonan'),height=altura, background= bkg)
-# kwgs = dict(height=altura,path='informe',dates =binario.dataInfo.index[binario.dataInfo.index.hour <1 ])
+# kwgs = dict(parameters=['photon-p'], dates=binario.dataInfo.index, make_gif=True, path= date.strftime('%Y-%m-%d-bkg-nonan'),height=altura, background= bkg)
+# kwgs = dict(height=altura,path='vlim',dates =binario.dataInfo.index[binario.dataInfo.index.hour <1 ])
+kwgs = dict(
+    height=4.5,
+    path=date.strftime('vlim'),
+    textSave='',
+)
+
+
+binario.plot(
+    output='RCS',
+    parameters=['analog-b'],
+    vlim = [0.25,20],
+    **kwgs
+)
+kwgs['parameters'] = ['analog-s','analog-p']
+kwgs['vlim'] = [0.15,16]
+
+
+binario.plot(
+    output='RCS',
+    **kwgs
+)
+kwgs['parameters'] = ['photon-s','photon-p','photon-b']
+kwgs['vlim'] = [10,400]
+binario.plot(
+    output='RCS',
+    **kwgs
+)
 #
 # #
 # #
