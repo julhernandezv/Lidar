@@ -413,7 +413,6 @@ class Lidar(PlotBook):
         self.datos.index        = pd.to_datetime( self.datos.index )
 
         self.datos.astype(np.float64)
-        self.datosInfo.astype(np.float64)
         self.datosInfo.sort_index(inplace=True)
         self.datos.index.name       = 'Dates'
         self.datosInfo.index.name   = 'Dates'
