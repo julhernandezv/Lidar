@@ -99,3 +99,10 @@ def cy_brackground ( np.ndarray [DTYPE_t, ndim=2] matrix,
             else:
                 c = 0
     return matrix
+
+
+# """ Function to derived by centered difference method"""
+# @cython.boundscheck(False)
+# @cython.wraparound(False)
+# def cy_derived ( np.ndarray [DTYPE_t, ndim=2] matrix,
+#             D delta):

@@ -447,14 +447,16 @@ class Lidar(PlotBook):
 
                 if self.output not in ['P(r)']:
                     print '{}\nRemoving Background \n{}'.format('-'*50,'-'*50)
-                    self.datos      = self.background
+                    # self.datos      = 
+                    self.background
 
 
             if self.output in ['RCS','LVD', 'Ln(RCS)', 'fLn(RCS)',
                         'dLn(RCS)', 'fdLn(RCS)', 'dfLn(RCS)', 'fdfLn(RCS)']:
 
                 print '{}\nGetting RCS \n{}'.format('-'*50,'-'*50)
-                self.datos      = self.RCS
+                # self.datos      = self.RCS
+                self.RCS
 
                 if self.output == 'LVD':
                     print '{}\nGetting Linear Volume Depolarization Ratio \n{}'.format('-'*50,'-'*50)
@@ -801,11 +803,12 @@ class Lidar(PlotBook):
             ].groupby(level=(1,2), axis=1).mean()
         bkg [bkg.isnull()] = 0
 
-        return  pd.DataFrame(
-                    cy_brackground(self.datos.values, bkg.values),
-                    index = self.datos.index,
-                    columns = self.datos.columns,
-                )
+        cy_brackground(self.datos.values, bkg.values)
+        #return  pd.DataFrame(
+                #     cy_brackground(self.datos.values, bkg.values),
+                #     index = self.datos.index,
+                #     columns = self.datos.columns,
+                # )
 
         # self.datos.apply(lambda x: x - y[ (x.name[1],x.name[2]) ])
         # self.datos       = self.datos.apply(lambda x: x - self.bkg[x.name[-1]])
