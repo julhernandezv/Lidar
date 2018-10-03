@@ -125,8 +125,8 @@ import pandas as pd
 import numpy as np
 import datetime as dt
 import os, locale
-os.system('rm lidar/lidar/*.pyc')
-from lidar.lidar.lidar import Lidar
+# os.system('rm lidar/lidar/*.pyc')
+from lidar.lidar import Lidar
 locale.setlocale(locale.LC_TIME, ('en_GB','utf-8'))
 
 # vlim = {'analog-s':[0.2,16],'analog-p':[0.2,16],'analog':[0,0.7] }
@@ -134,7 +134,7 @@ locale.setlocale(locale.LC_TIME, ('en_GB','utf-8'))
 
 # for date in pd.date_range('2018-08-01','2018-08-31',freq='d'): #'2018-06-27','2018-07-14',freq='d'):
     # try:
-date = pd.date_range('2018-08-06','2018-08-06',freq='d') #'2018-06-27','2018-07-14',freq='d'):
+date = pd.date_range('2018-08-28','2018-08-28',freq='d') #'2018-06-27','2018-07-14',freq='d'):
         #
 binario =   Lidar(
     fechaI=date.strftime('%Y-%m-%d')[0],
@@ -173,35 +173,50 @@ binario.datosInfo = binario.datosInfo.resample('30s').mean()
 # #
 kwgs = dict(
     height=4.5,
-    path=date.strftime('%m-%d'),
+    path='cython_test', #date.strftime('%m-%d'),
     textSave='',
+
 )
+    # colorbarKind=''
+# binario.plot(output = 'raw',**kwgs )
+#
+# binario.plot(output = 'P(r)',totalSignal=True,**kwgs )
+#
+# binario.plot(output = 'S(r)',totalSignal=True,**kwgs )
 
-binario.plot(output = 'LVD',vlim=[0.,0.7],**kwgs )
+binario.plot(output = 'LVD',
+    totalSignal=True,
+    vlim=[0,.7],
+    **kwgs )
 
-binario.plot(output = 'S(r)',totalSignal=True,**kwgs )
-
+kwgs['colorbarKind'] = 'Log'
 binario.plot(
     output='RCS',
     parameters=['analog-b'],
-    vlim = [0.25,20],
+    vlim = [0.15,20],#[1,20],
     **kwgs
 )
-kwgs['parameters'] = ['analog-s','analog-p']
-kwgs['vlim'] = [0.15,16]
-
 
 binario.plot(
-    output='RCS',
-    **kwgs
-)
-kwgs['parameters'] = ['photon-s','photon-p','photon-b']
-kwgs['vlim'] = [10,400]
-binario.plot(
+    parameters=['analog-s','analog-p'],
+    vlim=[0.1,16], #[1,16]
     output='RCS',
     **kwgs
 )
 
+binario.plot(
+    parameters=['photon-s','photon-p'],
+    vlim=[10,400], #[15,350]
+    output='RCS',
+    **kwgs
+)
+
+binario.plot(
+    output='RCS',
+    parameters=['photon-b'],
+    vlim = [20,380],
+    **kwgs
+)
         # for location in ['amva','siata','itagui']:
         #     # binario = Lidar(fechaI='20180801',Fechaf='20180801',scan='FixedPoint',output='raw')
         #     ceil = lee_Ceil(

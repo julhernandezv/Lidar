@@ -5,11 +5,11 @@ import numpy as np
 
 #requirements = read requirements.txt
 
-ext_modul = [  Extension(name="cytools",
+ext_module = [  Extension(name="cytools",
         sources=["lidar/_libs/cytools.pyx"],
         include_dirs=[np.get_include()],
         # libraries=["m"]  # Unix-like specific
-        )
+        ),
 ]
 
 
@@ -26,7 +26,7 @@ setup(
     license='LICENSE.txt',
     description="Class for manipulating SIATA's Scanning Lidar",
     long_description=open('README.md').read(),
-    ext_modules=cythonize(ext_modul),
+    ext_modules=cythonize(ext_module),
     #install_requires=requirements,
 )
 

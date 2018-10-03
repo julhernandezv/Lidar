@@ -816,16 +816,16 @@ class Lidar(PlotBook):
 
     @property
     def RCS(self):
-        tmp     =   cy_range_corrected(
+        cy_range_corrected(
                         self.datos.values,
                         self.datos.columns.get_level_values(0).values
                     )
         # self.datos       = self.datos.apply(lambda x: x - self.bkg[x.name[-1]])
         #self.datos.apply(lambda x: x*( x.name[0]**2) )
         #self.datos.stack([1,2]).apply( lambda x: x*(x.name**2)).unstack([1,2])
-        return pd.DataFrame(tmp,
-                    index=self.datos.index,
-                    columns=self.datos.columns)
+        # return pd.DataFrame(tmp,
+                    # index=self.datos.index,
+                    # columns=self.datos.columns)
 
     @property
     def total_signal(self):
@@ -849,7 +849,9 @@ class Lidar(PlotBook):
 
     @property
     def derived(self):
-        return self.datos.T.groupby(level=[1,2]).diff().T
+        dr  = (self.datos.columns.levels[0][1] - self.datos.columns.levels[0][0])
+        return self.datos.groupby(level=[1,2],axis=1).diff(axis=1) / dr
+
 
     @staticmethod
     def derived2(obj):

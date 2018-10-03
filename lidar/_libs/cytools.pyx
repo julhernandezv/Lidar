@@ -18,16 +18,20 @@ def cy_range_corrected( np.ndarray [DTYPE_t, ndim=2] matrix,
     cdef int i,j
     cdef int rdim = matrix.shape[0]
     cdef int cdim = matrix.shape[1]
-    #cdef np.ndarray[DTYPE_t, ndim=2] result = np.empty_like(matrix, dtype=DTYPE)
+    # cdef np.ndarray[DTYPE_t, ndim=2] result = np.empty_like(matrix, dtype=DTYPE)
 
     for i in range(rdim):
         for j in range(cdim):
-            matrix [i,j] *= rang[j]
+            # result [i,j] = matrix[i,j] * rang[j]
+            matrix[i,j] *= rang[j]
     return matrix
 
 # """ Function to calculate mVolts from Lidar raw data"""
 @cython.boundscheck(False)
 @cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(True)
 def cy_mVolts ( np.ndarray [DTYPE_t, ndim=2] matrix,
             np.ndarray[DTYPE_t, ndim=1] inputRange,
             np.ndarray[DTYPE_t, ndim=1] ADCBits,
@@ -39,13 +43,14 @@ def cy_mVolts ( np.ndarray [DTYPE_t, ndim=2] matrix,
     cdef int const2 = 2
     cdef int rdim = matrix.shape[0]
     cdef int cdim = matrix.shape[1]
-    #cdef np.ndarray[DTYPE_t, ndim=2] result = np.empty_like(matrix, dtype=DTYPE)
+    # cdef np.ndarray[DTYPE_t, ndim=2] result = np.empty_like(matrix, dtype=DTYPE)
 
     for i in range(rdim):
         for j in range(cdim):
             #assert shotNumber[i] != 0
             power = const2 ** -ADCBits[i]
-            matrix[i,j] *=  inputRange[i] * const1 *  power  / shotNumber[i]
+            # result[i,j] = matrix[i,j] * inputRange[i] * const1 *  power  / shotNumber[i]
+            matrix[i,j] *= inputRange[i] * const1 *  power  / shotNumber[i]
     return matrix
 
 
@@ -53,6 +58,9 @@ def cy_mVolts ( np.ndarray [DTYPE_t, ndim=2] matrix,
 # """ Function to calculate mHz from Lidar raw data"""
 @cython.boundscheck(False)
 @cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(True)
 def cy_mHz ( np.ndarray [DTYPE_t, ndim=2] matrix,
             np.ndarray[DTYPE_t, ndim=1] binWidth,
             np.ndarray[DTYPE_t, ndim=1] shotNumber):
