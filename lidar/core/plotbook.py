@@ -137,8 +137,7 @@ class PlotBook(MPLPlot):
             vmin, vmax      = [Z.min().min(),Z.max().max()] #np.nanpercentile(Z,[2.5,97.5]) #
         print vmin, vmax
         colorbarKwd        = {'extend':'both'}
-        contourKwd         = { 'levels':np.linspace(vmin,vmax,100),
-                                'cmap':self.colormap }
+        contourKwd         = { 'cmap':self.colormap } #'levels':np.linspace(vmin,vmax,100),
 
         if self.kwargs['colorbarKind'] == 'Linear':
             contourKwd['norm']    = Normalize(vmin,vmax)
@@ -155,23 +154,15 @@ class PlotBook(MPLPlot):
             if  self.kwargs['vlim'] is None:
                 vmin, vmax =  [Z.min().min(),Z.max().max()]  # np.nanpercentile(Z,[1,99])))
 
-            vmin, vmax =   np.log10([vmin,vmax])
-
-            contourKwd['levels']               = np.logspace(vmin,vmax,100)
-            Z[Z < contourKwd['levels'][0]]     = contourKwd['levels'][0]
-            Z[Z > contourKwd['levels'][-1]]    = contourKwd['levels'][-1]
-            contourKwd['norm']                 = LogNorm(
-                                        contourKwd['levels'][0],
-										contourKwd['levels'][-1] )
-            print contourKwd['levels'][0],contourKwd['levels'][-1]
-            # print Z
+            Z[Z < vmin]         = vmin
+            Z[Z > vmax]         = vmax
+            contourKwd['norm']  = LogNorm(vmin,max )
+            print vmin,vmax
 
             minorTicks = np.hstack([np.arange(1,10,1)*log for log in np.logspace(-2,16,19)])
-            minorTicks = minorTicks[(minorTicks >=contourKwd['levels'] [0]) & (minorTicks <=contourKwd['levels'] [-1])]
+            minorTicks = minorTicks[(minorTicks >= vmin) & (minorTicks <=vamx)]
             colorbarKwd.update(dict(format = LogFormatterMathtext(10) ,ticks=LogLocator(10) ))
 
-        # cf		= ax.contourf(X,Y,Z,levels=levels, alpha=1,cmap =shrunk_cmap,  norm=LogNorm())   #
-        contourKwd.pop('levels')
         args    = (self.x, self.y, Z)
         cf      = self.axes[0].pcolormesh(*args, **contourKwd)
 

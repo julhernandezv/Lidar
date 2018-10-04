@@ -276,6 +276,7 @@ class Lidar(PlotBook):
 
                     ejeX = np.arange(1,dictDescripcionDataset[ix+1]["datasetBinNums"]-17
                                 ) * dictDescripcionDataset[ix+1]["datasetBinWidth"] / 1000.
+
                     dataset.append( pd.DataFrame(
                             dictDescripcionDataset[ix+1]['datasetLista'][18:]
                             if dictDescripcionDataset[ix+1]["datasetDescriptor"] == 'BT' else dictDescripcionDataset[ix+1]['datasetLista'][:-18], index=ejeX, columns=[ "{}-{}".format('analog' if dictDescripcionDataset[ix+1]["datasetModoAnalogo"] else 'photon', dictDescripcionDataset[ix+1]["datasetPolarization"])] ))
@@ -313,7 +314,7 @@ class Lidar(PlotBook):
             # print df2.index.strftime('%Y-%m-%d %H:%M:%S')
             # print '\n index= {}'.format(df2['Zenith' if self.scan in ['FixedPoint','3D'] else self.scan].values[0])
             data[ df2.index[0].strftime('%Y-%m-%d %H:%M:%S') ] = df1
-            dataInfo   = dataInfo.append(df2)
+            dataInfo.append(df2)
 
         data        = pd.concat(data,axis=1)
         dataInfo    = pd.concat(dataInfo)
@@ -412,14 +413,16 @@ class Lidar(PlotBook):
                     self.datos[ df4.index[0].strftime('%Y-%m-%d %H:%M:%S') ] = df3.stack([0,1])
 
                     df4.loc[df4.index[0], 'Fecha_fin'] = df4.index[-1]
-                    self.datosInfo = self.datosInfo.append(df4.iloc[0])
+                    self.datosInfo.append(df4.iloc[0])
 
         self.datos              = pd.concat(self.datos,axis=1).T.astype(np.float64)
         self.datos.index        = pd.to_datetime( self.datos.index )
-        self.datosInfo          = pd.concat(self.datos)
-        self.datosInfo.sort_index(inplace=True)
         self.datos.index.name       = 'Dates'
+
+        self.datosInfo          = pd.concat(self.datosInfo)
+        self.datosInfo.sort_index(inplace=True)
         self.datosInfo.index.name   = 'Dates'
+
         self.raw                    = self.datos.copy()
         self.derived_output(**kwargs)
 
