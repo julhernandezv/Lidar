@@ -51,6 +51,8 @@ shrunkCmap3 = shiftedColorMap(cm.jet, start=0.15,midpoint=0.45, stop=.85, name='
 shrunkCmap3 = get_cmap('shrunk_LDV', 28)
 shrunkCmap3.set_under(cm.jet(0))
 shrunkCmap3.set_over(cm.jet(1000))
+shrunkCmap.set_under(cm.jet(0))
+shrunkCmap.set_over(cm.jet(1000))
 
 class Lidar(PlotBook):
     """
@@ -250,9 +252,8 @@ class Lidar(PlotBook):
                             header=9 if self.scan not in ['FixedPoint'] else 8,
                             usecols=[0,1,2,3]
                         )
-            ejeX =      np.array(
-                            range(1,dataset.shape[0]+ 1)
-                        )*dictDescripcionDataset[1]["datasetBinWidth"] / 1000.
+            ejeX =      np.arange(1,dataset.shape[0]+ 1
+                            )*dictDescripcionDataset[1]["datasetBinWidth"] / 1000.
 
             dataset.index  = ejeX
             dataset.columns = dataset.columns.str.strip('355.000 .').str.strip(' 0 ').str.strip(' 1 ').str.replace(' ','-')
@@ -262,19 +263,22 @@ class Lidar(PlotBook):
             # The datasets are stored as 32bit integer values. Datasets are separated by CRLF. The last dataset is followed by a CRLF.
             # These CRLF are used as markers and can be used as check points for file integrity.
             dataset = []
-            for ix in range (1, valorNumDatasets+1):
-                if dictDescripcionDataset[ix]["datasetDescriptor"] in ['BT','BC']:
+            for ix in xrange (valorNumDatasets):
+                if dictDescripcionDataset[ix+1]["datasetDescriptor"] in ['BT','BC']:
 
-                    dictDescripcionDataset[ix]["datasetLista"] = []
+                    dictDescripcionDataset[ix+1]["datasetLista"] = []
 
-                    for idiBin in xrange (dictDescripcionDataset[ix]["datasetBinNums"]):
+                    for idiBin in xrange (dictDescripcionDataset[ix+1]["datasetBinNums"]):
 
-                        dictDescripcionDataset[ix]["datasetLista"].append ((struct.unpack ('i', fileObj.read (4)))[0])
+                        dictDescripcionDataset[ix+1]["datasetLista"].append ((struct.unpack ('i', fileObj.read (4)))[0])
 
-                    print 'CRLF integrity {} = {}'.format(dictDescripcionDataset[ix]["datasetDescriptor"],fileObj.readline ())
+                    print 'CRLF integrity {} = {}'.format(dictDescripcionDataset[ix+1]["datasetDescriptor"],fileObj.readline ())
 
-                    ejeX = np.array(range(1,dictDescripcionDataset[ix]["datasetBinNums"]-17)) * dictDescripcionDataset[ix]["datasetBinWidth"] / 1000.
-                    dataset.append( pd.DataFrame(dictDescripcionDataset[ix]['datasetLista'][18:] if dictDescripcionDataset[ix]["datasetDescriptor"] == 'BT' else dictDescripcionDataset[ix]['datasetLista'][:-18], index=ejeX, columns=[ "{}-{}".format('analog' if dictDescripcionDataset[ix]["datasetModoAnalogo"] else 'photon', dictDescripcionDataset[ix]["datasetPolarization"])] ))
+                    ejeX = np.arange(1,dictDescripcionDataset[ix+1]["datasetBinNums"]-17
+                                ) * dictDescripcionDataset[ix+1]["datasetBinWidth"] / 1000.
+                    dataset.append( pd.DataFrame(
+                            dictDescripcionDataset[ix+1]['datasetLista'][18:]
+                            if dictDescripcionDataset[ix+1]["datasetDescriptor"] == 'BT' else dictDescripcionDataset[ix+1]['datasetLista'][:-18], index=ejeX, columns=[ "{}-{}".format('analog' if dictDescripcionDataset[ix+1]["datasetModoAnalogo"] else 'photon', dictDescripcionDataset[ix+1]["datasetPolarization"])] ))
 
                     # print dictDescripcionDataset[ix]
 
@@ -300,7 +304,7 @@ class Lidar(PlotBook):
 
         """
 
-        dataInfo   = pd.DataFrame()
+        dataInfo   = []
         data        = {}
 
         for file in sorted(filenames):
@@ -312,7 +316,8 @@ class Lidar(PlotBook):
             dataInfo   = dataInfo.append(df2)
 
         data        = pd.concat(data,axis=1)
-        dataInfo   = dataInfo.sort_index() #.reset_index()
+        dataInfo    = pd.concat(dataInfo)
+        dataInfo    = dataInfo.sort_index() #.reset_index()
         data.columns.set_levels( pd.to_datetime(data.columns.levels[0].values), level=0, inplace=True) #range(data.columns.levels[0].size), level=0, inplace=True)
 
         if self.scan == '3D':
@@ -389,7 +394,7 @@ class Lidar(PlotBook):
         print dates
 
         self.datos       = {}
-        self.datosInfo  = pd.DataFrame()
+        self.datosInfo  = []
 
         for d in dates:
         # d = dates[0]
@@ -409,10 +414,9 @@ class Lidar(PlotBook):
                     df4.loc[df4.index[0], 'Fecha_fin'] = df4.index[-1]
                     self.datosInfo = self.datosInfo.append(df4.iloc[0])
 
-        self.datos              = pd.concat(self.datos,axis=1).T
+        self.datos              = pd.concat(self.datos,axis=1).T.astype(np.float64)
         self.datos.index        = pd.to_datetime( self.datos.index )
-
-        self.datos.astype(np.float64)
+        self.datosInfo          = pd.concat(self.datos)
         self.datosInfo.sort_index(inplace=True)
         self.datos.index.name       = 'Dates'
         self.datosInfo.index.name   = 'Dates'
@@ -447,7 +451,7 @@ class Lidar(PlotBook):
 
                 if self.output not in ['P(r)']:
                     print '{}\nRemoving Background \n{}'.format('-'*50,'-'*50)
-                    # self.datos      = 
+                    # self.datos      =
                     self.background
 
 
@@ -462,7 +466,7 @@ class Lidar(PlotBook):
                     print '{}\nGetting Linear Volume Depolarization Ratio \n{}'.format('-'*50,'-'*50)
                     self.datos = self.LVD
 
-                if self.output not in ['RCS']:
+                if self.output not in ['RCS','LVD']:
                     # self.datos.mask(self.datos<=0,inplace=True)
                     self.datos[ self.datos <= 0.1 ] = 0.1
                     self.datos       = np.log(self.datos)

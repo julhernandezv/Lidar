@@ -49,6 +49,7 @@ def cy_mVolts ( np.ndarray [DTYPE_t, ndim=2] matrix,
         for j in range(cdim):
             #assert shotNumber[i] != 0
             power = const2 ** -ADCBits[i]
+            # print  power
             # result[i,j] = matrix[i,j] * inputRange[i] * const1 *  power  / shotNumber[i]
             matrix[i,j] *= inputRange[i] * const1 *  power  / shotNumber[i]
     return matrix
