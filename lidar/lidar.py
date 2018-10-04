@@ -317,7 +317,7 @@ class Lidar(PlotBook):
             dataInfo.append(df2)
 
         data        = pd.concat(data,axis=1)
-        dataInfo    = pd.concat(dataInfo)
+        dataInfo    = pd.concat(dataInfo,axis=1)
         dataInfo    = dataInfo.sort_index() #.reset_index()
         data.columns.set_levels( pd.to_datetime(data.columns.levels[0].values), level=0, inplace=True) #range(data.columns.levels[0].size), level=0, inplace=True)
 
