@@ -83,7 +83,6 @@ def cy_mHz ( np.ndarray [DTYPE_t, ndim=2] matrix,
 @cython.wraparound(False)
 def cy_brackground ( np.ndarray [DTYPE_t, ndim=2] matrix,
             np.ndarray[DTYPE_t, ndim=2] bkg,
-            np.ndarray[DTYPE_t, ndim=2] bkg,
             np.array[np.int16_t, ndim=1] labelA,
             np.array[np.int16_t, ndim=1] labelP,
             int lenP ):
