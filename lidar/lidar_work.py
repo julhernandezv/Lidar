@@ -181,7 +181,7 @@ binario.datosInfo = binario.datosInfo.resample('30s').mean()
 #
 # #
 # kwgs = dict(
-#     height=4.5,
+#     height=22,
 #     path='cython_test', #date.strftime('%m-%d'),
 #     textSave='',
 #
@@ -209,37 +209,40 @@ binario.datosInfo = binario.datosInfo.resample('30s').mean()
 #     parameters=[],
 #     **kwgs )
 
-#
+
 # binario.plot(output = 'S(r)',totalSignal=True,**kwgs )
 
-# binario.plot(output = 'LVD',
-#     totalSignal=True,
-#     vlim=[0,.7],
-#     **kwgs )
+
 
 kwgs = dict(
     height=4.5,
     path='cython_test', #date.strftime('%m-%d'),
-    textSave='',
 
 )
+
+binario.plot(output = 'LVD',
+    totalSignal=True,
+    vlim=[0,1],
+    textSave='xVT',
+    **kwgs )
+
 binario.plot(
     output='RCS',
     parameters=['analog-b'],
-    vlim = [.4,9],#[1,20],
+    vlim = [.1,12],#[1,20],
     **kwgs
 )
 
 binario.plot(
     parameters=['analog-s','analog-p'],
-    vlim=[.4,8], #[1,16]
+    vlim=[.1,11], #[1,16]
     output='RCS',
     **kwgs
 )
 
 binario.plot(
     parameters=['photon-s','photon-p'],
-    vlim=[5,200], #[15,350]
+    vlim=[8,200], #[15,350]
     output='RCS',
     **kwgs
 )
@@ -247,7 +250,7 @@ binario.plot(
 binario.plot(
     output='RCS',
     parameters=['photon-b'],
-    vlim = [15,200],
+    vlim = [7,220],
     **kwgs
 )
 
@@ -257,13 +260,13 @@ kwgs['textSave'] = '_Linear'
 binario.plot(
     output='RCS',
     parameters=['analog-b'],
-    vlim = [.4,9],#[1,20],
+    vlim = [0,9],#[1,20],
     **kwgs
 )
 
 binario.plot(
     parameters=['analog-s','analog-p'],
-    vlim=[.4,8], #[1,16]
+    vlim=[0,8], #[1,16]
     output='RCS',
     **kwgs
 )

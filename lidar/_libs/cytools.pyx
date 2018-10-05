@@ -82,23 +82,23 @@ def cy_mHz ( np.ndarray [DTYPE_t, ndim=2] matrix,
 @cython.boundscheck(False)
 @cython.wraparound(False)
 def cy_brackground ( np.ndarray [DTYPE_t, ndim=2] matrix,
-            np.ndarray[DTYPE_t, ndim=2] bkg):
+            np.ndarray[DTYPE_t, ndim=2] bkg,
+            np.ndarray[DTYPE_t, ndim=2] bkg,
+            np.array[np.int16_t, ndim=1] labelA,
+            np.array[np.int16_t, ndim=1] labelP,
+            int lenP ):
 
-    cdef int i,j
-    cdef int c = 0
+    cdef int i,j,c
     cdef int rdim = matrix.shape[0]
     cdef int cdim = matrix.shape[1]
     cdef int bkgdim = bkg.shape[1] - 1
     #cdef np.ndarray[DTYPE_t, ndim=2] result = np.empty_like(matrix, dtype=DTYPE)
 
     for i in range(rdim):
-        c = 0
         for j in range(cdim):
+            c = labelP[j] + labelA[j] * lenP 
             matrix[i,j] -= bkg[i,c]
-            if c < bkgdim:
-                c += 1
-            else:
-                c = 0
+
     return matrix
 
 

@@ -51,8 +51,8 @@ shrunkCmap3 = shiftedColorMap(cm.jet, start=0.15,midpoint=0.45, stop=.85, name='
 shrunkCmap3 = get_cmap('shrunk_LDV', 28)
 shrunkCmap3.set_under(cm.jet(0))
 shrunkCmap3.set_over(cm.jet(1000))
-shrunkCmap.set_under(cm.jet(0))
-shrunkCmap.set_over(cm.jet(1000))
+# shrunkCmap.set_under(cm.jet(0))
+# shrunkCmap.set_over(cm.jet(1000))
 
 class Lidar(PlotBook):
     """
@@ -419,7 +419,7 @@ class Lidar(PlotBook):
         self.datos.index        = pd.to_datetime( self.datos.index )
         self.datos.index.name       = 'Dates'
 
-        
+
         self.datosInfo.sort_index(inplace=True)
         self.datosInfo.index.name   = 'Dates'
 
@@ -810,7 +810,12 @@ class Lidar(PlotBook):
             ].groupby(level=(1,2), axis=1).mean()
         bkg [bkg.isnull()] = 0
 
-        cy_brackground(self.datos.values, bkg.values)
+        cy_brackground(self.datos.values,
+            bkg.values,
+            self.datos.columns.labels[1].values().astype(np.int16),
+            self.datos.columns.labels[2].values().astype(np.int16),
+            self.datos.columns.levels[2].size
+        )
         #return  pd.DataFrame(
                 #     cy_brackground(self.datos.values, bkg.values),
                 #     index = self.datos.index,
@@ -849,10 +854,10 @@ class Lidar(PlotBook):
     @property
     def LVD(self):
 
-        an =   ( self.datos.xs('analog-s',axis=1,level=2
-                ) / self.datos.xs('analog-p',axis=1,level=2) ) #*self.vAn
-        pc =   ( self.datos.xs('photon-s',axis=1,level=2
-                ) / self.datos.xs('photon-p',axis=1,level=2) ) #*self.vPc
+        an =    self.datos.xs('analog-s',axis=1,level=2
+                    ) /  self.datos.xs('analog-p',axis=1,level=2)  *self.vAn
+        pc =    self.datos.xs('photon-s',axis=1,level=2
+                    ) / self.datos.xs('photon-p',axis=1,level=2)  *self.vPc
         pc [(pc==np.inf) | (pc==-np.inf)] = np.NaN
         return pd.concat({'analog':an,'photon':pc}).unstack(0)
 

@@ -92,6 +92,7 @@ class PlotBook(MPLPlot):
             if kw in kwargs.keys():
                 self.kwargs[kw] = kwargs.pop(kw)
 
+        data.replace([np.inf,-np.inf],np.nan)
         super(PlotBook, self).__init__(data,*args,**kwargs)
         self.x = x
         self.y = y
@@ -131,6 +132,7 @@ class PlotBook(MPLPlot):
 
         Z = self.data.copy()
 
+
         if self.kwargs['vlim'] is not None:
             vmin, vmax      = self.kwargs['vlim']
         else:
@@ -151,16 +153,17 @@ class PlotBook(MPLPlot):
 
         elif self.kwargs['colorbarKind'] == 'Log':
             Z.mask( Z <= 0, inplace=True )
+
             if  self.kwargs['vlim'] is None:
                 vmin, vmax =  [Z.min().min(),Z.max().max()]  # np.nanpercentile(Z,[1,99])))
 
-            Z[Z < vmin]         = vmin
-            Z[Z > vmax]         = vmax
-            contourKwd['norm']  = LogNorm(vmin,max )
+            # Z[Z < vmin]         = vmin
+            # Z[Z > vmax]         = vmax
+            contourKwd['norm']  = LogNorm(vmin,vmax )
             print vmin,vmax
 
             minorTicks = np.hstack([np.arange(1,10,1)*log for log in np.logspace(-2,16,19)])
-            minorTicks = minorTicks[(minorTicks >= vmin) & (minorTicks <=vamx)]
+            minorTicks = minorTicks[(minorTicks >= vmin) & (minorTicks <=vmax)]
             colorbarKwd.update(dict(format = LogFormatterMathtext(10) ,ticks=LogLocator(10) ))
 
         args    = (self.x, self.y, Z)
