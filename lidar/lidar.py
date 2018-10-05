@@ -168,7 +168,7 @@ class Lidar(PlotBook):
 
         # ValorLocationStr = lineaLocationArray[0]
         description ['Fecha'] = dt.datetime.strptime (lineaLocationArray[1] + " " + lineaLocationArray[2], "%d/%m/%Y %H:%M:%S") - dt.timedelta(hours=5)
-        description ['Fecha_fin'] = dt.datetime.strptime (lineaLocationArray[3] + " " + lineaLocationArray[4], "%d/%m/%Y %H:%M:%S") - dt.timedelta(hours=5)
+        # description ['Fecha_fin'] = dt.datetime.strptime (lineaLocationArray[3] + " " + lineaLocationArray[4], "%d/%m/%Y %H:%M:%S") - dt.timedelta(hours=5)
         # valorHeight = float (lineaLocationArray[5])
         # valorLong = float (lineaLocationArray[6])
         # valorLat = float (lineaLocationArray[7])
@@ -395,7 +395,7 @@ class Lidar(PlotBook):
         print dates
 
         self.datos       = {}
-        self.datosInfo  = []
+        self.datosInfo  = pd.DataFrame()
 
         for d in dates:
         # d = dates[0]
@@ -413,13 +413,13 @@ class Lidar(PlotBook):
                     self.datos[ df4.index[0].strftime('%Y-%m-%d %H:%M:%S') ] = df3.stack([0,1])
 
                     df4.loc[df4.index[0], 'Fecha_fin'] = df4.index[-1]
-                    self.datosInfo.append(df4.iloc[0])
+                    self.datosInfo = self.datosInfo.append(df4.iloc[0])
 
         self.datos              = pd.concat(self.datos,axis=1).T.astype(np.float64)
         self.datos.index        = pd.to_datetime( self.datos.index )
         self.datos.index.name       = 'Dates'
 
-        self.datosInfo          = pd.concat(self.datosInfo,axis=1).T
+        
         self.datosInfo.sort_index(inplace=True)
         self.datosInfo.index.name   = 'Dates'
 
