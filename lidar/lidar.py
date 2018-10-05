@@ -419,7 +419,7 @@ class Lidar(PlotBook):
         self.datos.index        = pd.to_datetime( self.datos.index )
         self.datos.index.name       = 'Dates'
 
-        self.datosInfo          = pd.concat(self.datosInfo)
+        self.datosInfo          = pd.concat(self.datosInfo,axis=1).T
         self.datosInfo.sort_index(inplace=True)
         self.datosInfo.index.name   = 'Dates'
 
