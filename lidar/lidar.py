@@ -48,7 +48,7 @@ def shiftedColorMap(cmap, start=0, midpoint=0.5, stop=1.0, name='shiftedcmap'):
 shrunkCmap  = shiftedColorMap(cm.jet, start=0.15,midpoint=0.45, stop=0.85, name='shrunk')
 shrunkCmap2 = shiftedColorMap(cm.jet, start=0.0,midpoint=0.65, stop=0.85, name='shrunk_ceil')
 shrunkCmap3 = shiftedColorMap(cm.jet, start=0.15,midpoint=0.45, stop=.85, name='shrunk_LDV')
-shrunkCmap3 = get_cmap('shrunk_LDV', 28)
+shrunkCmap3 = get_cmap('shrunk_LDV', 25)
 shrunkCmap3.set_under(cm.jet(0))
 shrunkCmap3.set_over(cm.jet(1000))
 # shrunkCmap.set_under(cm.jet(0))
@@ -807,7 +807,7 @@ class Lidar(PlotBook):
                     (self.datos.columns.levels[0] > 18) &
                     (self.datos.columns.levels[0] < 21)
                 ]
-            ].groupby(level=(1,2), axis=1).mean()
+            ].groupby(level=(1,2), axis=1).median()
         bkg [bkg.isnull()] = 0
 
         cy_brackground(self.datos.values,

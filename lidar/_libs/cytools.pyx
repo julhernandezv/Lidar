@@ -41,6 +41,7 @@ def cy_mVolts ( np.ndarray [DTYPE_t, ndim=2] matrix,
     cdef DTYPE_t power
     cdef int const1 = 1000
     cdef int const2 = 2
+    cdef int const3 = 1
     cdef int rdim = matrix.shape[0]
     cdef int cdim = matrix.shape[1]
     # cdef np.ndarray[DTYPE_t, ndim=2] result = np.empty_like(matrix, dtype=DTYPE)
@@ -48,8 +49,8 @@ def cy_mVolts ( np.ndarray [DTYPE_t, ndim=2] matrix,
     for i in range(rdim):
         for j in range(cdim):
             #assert shotNumber[i] != 0
-            power = const2 ** -ADCBits[i]
-            # print  power
+            power = const3 / (const2 ** ADCBits[i])
+            print  power
             # result[i,j] = matrix[i,j] * inputRange[i] * const1 *  power  / shotNumber[i]
             matrix[i,j] *= inputRange[i] * const1 *  power  / shotNumber[i]
     return matrix
