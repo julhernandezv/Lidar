@@ -23,7 +23,7 @@ def cy_range_corrected( np.ndarray [DTYPE_t, ndim=2] matrix,
     for i in range(rdim):
         for j in range(cdim):
             # result [i,j] = matrix[i,j] * rang[j]
-            matrix[i,j] *= rang[j]
+            matrix[i,j] = matrix[i,j] ** rang[j]
     return matrix
 
 # """ Function to calculate mVolts from Lidar raw data"""
@@ -96,7 +96,7 @@ def cy_brackground ( np.ndarray [DTYPE_t, ndim=2] matrix,
 
     for i in range(rdim):
         for j in range(cdim):
-            c = labelP[j] + labelA[j] * lenP 
+            c = labelP[j] + labelA[j] * lenP
             matrix[i,j] -= bkg[i,c]
 
     return matrix
