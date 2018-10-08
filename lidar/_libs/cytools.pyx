@@ -14,15 +14,18 @@ ctypedef np.float64_t DTYPE_t
 def cy_range_corrected( np.ndarray [DTYPE_t, ndim=2] matrix,
                     np.ndarray [DTYPE_t, ndim=1] rang):
     cdef int i,j
+    cdef int c = 2
     cdef int rdim = matrix.shape[0]
     cdef int cdim = matrix.shape[1]
-    # cdef np.ndarray[DTYPE_t, ndim=2] result = np.empty_like(matrix, dtype=DTYPE)
+    # result = np.empty_like(matrix, dtype=DTYPE)
+    # cdef DTYPE_t [:,::1] result_view = result
+    # cdef np.ndarray[DTYPE_t ,ndim=2] result = np.empty_like(matrix, dtype=DTYPE)
 
     for i in range(rdim):
         for j in range(cdim):
-            # result [i,j] = matrix[i,j] * rang[j]
-            matrix[i,j] = matrix[i,j] ** rang[j]
-    return matrix
+            # result [i,j] = matrix[i,j] * (rang[j]**c)
+            matrix[i,j] *= rang[j]**c
+    # return result
 
 # """ Function to calculate mVolts from Lidar raw data"""
 @cython.boundscheck(False)
@@ -86,17 +89,19 @@ def cy_brackground ( np.ndarray [DTYPE_t, ndim=2] matrix,
             np.ndarray[np.int16_t, ndim=1] labelP,
             int lenP ):
 
-    cdef Py_ssize_t i,j,c
+    cdef int i,j,c
     cdef int rdim = matrix.shape[0]
     cdef int cdim = matrix.shape[1]
-    #cdef np.ndarray[DTYPE_t, ndim=2] result = np.empty_like(matrix, dtype=DTYPE)
+    # result = np.empty_like(matrix, dtype=DTYPE)
+    # cdef DTYPE_t [:,::1] result_view = result
 
     for i in range(rdim):
         for j in range(cdim):
             c = labelP[j] + labelA[j] * lenP
+            # result_view[i,j] = matrix[i,j] - bkg[i,c]
             matrix[i,j] -= bkg[i,c]
 
-    return matrix
+    # return result
 
 
 # """ Function to derived by centered difference method"""
