@@ -1,5 +1,3 @@
-python setup.py build_ext -b
-
 import cytools
 import numpy as np
 
@@ -17,7 +15,7 @@ def range_corrected(  matrix, rang, step=1 ):
     result = np.zeros([rdim,cdim], dtype=np.float64)
 
     for i in range(0,cdim,step):  #step):
-        result [:,i:i+step] = matrix[:,i:i+step] * rang[i]
+        result [:,i:i+step] = matrix[:,i:i+step] ** rang[i]
         # result [:,i] = matrix[:,i] * rang[i]
     return result
 
@@ -142,3 +140,11 @@ adcbits = np.ones(4,dtype=np.float64)*12
 shot = np.ones(4,dtype=np.float64)*601
 
 c = cytools.cy_mVolts( tmp, input, adcbits, shot)
+
+%load_ext Cython
+%%cython
+import numpy as np
+cimport numpy as np
+def test( int c):
+    cdef np.ndarray[np.float64_t,ndim=2] test = np.ones((3,5),dtype=np.float64)
+    print test [c,c]

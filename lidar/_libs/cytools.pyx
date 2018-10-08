@@ -1,6 +1,4 @@
 
-
-
 import numpy as np
 cimport numpy as np
 cimport cython
@@ -50,7 +48,7 @@ def cy_mVolts ( np.ndarray [DTYPE_t, ndim=2] matrix,
         for j in range(cdim):
             #assert shotNumber[i] != 0
             power = const3 / (const2 ** ADCBits[i])
-            print  power
+            # print  power
             # result[i,j] = matrix[i,j] * inputRange[i] * const1 *  power  / shotNumber[i]
             matrix[i,j] *= inputRange[i] * const1 *  power  / shotNumber[i]
     return matrix
@@ -88,10 +86,9 @@ def cy_brackground ( np.ndarray [DTYPE_t, ndim=2] matrix,
             np.ndarray[np.int16_t, ndim=1] labelP,
             int lenP ):
 
-    cdef int i,j,c
+    cdef Py_ssize_t i,j,c
     cdef int rdim = matrix.shape[0]
     cdef int cdim = matrix.shape[1]
-    cdef int bkgdim = bkg.shape[1] - 1
     #cdef np.ndarray[DTYPE_t, ndim=2] result = np.empty_like(matrix, dtype=DTYPE)
 
     for i in range(rdim):

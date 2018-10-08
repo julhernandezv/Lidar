@@ -222,27 +222,27 @@ kwgs = dict(
 
 binario.plot(output = 'LVD',
     totalSignal=True,
-    vlim=[0,1],
-    textSave='xVT',
+    vlim=[0.25,1],
+    textSave='xV',
     **kwgs )
 
 binario.plot(
     output='RCS',
     parameters=['analog-b'],
-    vlim = [.1,12],#[1,20],
+    vlim = [.6,20],#[1,20],
     **kwgs
 )
 
 binario.plot(
     parameters=['analog-s','analog-p'],
-    vlim=[.1,11], #[1,16]
+    vlim=[.5,16], #[1,16]
     output='RCS',
     **kwgs
 )
 
 binario.plot(
     parameters=['photon-s','photon-p'],
-    vlim=[8,200], #[15,350]
+    vlim=[9,200], #[15,350]
     output='RCS',
     **kwgs
 )
@@ -250,7 +250,7 @@ binario.plot(
 binario.plot(
     output='RCS',
     parameters=['photon-b'],
-    vlim = [7,220],
+    vlim = [10,200],
     **kwgs
 )
 
