@@ -55,12 +55,16 @@ from pandas.plotting._core import MPLPlot
 # files = glob.glob('InfoLidar/AS0_180307-035517/RM*')
 # files = glob.glob('InfoLidar/ZS0_180223-131945/RM*')
 import glob
-files = glob.glob('InfoLidar/ZS0_180709-151714/RM*')
 
+# files = glob.glob('InfoLidar/ZS0_180709-151714/RM*')      # test
+files = sorted(glob.glob('/home/jhernandezv/Lidar/InfoLidar/3Ds_180703-135028/RM*') )       # test2
+# files = glob.glob('InfoLidar/3Ds_180704-105519/RM*')        # test3
 from lidar.lidar import Lidar
 binario = Lidar(scan='Zenith',output='raw')
-binario.read(files)
-#
+df1,df2 = binario.read_folder(files)
+t1,t2 = binario.read_file(files[0])
+t3,t4 = binario.read_file(files[1])
+t5,t6 = binario.read_file(files[-1],180)
 # plt.close('all')
 # binario.data.groupby(axis=1,level=1).median().boxplot(column=['analog-p','analog-s'])
 # binario._save_fig(textSave='_boxplot_median_analog')
@@ -72,9 +76,7 @@ binario.read(files)
 
 
 
-# files = glob.glob('InfoLidar/ZS0_180709-151714/RM*')      # test
-# files = glob.glob('InfoLidar/3Ds_180703-135028/RM*')        # test2
-# files = glob.glob('InfoLidar/3Ds_180704-105519/RM*')        # test3
+
 
 # binario = Lidar(fechaI='2018-07-04',Fechaf='2018-07-04',scan='3D')
 # binario.read()
@@ -141,169 +143,133 @@ locale.setlocale(locale.LC_TIME, ('en_GB','utf-8'))
 # vlim = {'analog-s':[0.2,16],'analog-p':[0.2,16],'analog':[0,0.7] }
 
 
-# for date in pd.date_range('2018-08-01','2018-08-31',freq='d'): #'2018-06-27','2018-07-14',freq='d'):
-    # try:
-date = pd.date_range('2018-08-28','2018-08-28',freq='d') #'2018-06-27','2018-07-14',freq='d'):
+for date in pd.date_range('2018-08-01','2018-08-31',freq='d'): #'2018-06-27','2018-07-14',freq='d'):
+    try:
+# date = pd.date_range('2018-08-30','2018-08-30',freq='d')[0] #'2018-06-27','2018-07-14',freq='d'):
         #
-binario =   Lidar(
-    fechaI=date.strftime('%Y-%m-%d')[0],
-    fechaF=date.strftime('%Y-%m-%d')[-1],
-    scan='FixedPoint',
-    output='raw'
-)
-binario.read()
+        binario =   Lidar(
+            fechaI=date.strftime('%Y-%m-%d'),
+            fechaF=date.strftime('%Y-%m-%d'),
+            scan='FixedPoint',
+            output='raw'
+        )
+        binario.read()
 
-# binario.datos.loc(axis=1)[:,:,'photon-p'] * binario.datosInfo.loc[0,'BinWidth_photon-p']
-backup = [binario.datos.copy(), binario.datosInfo.copy()]
-# binario.datos        = backup[0]
-# binario.raw    = backup[0].copy()
-# binario.datosInfo   = backup[1]
+        # binario.datos.loc(axis=1)[:,:,'photon-p'] * binario.datosInfo.loc[0,'BinWidth_photon-p']
+        backup = [binario.datos.copy(), binario.datosInfo.copy()]
+        # binario.datos        = backup[0]
+        # binario.raw    = backup[0].copy()
+        # binario.datosInfo   = backup[1]'cython_test', #
 
-binario.datos = binario.datos.resample('30s').mean()
-binario.raw = binario.raw.resample('30s').mean()
-binario.datosInfo = binario.datosInfo.resample('30s').mean()
-
-# for param in ['analog-s','analog-p']:
-
-# x = binario.datos.copy()
-# # ################################################################################
-# # x
-# y = x.loc(axis=1)[
-#         x.columns.levels[0][
-#             (x.columns.levels[0]>18) &
-#             (x.columns.levels[0]<21)
-#         ]
-#     ]
-# y = y.groupby(level=(1,2),axis=1).mean()
-# x.apply(lambda x: x - y[ (x.name[1],x.name[2]) ])
- #.stack(0).unstack([1,2,3])
-
-#
-# #
-# kwgs = dict(
-#     height=22,
-#     path='cython_test', #date.strftime('%m-%d'),
-#     textSave='',
-#
-# )
-    # colorbarKind=''
-# binario.plot(output = 'raw',**kwgs )
-#
-# binario.plot(output = 'P(r)',
-#     totalSignal=True,
-#     vlim=[0,135],
-#     parameters=['photon-s','photon-p'],
-#     **kwgs )
-#
-#
-#
-# binario.plot(output = 'P(r)',
-#     totalSignal=True,
-#     vlim=[5,34],
-#     parameters=['analog-s','analog-p'],
-#     **kwgs )
-
-# binario.plot(output = 'P(r)',
-#     totalSignal=True,
-#     vlim=[0,141],
-#     parameters=[],
-#     **kwgs )
-
-
-# binario.plot(output = 'S(r)',totalSignal=True,**kwgs )
+        binario.datos = binario.datos.resample('30s').mean()
+        binario.raw = binario.raw.resample('30s').mean()
+        binario.datosInfo = binario.datosInfo.resample('30s').mean()
 
 
 
-kwgs = dict(
-    height=4.5,
-    path='cython_test', #date.strftime('%m-%d'),
+        kwgs = dict(
+            height=4.5,
+            path=date.strftime('%m-%d'),
+        )
 
-)
+        # binario.plot(output = 'raw',**kwgs )
+        # binario.plot(output = 'S(r)',totalSignal=True,**kwgs )
 
-binario.plot(output = 'LVD',
-    totalSignal=True,
-    vlim=[0.25,1],
-    textSave='xV',
-    **kwgs )
+        binario.plot(output = 'P(r)',
+            totalSignal=True,
+            vlim=[0,135],
+            parameters=['photon-s','photon-p'],
+            **kwgs )
 
-binario.plot(
-    output='RCS',
-    parameters=['analog-b'],
-    vlim = [.6,20],#[1,20],
-    **kwgs
-)
+        binario.plot(output = 'P(r)',
+            totalSignal=True,
+            vlim=[5,34],
+            parameters=['analog-s','analog-p'],
+            **kwgs )
 
-binario.plot(
-    parameters=['analog-s','analog-p'],
-    vlim=[.5,16], #[1,16]
-    output='RCS',
-    **kwgs
-)
+        binario.plot(output = 'LVD',
+            totalSignal=True,
+            vlim=[0.25,1],
+            **kwgs )
 
-binario.plot(
-    parameters=['photon-s','photon-p'],
-    vlim=[9,200], #[15,350]
-    output='RCS',
-    **kwgs
-)
+        binario.plot(
+            output='RCS',
+            parameters=['analog-b'],
+            vlim = [.15,20],#[1,20],
+            **kwgs
+        )
 
-binario.plot(
-    output='RCS',
-    parameters=['photon-b'],
-    vlim = [10,200],
-    **kwgs
-)
+        binario.plot(
+            parameters=['analog-s','analog-p'],
+            vlim=[.1,16], #[1,16]
+            output='RCS',
+            **kwgs
+        )
+
+        binario.plot(
+            parameters=['photon-s','photon-p'],
+            vlim=[9,200], #[15,350]
+            output='RCS',
+            **kwgs
+        )
+
+        binario.plot(
+            output='RCS',
+            parameters=['photon-b'],
+            vlim = [10,200],
+            **kwgs
+        )
 
 #########
-kwgs['colorbarKind'] = 'Linear'
-kwgs['textSave'] = '_Linear'
-binario.plot(
-    output='RCS',
-    parameters=['analog-b'],
-    vlim = [0,9],#[1,20],
-    **kwgs
-)
+        # kwgs['colorbarKind'] = 'Linear'
+        # kwgs['textSave'] = '_Linear'
+        # binario.plot(
+        #     output='RCS',
+        #     parameters=['analog-b'],
+        #     vlim = [0,9],#[1,20],
+        #     **kwgs
+        # )
+        #
+        # binario.plot(
+        #     parameters=['analog-s','analog-p'],
+        #     vlim=[0,8], #[1,16]
+        #     output='RCS',
+        #     **kwgs
+        # )
+        #
+        # binario.plot(
+        #     parameters=['photon-s','photon-p'],
+        #     vlim=[5,190], #[15,350]
+        #     output='RCS',
+        #     **kwgs
+        # )
+        #
+        # binario.plot(
+        #     output='RCS',
+        #     parameters=['photon-b'],
+        #     vlim = [15,210],
+        #     **kwgs
+        # )
 
-binario.plot(
-    parameters=['analog-s','analog-p'],
-    vlim=[0,8], #[1,16]
-    output='RCS',
-    **kwgs
-)
-
-binario.plot(
-    parameters=['photon-s','photon-p'],
-    vlim=[5,190], #[15,350]
-    output='RCS',
-    **kwgs
-)
-
-binario.plot(
-    output='RCS',
-    parameters=['photon-b'],
-    vlim = [15,210],
-    **kwgs
-)
-
-        # for location in ['amva','siata','itagui']:
-        #     # binario = Lidar(fechaI='20180801',Fechaf='20180801',scan='FixedPoint',output='raw')
-        #     ceil = lee_Ceil(
-        #         ceilometro=location,
-        #         Fecha_Inicio=binario.datosInfo.index[0].strftime('%Y%m%d %H:%M'), Fecha_Fin=binario.datosInfo.index[-1].strftime('%Y%m%d %H:%M') ) #'%Y-%m-%d %H:%M:%S'
-        #     # ceil         = lee_Ceil(ceilometro=location,  Fecha_Inicio='20180801 10:45', Fecha_Fin='20180801 13:25' )
-        #     ceil.columns            = (ceil.columns+1)/100.
-        #     ceil[ceil < 100]        = 100
-        #     ceil[ceil.isnull()]     = 100
-        #     if ceil.size > 0:
-        #         binario.plot_lidar(
-        #             ceil.index,ceil.columns,ceil.T,
-        #             textSave='Ceilometro_'+location,
-        #             colorbarKind='Log',
-        #             vlim=[10,13000],
-        #             cbarlabel=r'Intensidad Backscatter $[10^{-9}m^{-1}sr^{-1}]$',
-        #             path='jhernandezv/Lidar/FixedPoint/' +kwgs['path'],
-        #             colormap = binario.ceilCmap
-                # )
+        for location in ['amva','siata','itagui']:
+            # binario = Lidar(fechaI='20180801',Fechaf='20180801',scan='FixedPoint',output='raw')
+            ceil = lee_Ceil(
+                ceilometro=location,
+                Fecha_Inicio=binario.datosInfo.index[0].strftime('%Y%m%d %H:%M'), Fecha_Fin=binario.datosInfo.index[-1].strftime('%Y%m%d %H:%M') ) #'%Y-%m-%d %H:%M:%S'
+            # ceil         = lee_Ceil(ceilometro=location,  Fecha_Inicio='20180801 10:45', Fecha_Fin='20180801 13:25' )
+            ceil.columns            = (ceil.columns+1)/100.
+            ceil[ceil < 100]        = 100
+            ceil[ceil.isnull()]     = 100
+            if ceil.size > 0:
+                binario.plot_lidar(
+                    ceil.index,ceil.columns,ceil.T,
+                    textSave='Ceilometro_'+location,
+                    colorbarKind='Log',
+                    vlim=[10,13000],
+                    cbarlabel=r'Intensidad Backscatter $[10^{-9}m^{-1}sr^{-1}]$',
+                    path='jhernandezv/Lidar/FixedPoint/' +kwgs['path'],
+                    colormap = binario.ceilCmap
+                )
     except:
         import traceback
         traceback.print_exc()
@@ -381,26 +347,27 @@ binario.plot_lidar(ceil.index,ceil.columns,ceil.T,textSave='Ceilometro_AMVA',col
 
 # bkg.loc[:,pd.IndexSlice[:,'analog-p']]  =
 # ################################################################################
-from Funciones_Lectura import lee_Ceil,lee_data_ceil
+# from Funciones_Lectura import lee_Ceil,lee_data_ceil
 # import pandas as pd
 import pandas as pd
 import numpy as np
 import datetime as dt
 import os, locale
-os.system('rm lidar/lidar/*.pyc')
-from lidar.lidar.lidar import Lidar
+# os.system('rm lidar/lidar/*.pyc')
+from lidar.lidar import Lidar
 locale.setlocale(locale.LC_TIME, ('en_GB','utf-8'))
 
-altura = 4.5
+
 # # for date in pd.date_range('2018-06-30','2018-06-30',freq='d'): #'2018-06-27','2018-07-14',freq='d'):
 # # try:
 date = pd.date_range('2018-06-30','2018-06-30',freq='d')[0] #'2018-06-27','2018-07-14',freq='d'):
 
 binario = Lidar(
-fechaI=date.strftime('%Y-%m-%d'),
-fechaF=date.strftime('%Y-%m-%d'),
-scan='3D',
-output='raw')
+    fechaI=date.strftime('%Y-%m-%d'),
+    fechaF=date.strftime('%Y-%m-%d'),
+    scan='3D',
+    output='raw'
+)
 binario.read()
 # # backup = [binario.raw, binario.dataInfo]
 # # binario.data        = backup[0]
@@ -411,32 +378,53 @@ binario.read()
 # kwgs = dict(parameters=['photon-p'], dates=binario.dataInfo.index, make_gif=True, path= date.strftime('%Y-%m-%d-bkg-nonan'),height=altura, background= bkg)
 # kwgs = dict(height=altura,path='vlim',dates =binario.dataInfo.index[binario.dataInfo.index.hour <1 ])
 kwgs = dict(
-height=4.5,
-path=date.strftime('vlim'),
-textSave='',
+    height=7,
+    path=date.strftime('cython_test'),
+    textSave='',
+    ylim=[0,7],
+    dates=binario.datos.index,
+    makeGif=True,
 )
-
 
 binario.plot(
-output='RCS',
-parameters=['analog-b'],
-vlim = [0.25,20],
-**kwgs
+    output='RCS',
+    parameters=['analog-b'],
+    vlim = [0.15,20],
+    **kwgs
 )
-kwgs['parameters'] = ['analog-s','analog-p']
-kwgs['vlim'] = [0.15,16]
-
+binario.plot(
+    output='RCS',
+    parameters=['analog-b'],
+    vlim = [0.15,20],
+    **kwgs
+)
 
 binario.plot(
-output='RCS',
-**kwgs
+    parameters=['analog-s','analog-p'],
+    vlim=[0.15,16], #[15,350]
+    output='RCS',
+    **kwgs
 )
-kwgs['parameters'] = ['photon-s','photon-p','photon-b']
-kwgs['vlim'] = [10,400]
+
 binario.plot(
-output='RCS',
-**kwgs
+    parameters=['photon-s','photon-p','photon-b'],
+    vlim=[9,200], #[15,350]
+    output='RCS',
+    **kwgs
 )
+
+binario.plot(
+    output='LVD',
+    totalSignal=True,
+    vlim = [0.25,1],
+    **kwgs
+)
+# binario.plot(
+#     output='RCS',
+#     parameters=['photon-b'],
+#     vlim = [10,200],
+#     **kwgs
+# )
 #### Informe de Actividades
 #
 # #

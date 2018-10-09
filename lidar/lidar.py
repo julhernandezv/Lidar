@@ -142,7 +142,7 @@ class Lidar(PlotBook):
         # super()
 
 
-    def read_file(self,filename):
+    def read_file(self,filename,offset=None):
         """Function for reading Lidar files
 
         Parameters
@@ -168,12 +168,19 @@ class Lidar(PlotBook):
 
         # ValorLocationStr = lineaLocationArray[0]
         description ['Fecha'] = dt.datetime.strptime (lineaLocationArray[1] + " " + lineaLocationArray[2], "%d/%m/%Y %H:%M:%S") - dt.timedelta(hours=5)
-        # description ['Fecha_fin'] = dt.datetime.strptime (lineaLocationArray[3] + " " + lineaLocationArray[4], "%d/%m/%Y %H:%M:%S") - dt.timedelta(hours=5)
+        description ['Fecha_fin'] = dt.datetime.strptime (lineaLocationArray[3] + " " + lineaLocationArray[4], "%d/%m/%Y %H:%M:%S") - dt.timedelta(hours=5)
         # valorHeight = float (lineaLocationArray[5])
         # valorLong = float (lineaLocationArray[6])
         # valorLat = float (lineaLocationArray[7])
         description ['Zenith'] = int( float (lineaLocationArray[8]) )
-        description ['Azimuth'] = int( float (lineaLocationArray[9]) )
+        description ['Azimuth'] = (270 -  int( float( lineaLocationArray[9]) ))%360
+
+        if (self.scan == '3D') & (offset is not None) & (description ['Azimuth'] != offset): #(np.abs(description ['Azimuth'] - offset) == 180
+            description ['Azimuth'] += 180
+            description ['Zenith'] += 180
+        else:
+            description ['Zenith'] *= -1
+
         # description ['Temp'] = float (lineaLocationArray[10])
         # description ['Press'] = float (lineaLocationArray[11])
 #
@@ -308,39 +315,49 @@ class Lidar(PlotBook):
         dataInfo   = []
         data        = {}
 
-        for file in sorted(filenames):
+        for ix, file in enumerate(sorted(filenames)):
             print "{} \n {} \n {}".format("="*50,file,"="*50)
-            df1, df2    = self.read_file(file)
+
+            offset  = None if ix == 0 else  df2[self.degreeFixed].values[0]
+            # print offset
+            df1, df2    = self.read_file(file,offset)
             # print df2.index.strftime('%Y-%m-%d %H:%M:%S')
             # print '\n index= {}'.format(df2['Zenith' if self.scan in ['FixedPoint','3D'] else self.scan].values[0])
-            data[ df2.index[0].strftime('%Y-%m-%d %H:%M:%S') ] = df1
+            # data[ df2.index[0].strftime('%Y-%m-%d %H:%M:%S') ] = df1
+
+
+            data[ df2[self.degreeVariable].values[0] ] = df1
             dataInfo.append(df2)
 
-        data        = pd.concat(data,axis=1)
+        data        = pd.concat(data,axis=1,names=[self.degreeVariable,'Parameters'])
         dataInfo    = pd.concat(dataInfo)
         dataInfo    = dataInfo.sort_index() #.reset_index()
-        data.columns.set_levels( pd.to_datetime(data.columns.levels[0].values), level=0, inplace=True) #range(data.columns.levels[0].size), level=0, inplace=True)
+        # data.columns.set_levels( pd.to_datetime(data.columns.levels[0].values), level=0, inplace=True) #range(data.columns.levels[0].size), level=0, inplace=True)
 
         if self.scan == '3D':
-            if np.abs(dataInfo.Zenith.iloc[1] - dataInfo.Zenith.iloc[0]) > 10:
-                print dataInfo.index[0]
-                # dataInfo.loc[dataInfo.index[0],'Zenith'] = dataInfo.Zenith.iloc[1] + 5
-                data.drop(
-                    dataInfo.index[0],
-                    axis=1,
-                    level=0,
-                    inplace=True)
-                dataInfo.drop(
-                    dataInfo.index[0],
-                    inplace=True)
+            print "{}\n Deleting duplicates\n{}".format('-'*50,'-'*50)
+            data = data[data.columns.drop_duplicates(keep='last')]
+            dataInfo.drop_duplicates('Zenith',keep='last',inplace=True)
+            # if np.abs(dataInfo.Zenith.iloc[1] - dataInfo.Zenith.iloc[0]) > 10:
+            #     print dataInfo.index[0]
+            #     # dataInfo.loc[dataInfo.index[0],'Zenith'] = dataInfo.Zenith.iloc[1] + 5
+            #     data.drop(
+            #         dataInfo.index[0],
+            #         axis=1,
+            #         level=0,
+            #         inplace=True)
+            #     dataInfo.drop(
+            #         dataInfo.index[0],
+            #         inplace=True)
 
-            dataInfo.loc[
-                dataInfo.Azimuth != dataInfo.Azimuth.iloc[0],
-                ['Azimuth','Zenith'] ] += 180
-            dataInfo.loc[
-                dataInfo.Azimuth == dataInfo.Azimuth.iloc[0],
-                'Zenith' ] *= -1
+            # dataInfo.loc[
+            #     dataInfo.Azimuth != dataInfo.Azimuth.iloc[0],
+            #     ['Azimuth','Zenith'] ] += 180
+            # dataInfo.loc[
+            #     dataInfo.Azimuth == dataInfo.Azimuth.iloc[0],
+            #     'Zenith' ] *= -1
 
+            # data.columns.set_levels( , level=0, inplace=True)
             #Filter by repeated measures at Zenith 90
             # duplicated =  dataInfo.index[dataInfo.Zenith == 90]
             # print duplicated#duplicated('Zenith',keep=False)
@@ -359,14 +376,10 @@ class Lidar(PlotBook):
             #         duplicated[1:],
             #         inplace=True)
 
-        elif self.scan in ['Zenith','Azimuth','FixedPoint']:
-            dataInfo.loc[:,'Zenith']   *= -1
 
-        dataInfo['Azimuth']    = (270-dataInfo['Azimuth'])%360
-
-        data.columns    = pd.MultiIndex.from_product(
-            [ dataInfo[ self.degreeVariable ].values, data.columns.levels[-1].values ],
-            names = [self.degreeVariable,'Parameters'] )
+        # data.columns    = pd.MultiIndex.from_product(
+        #     [ dataInfo[ self.degreeVariable ].values, data.columns.levels[-1].values ],
+        #     names = [self.degreeVariable,'Parameters'] )
 
         #Filtro para mediciones inferiores a 110m de distacia al sensor
         # data       = data[data.index >= 0.110]
@@ -445,15 +458,15 @@ class Lidar(PlotBook):
             self.datos       = self.raw.copy()
 
             if self.output not in ['raw']:
-                print '{}\nGetting P(r) \n{}'.format('-'*50,'-'*50)
+                print '{}\n Getting P(r) \n{}'.format('-'*50,'-'*50)
                 self.datos       = self.Pr
 
                 if totalSignal:
-                    print '{}\nGetting Depolarization Signal \n{}'.format('-'*50,'-'*50)
+                    print '{}\n Getting Depolarization Signal \n{}'.format('-'*50,'-'*50)
                     self.datos = self.total_signal
 
                 if self.output not in ['P(r)']:
-                    print '{}\nRemoving Background \n{}'.format('-'*50,'-'*50)
+                    print '{}\n Removing Background \n{}'.format('-'*50,'-'*50)
                     # self.datos      =
                     self.background
 
@@ -466,7 +479,7 @@ class Lidar(PlotBook):
                 self.RCS
 
                 if self.output == 'LVD':
-                    print '{}\nGetting Linear Volume Depolarization Ratio \n{}'.format('-'*50,'-'*50)
+                    print '{}\n Getting Linear Volume Depolarization Ratio \n{}'.format('-'*50,'-'*50)
                     self.datos = self.LVD
 
                 if self.output not in ['RCS','LVD']:
@@ -475,15 +488,15 @@ class Lidar(PlotBook):
                     self.datos       = np.log(self.datos)
 
                 if self.output in ['fLn(RCS)','dfLn(RCS)','fdfLn(RCS)']:
-                    print '{}\nAverage Filtering {} \n{}'.format('-'*50,self.output,'-'*50)
+                    print '{}\n Average Filtering {} \n{}'.format('-'*50,self.output,'-'*50)
                     self.datos       = self.average_filter
 
                 if self.output in ['dLn(RCS)','fdLn(RCS)','fdfLn(RCS)','dfLn(RCS)']:
-                    print '{}\nDerivating {} \n{}'.format('-'*50,self.output,'-'*50)
+                    print '{}\n Derivating {} \n{}'.format('-'*50,self.output,'-'*50)
                     self.datos       = self.derived
 
                 if self.output in ['fdLn(RCS)','fdfLn(RCS)']:
-                    print '{}\nAverage Filtering 2 {} \n{}'.format('-'*50,self.output,'-'*50)
+                    print '{}\n Average Filtering 2 {} \n{}'.format('-'*50,self.output,'-'*50)
                     self.datos       = self.average_filter
 
         else:
@@ -552,8 +565,8 @@ class Lidar(PlotBook):
 
         x       = np.empty((profile.shape[0]+1,profile.shape[1]+1))
         y       = x.copy()
-        dh      = np.nanmin(profile.index.values[1:] - profile.index.values[:-1])
-        dg      = np.nanmin(profile.columns.values[1:] - profile.columns.values[:-1])
+        dh      = np.nanmin(profile.columns.values[1:] - profile.columns.values[:-1])
+        dg      = np.nanmin(profile.index.values[1:] - profile.index.values[:-1])
 
         # for ix in range():
 
@@ -609,7 +622,7 @@ class Lidar(PlotBook):
         at Zenith or Azimuth
 
         Parameters
-            height  = int - For selecting height to plot
+            height  = int - to select plot height
 
             **kwargs
             dates       = DatetimeIndex - Used to plot. Default .index[0]
@@ -629,7 +642,7 @@ class Lidar(PlotBook):
             )
             self.datos = self.datos.loc[
                 kwargs.pop('dates',
-                    self.datos.index[0]
+                    self.datos.index[:1]
                     if self.scan != 'FixedPoint' else
                     self.datos.index),
                 self.datos.columns.levels[0][
@@ -639,7 +652,9 @@ class Lidar(PlotBook):
                         'colorbarKind',
                         self.lidarProperties[ self.output ] ['colorbarKind'] )
 
-
+        kwargs['parameters'] = kwargs.pop('parameters',self.datos.columns.levels[-1].values)
+        if self.scan != 'Azimuth':
+            kwargs['ylim'] = [0,height]
 
         _vlim = None if 'vlim' in kwargs.keys() else self.get_vlim(**kwargs)
 
@@ -660,35 +675,37 @@ class Lidar(PlotBook):
 
         if self.scan == 'FixedPoint' :
             self.plot_parameters(_vlim=_vlim, **kwargs)
-
         else:
-            datos = self.datos.copy()
-            for date in datos.index:
-                self.datos = datos.loc[date]
-                kwargs['addText']  = date.strftime('%b-%d\n%H:%M')
-                kwargs['title']     = "{} = {}".format(
+            tmpData = self.datos.copy()
+            for ix in tmpData.index:
+                self.datos = tmpData.loc[ix]
+
+                kwargs['addText']   = ix.strftime('%b-%d\n%H:%M')
+                kwargs['title']     = "{} = {} ->".format(
                                         self.degreeFixed,
                                         self.degrees_to_cardinal(
-                                            self.datosInfo.loc[date, self.degreeFixed], self.degreeFixed )
+                                            self.datosInfo.loc[ix, self.degreeFixed], self.degreeFixed )
                                     )
+
                 self.plot_parameters(_vlim=_vlim,**kwargs)
 
-        if kwargs.get('make_gif',False) and self.scan != 'FixedPoint':
+        if kwargs.get('makeGif',False) and self.scan != 'FixedPoint':
             gifKwd = {}
-            for col in kwargs.get('parameters',self.datos.columns.levels[-1].values):
+            for col in kwargs.pop('parameters'):
                 gifKwd['textSave']     = "_{}_{}_{}".format(
                                                 self.scan,
                                                 self.output,
                                                 col )
-                gifKwd['textSaveGif'] = '{}_{}'.format(
-                                                kwargs.get('textSave',''),
-                                                kwargs['dates'][0].strftime('%Y-%m-%d') )
+                gifKwd['textSaveGif'] = '_{}{}'.format(
+                                        tmpData.index[0].strftime('%Y-%m-%d'),
+                                        kwargs.pop('textSave',''),
+                                        )
                 gifKwd['path']         = kwargs['path']
                 self._make_gif(**gifKwd)
 
     def plot_parameters(self,_vlim=None,**kwargs):
 
-        for par in  kwargs.pop('parameters',self.datos.columns.levels[-1].values):
+        for par in  kwargs.pop('parameters'):
             if _vlim is not None:
                 kwargs['vlim'] = _vlim[par].values
             self.plot_by_parameter(
@@ -699,17 +716,21 @@ class Lidar(PlotBook):
 
     def plot_by_parameter(self,parameter, **kwargs):
 
+        if self.scan != 'FixedPoint':
+            tmpDate = self.datos.name.strftime('%H:%M')
+        else:
+            tmpDate = self.datos.index[0].strftime('%m-%d')
+
+
         kwargs['cbarlabel'] = self.lidarProperties[self.output][parameter[:6]]
-        kwargs['textSave']  = "_{}_{}_{}{}_{}".format(
+        kwargs['textSave']  = "_{}_{}_{}_{}{}".format(
                                     self.scan,
                                     self.output,
                                     parameter,
+                                    tmpDate,
                                     kwargs.pop('textSave',''),
-                                    self.datos.index[0].strftime(
-                                        '%H:%M'
-                                        if self.scan != 'FixedPoint' else
-                                        '%m-%d' )
-                                )
+                                    )
+
 
         dataframe           =  self.get_parameter( parameter )
 
@@ -771,16 +792,16 @@ class Lidar(PlotBook):
             tmp  = self.datos.loc(axis=1)[:,:,col]
 
             if 'analog' in col:
-                tmp_data    = cy_mVolts( tmp.values,
+                tmpData    = cy_mVolts( tmp.values,
                             self.datosInfo[ 'InputRange_'+col ].values,
                             self.datosInfo[ 'ADCBits_'+col ].values,
                             self.datosInfo[ 'ShotNumber_'+col ].values)
             else:
-                tmp_data    = cy_mHz(tmp.values,
+                tmpData    = cy_mHz(tmp.values,
                             self.datosInfo['BinWidth_'+col ].values,
                             self.datosInfo[ 'ShotNumber_'+col ].values)
 
-            tmpList.append( pd.DataFrame(tmp_data,
+            tmpList.append( pd.DataFrame(tmpData,
                                         index=tmp.index,
                                         columns=tmp.columns)
             )
@@ -855,9 +876,9 @@ class Lidar(PlotBook):
     def LVD(self):
 
         an =    self.datos.xs('analog-s',axis=1,level=2
-                    ) /  self.datos.xs('analog-p',axis=1,level=2)  *self.vAn
+                    ) / self.datos.xs('analog-p',axis=1,level=2)  * self.vAn
         pc =    self.datos.xs('photon-s',axis=1,level=2
-                    ) / self.datos.xs('photon-p',axis=1,level=2)  *self.vPc
+                    ) / self.datos.xs('photon-p',axis=1,level=2)  * self.vPc
         pc [(pc==np.inf) | (pc==-np.inf)] = np.NaN
         return pd.concat({'analog':an,'photon':pc}).unstack(0)
 
@@ -904,10 +925,10 @@ class Lidar(PlotBook):
         '''
         # azimuths = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE",
         #         "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"]
-        dirs = ["E", "ENE", "NE", "NNE",
-                "N", "NNW", "NW", "WNW",
-                "W", "WSW", "SW", "SSW",
-                "S", "SSE", "SE","ESE"]
+        dirs = ["East", "ENE", "NE", "NNE",
+                "North", "NNW", "NW", "WNW",
+                "West", "WSW", "SW", "SSW",
+                "South", "SSE", "SE","ESE"]
         ix = int((d + 11.25)/22.5)
 
         if degree == 'Azimuth':

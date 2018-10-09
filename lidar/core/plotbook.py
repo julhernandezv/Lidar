@@ -73,7 +73,7 @@ class PlotBook(MPLPlot):
         'scp':True,
         'textSave': '',
         'user':'jhernandezv',
-        'delay':30,
+        'delay':70,
         'textSaveGif':'',
         'colorbarKind': 'Linear',
         'ylabel': '',

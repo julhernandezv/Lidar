@@ -40,9 +40,9 @@ import numpy as np
 # x = np.random.random((100,800000))
 x = np.ones((100,800000),dtype=np.float64)
 y = np.arange(800000,dtype=np.float64)
-z = cytools.cy_range_corrected(x,y)
+# z = cytools.cy_range_corrected(x,y)
 
-%timeit cytools.cy_range_corrected(x,y)
+%timeit -n100 cytools.cy_range_corrected(x,y)
 zz=cytools.cy_range_corrected(x,y)
 
 def range_corrected(  matrix, rang, step=1 ):
