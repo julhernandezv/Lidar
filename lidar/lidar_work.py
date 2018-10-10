@@ -120,14 +120,72 @@ t5,t6 = binario.read_file(files[-1],180)
 # binario.data.reindex( pd.date_range(binario.data.columns[0],binario.data.columns[-1],freq='30s'), axis=1)
 # binario.data.reindex(pd.date_range(binario.data.columns.levels[0][0],binario.data.columns.levels[0][-1],freq='30s'))
 #################################################################################
-################################################################################
 #Calculo CLA
+################################################################################
+import pandas as pd
+import numpy as np
+import datetime as dt
+import os, locale
+# os.system('rm lidar/lidar/*.pyc')
+from lidar.lidar import Lidar
+locale.setlocale(locale.LC_TIME, ('en_GB','utf-8'))
+
+# vlim = {'analog-s':[0.2,16],'analog-p':[0.2,16],'analog':[0,0.7] }
+
+
+# for date in pd.date_range('2018-06-01','2018-10-01',freq='d'): #'2018-06-27','2018-07-14',freq='d'):
+    # try:
+date = pd.date_range('2018-06-30','2018-06-30',freq='d')[0] #'2018-06-27','2018-07-14',freq='d'):
+# date = pd.date_range('2018-08-28','2018-08-28',freq='d')[0]
+        #
+binario =   Lidar(
+    fechaI=date.strftime('%Y-%m-%d'),
+    fechaF=date.strftime('%Y-%m-%d'),
+    scan='FixedPoint',
+    output='raw'
+)
+binario.read()
+
+#------------------------
+# Gradiente minimo
+#------------------------
+binario.derived_output(output='RCS')
+
+height = 3.5
+
+binario.datos = binario.datos.loc(axis=1) [
+    binario.datos.columns.levels[0] [
+        binario.datos.columns.levels[0] < height
+    ]
+]
+
+binario.datos = binario.datos.resample('10T').mean()
+
 dr  = (binario.datos.columns.levels[0][2] - binario.datos.columns.levels[0][0])
-x = binario.datos.groupby(level=[1,2],axis=1).diff(axis=1,periods=2) /dr
-gm =  x.groupby(level=[1,2],axis=1).min()
-for ix in binario.datos.index:
-    ix = binario.datos.index[0]
-    x.loc[ix] == gm.loc[ix]
+binario.datos = binario.datos.groupby(level=[1,2],axis=1).diff(axis=1,periods=2) /dr
+
+# Suavizado
+
+binario.datos = binario.datos.groupby(level=[1,2],axis=1).rolling(16,center=True,min_periods=1,axis=1).mean()
+binario.datos.columns = binario.datos.columns.droplevel([0,1])
+# binario.datose
+# binario.datos = binario.datos.rolling(6,center=True,min_periods=1).mean()
+
+binario.plot(df=binario.datos,path='claTest',textSave='',colorbarKind='Anomaly',height=height,colormap='seismic',cbarlabel='')
+
+#get cla
+gm = binario.datos.groupby(level=[1,2],axis=1).idxmin(axis=1)
+for col in gm.columns:
+    gm[col] = gm[col].str[0]
+# x.stack([1,2]).idxmin(axis=1).unstack([1,2])
+
+#
+# x.where( x == x.min()).columns
+# x.groupby(level=[1,2],axis=1).min()
+# gm =  x.groupby(level=[1,2],axis=1).min()
+# for ix in binario.datos.index:
+#     ix = binario.datos.index[0]
+#     x.loc[ix] == gm.loc[ix]
 
 
 from Funciones_Lectura import lee_Ceil,lee_data_ceil
@@ -143,10 +201,10 @@ locale.setlocale(locale.LC_TIME, ('en_GB','utf-8'))
 # vlim = {'analog-s':[0.2,16],'analog-p':[0.2,16],'analog':[0,0.7] }
 
 
-for date in pd.date_range('2018-08-01','2018-08-31',freq='d'): #'2018-06-27','2018-07-14',freq='d'):
+for date in pd.date_range('2018-06-01','2018-10-01',freq='d'): #'2018-06-27','2018-07-14',freq='d'):
     try:
-# date = pd.date_range('2018-08-30','2018-08-30',freq='d')[0] #'2018-06-27','2018-07-14',freq='d'):
-        #
+        # date = pd.date_range('2018-08-30','2018-08-30',freq='d')[0] #'2018-06-27','2018-07-14',freq='d'):
+                #
         binario =   Lidar(
             fechaI=date.strftime('%Y-%m-%d'),
             fechaF=date.strftime('%Y-%m-%d'),
@@ -220,36 +278,17 @@ for date in pd.date_range('2018-08-01','2018-08-31',freq='d'): #'2018-06-27','20
             **kwgs
         )
 
-#########
-        # kwgs['colorbarKind'] = 'Linear'
-        # kwgs['textSave'] = '_Linear'
-        # binario.plot(
-        #     output='RCS',
-        #     parameters=['analog-b'],
-        #     vlim = [0,9],#[1,20],
-        #     **kwgs
-        # )
-        #
-        # binario.plot(
-        #     parameters=['analog-s','analog-p'],
-        #     vlim=[0,8], #[1,16]
-        #     output='RCS',
-        #     **kwgs
-        # )
-        #
-        # binario.plot(
-        #     parameters=['photon-s','photon-p'],
-        #     vlim=[5,190], #[15,350]
-        #     output='RCS',
-        #     **kwgs
-        # )
-        #
-        # binario.plot(
-        #     output='RCS',
-        #     parameters=['photon-b'],
-        #     vlim = [15,210],
-        #     **kwgs
-        # )
+        binario.plot( output='Ln(RCS)', **kwgs )
+
+        binario.plot(output='dLn(RCS)',  **kwgs)
+
+        binario.plot(output='fLn(RCS)', **kwgs)
+
+        binario.plot(output='fdLn(RCS)',  **kwgs)
+
+        binario.plot(output='dfLn(RCS)' **kwgs)
+
+        binario.plot(output='fdfLn(RCS)'  **kwgs)
 
         for location in ['amva','siata','itagui']:
             # binario = Lidar(fechaI='20180801',Fechaf='20180801',scan='FixedPoint',output='raw')
@@ -279,15 +318,15 @@ for date in pd.date_range('2018-08-01','2018-08-31',freq='d'): #'2018-06-27','20
 # binario.plot( output='Ln(RCS)', **kwgs )
 ################################################################################
 # Ceilomoetro
-from Funciones_Lectura import lee_Ceil,lee_data_ceil
+# from Funciones_Lectura import lee_Ceil,lee_data_ceil
+# # #
+# fecha_test = pd.date_range('2018-08-03 09:35:00', '2018-08-03 18:56:30',freq='30s')#binario.data.columns.levels[0]
+# ceil =lee_data_ceil('amva',fecha_test[0].strftime('%Y-%m-%d %H:%M:%S'),fecha_test[-1].strftime('%Y-%m-%d %H:%M:%S') ) #fecha_test[0].strftime('%Y%m%d %H:%M'),fecha_test[-1].strftime('%Y%m%d %H:%M'),'amva')
+# ceil.columns = (ceil.columns+1)/100.
+# ceil[ceil < 100] = 100
+# ceil[ceil.isnull()] = 100
 # #
-fecha_test = pd.date_range('2018-08-03 09:35:00', '2018-08-03 18:56:30',freq='30s')#binario.data.columns.levels[0]
-ceil =lee_data_ceil('amva',fecha_test[0].strftime('%Y-%m-%d %H:%M:%S'),fecha_test[-1].strftime('%Y-%m-%d %H:%M:%S') ) #fecha_test[0].strftime('%Y%m%d %H:%M'),fecha_test[-1].strftime('%Y%m%d %H:%M'),'amva')
-ceil.columns = (ceil.columns+1)/100.
-ceil[ceil < 100] = 100
-ceil[ceil.isnull()] = 100
-#
-binario.plot_lidar(ceil.index,ceil.columns,ceil.T,textSave='Ceilometro_AMVA',colorbarKind='Log',vlim=[10,13000],cbarlabel='Intensidad Backscatter $[10^{-9}m^{-1}sr^{-1}]$',**kwgs)
+# binario.plot_lidar(ceil.index,ceil.columns,ceil.T,textSave='Ceilometro_AMVA',colorbarKind='Log',vlim=[10,13000],cbarlabel='Intensidad Backscatter $[10^{-9}m^{-1}sr^{-1}]$',**kwgs)
 ##############################################################################
         #
 
@@ -358,67 +397,93 @@ from lidar.lidar import Lidar
 locale.setlocale(locale.LC_TIME, ('en_GB','utf-8'))
 
 
-# # for date in pd.date_range('2018-06-30','2018-06-30',freq='d'): #'2018-06-27','2018-07-14',freq='d'):
-# # try:
+# for date in pd.date_range('2018-02-23','2018-10-04',freq='d'): #'2018-06-27','2018-07-14',freq='d'):
+#     try:
 date = pd.date_range('2018-06-30','2018-06-30',freq='d')[0] #'2018-06-27','2018-07-14',freq='d'):
 
 binario = Lidar(
     fechaI=date.strftime('%Y-%m-%d'),
     fechaF=date.strftime('%Y-%m-%d'),
     scan='3D',
-    output='raw'
+    output='fdfLn(RCS)'
 )
 binario.read()
-# # backup = [binario.raw, binario.dataInfo]
-# # binario.data        = backup[0]
-# # binario.raw    = backup[0]
-# # binario.dataInfo   = backup[1]
+                # # backup = [binario.raw, binario.dataInfo]
+                # # binario.data        = backup[0]
+                # # binario.raw    = backup[0]
+                # # binario.dataInfo   = backup[1]
+                #
+                #
+                # kwgs = dict(parameters=['photon-p'], dates=binario.dataInfo.index, make_gif=True, path= date.strftime('%Y-%m-%d-bkg-nonan'),height=altura, background= bkg)
+                # kwgs = dict(height=altura,path='vlim',dates =binario.dataInfo.index[binario.dataInfo.index.hour <1 ])
+        kwgs = dict(
+            height=7,
+            path= 'relieve', #date.strftime('%m-%d'),
+            textSave='relieve',
+            dates=binario.datos.index,
+            makeGif=True,
+        )
+
+        binario.plot(output = 'P(r)',
+            totalSignal=True,
+            vlim=[0,135],
+            parameters=['photon-s','photon-p'],
+            scp=False,
+            **kwgs )
+
+        binario.plot(output = 'P(r)',
+            totalSignal=True,
+            vlim=[5,34],
+            parameters=['analog-s','analog-p'],
+            scp=False,
+            **kwgs )
+
+        binario.plot(
+            parameters=['analog-s','analog-p'],
+            vlim=[0.15,16], #[15,350]
+            output='RCS',
+            **kwgs
+        )
+
+        binario.plot(
+            output='RCS',
+            parameters=['analog-b'],
+            vlim = [0.15,20],
+            **kwgs
+        )
+
+
+
+        binario.plot(
+            parameters=['photon-s','photon-p','photon-b'],
+            vlim=[9,200], #[15,350]
+            output='RCS',
+            **kwgs
+        )
+
+        binario.plot(
+            output='LVD',
+            totalSignal=True,
+            vlim = [0.25,1],
+            **kwgs
+        )
+kwgs['scp'] = False
+# binario.plot( output='Ln(RCS)', **kwgs )
+# # #
 #
+# binario.plot(output='dLn(RCS)',colorbarKind='Anomaly',  **kwgs)
 #
-# kwgs = dict(parameters=['photon-p'], dates=binario.dataInfo.index, make_gif=True, path= date.strftime('%Y-%m-%d-bkg-nonan'),height=altura, background= bkg)
-# kwgs = dict(height=altura,path='vlim',dates =binario.dataInfo.index[binario.dataInfo.index.hour <1 ])
-kwgs = dict(
-    height=7,
-    path=date.strftime('cython_test'),
-    textSave='',
-    ylim=[0,7],
-    dates=binario.datos.index,
-    makeGif=True,
-)
+# binario.plot(scp=False,output='fLn(RCS)', **kwgs)
+#
+# binario.plot(output='fdLn(RCS)',colorbarKind='Anomaly',  **kwgs)
+#
+# binario.plot(output='dfLn(RCS)', colorbarKind='Anomaly', **kwgs)
+#
+# binario.plot(output='fdfLn(RCS)', colorbarKind='Anomaly',  **kwgs)
 
-binario.plot(
-    output='RCS',
-    parameters=['analog-b'],
-    vlim = [0.15,20],
-    **kwgs
-)
-binario.plot(
-    output='RCS',
-    parameters=['analog-b'],
-    vlim = [0.15,20],
-    **kwgs
-)
 
-binario.plot(
-    parameters=['analog-s','analog-p'],
-    vlim=[0.15,16], #[15,350]
-    output='RCS',
-    **kwgs
-)
-
-binario.plot(
-    parameters=['photon-s','photon-p','photon-b'],
-    vlim=[9,200], #[15,350]
-    output='RCS',
-    **kwgs
-)
-
-binario.plot(
-    output='LVD',
-    totalSignal=True,
-    vlim = [0.25,1],
-    **kwgs
-)
+    except:
+        pass
 # binario.plot(
 #     output='RCS',
 #     parameters=['photon-b'],

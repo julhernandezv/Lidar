@@ -118,8 +118,10 @@ class Lidar(PlotBook):
 
     ceilCmap = shrunkCmap2
 
-    bkg = {'analog-p':5.29, 'analog-s':4.984, 'photon-p':0.13289, 'photon-s':0.13289} #0.26578
-
+    # bkg = {'analog-p':5.29, 'analog-s':4.984, 'photon-p':0.13289, 'photon-s':0.13289} #0.26578
+    latitud = 6.201585
+    longitud = -75.578584
+    altitud = 1.540
     vAn = 0.525
     vPc = 0.534
 
@@ -139,6 +141,8 @@ class Lidar(PlotBook):
         self.degreeFixed       = 'Azimuth'  if self.scan in ['FixedPoint','3D','Zenith'] else 'Zenith'
         self.kwargs             = kwargs
 
+        if self.scan == '3D':
+            self.dem =  self.DEM_profile/1000. -self.altitud
         # super()
 
 
@@ -388,7 +392,7 @@ class Lidar(PlotBook):
             self.datos       = data
             self.datosInfo  = dataInfo
             self.raw       = self.datos.copy()
-            # self.derived_output(
+            # self.get_output(
             #     output=kwargs.pop('output',None),
             #     totalSignal=kwargs.pop('totalSignal',False)
             # )
@@ -437,11 +441,11 @@ class Lidar(PlotBook):
         self.datosInfo.index.name   = 'Dates'
 
         self.raw                    = self.datos.copy()
-        self.derived_output(**kwargs)
+        self.get_output(**kwargs)
 
 
 
-    def derived_output(self,**kwargs):
+    def get_output(self,**kwargs):
         """Method for derived values
             Kwargs
                 output = Allowed {}
@@ -522,14 +526,13 @@ class Lidar(PlotBook):
         if self.scan not in ['FixedPoint']:
             rel                 = (Y.max()-Y.min())/(np.abs(X).max()-X.min())
             kwargs['figsize']   = ( 10,10*rel) if rel <=1 else (10*(1./rel),10)
-            kwargs['xlim']      = [-np.abs(X).max(), np.abs(X).max()]
+            kwargs['xlim']      = [-np.abs(X).max() if self.scan !='Zeninth' else 0, np.abs(X).max()]
             kwargs['xlabel']    = r'Range $[Km]$'
         else:
             kwargs['figsize']   = (10,5.6)
 
-        kwargs['ylabel']        = r'Range $[Km]$'
+        kwargs['ylabel']        = r'{} $[Km]$'.format('Range' ) #if self.scan !='3D' else 'Altitude'
         kwargs['colormap']      = kwargs.get('colormap',self.lidarProperties[self.output]['cmap'])
-
 
 
         super(Lidar, self).__init__(data=Z, x=X, y=Y, **kwargs )
@@ -537,14 +540,21 @@ class Lidar(PlotBook):
 
         print kwargs
 
-        if self.scan  in ['FixedPoint']:
+        if self.scan  == 'FixedPoint':
             self.axes[0].xaxis.set_major_formatter(
                 DateFormatter('%H:%M \n%d-%b') )
+
+        elif self.scan == '3D':
+            self.axes[0].fill_between(
+                self.dem.index,
+                self.dem.values,
+                color=(0.875,0.875,0.875)
+            )
 
         if 'addText' in kwargs.keys():
             self.axes[0].text(
                 1.01,0.,
-                kwargs['addText'],
+                kwargs.pop('addText'),
                 ha='left',
                 va='bottom',
                 transform=self.axes[0].transAxes )
@@ -635,7 +645,7 @@ class Lidar(PlotBook):
             self.datos = kwargs.pop('df')
 
         else:
-            self.derived_output(
+            self.get_output(
                 output=kwargs.pop('output',self.output),
                 totalSignal=kwargs.pop('totalSignal',False),
                 **kwargs
@@ -650,27 +660,27 @@ class Lidar(PlotBook):
             ]
             kwargs['colorbarKind'] = kwargs.pop(
                         'colorbarKind',
-                        self.lidarProperties[ self.output ] ['colorbarKind'] )
+                        self.lidarProperties[ self.output ] ['colorbarKind']
+                        )
 
-        kwargs['parameters'] = kwargs.pop('parameters',self.datos.columns.levels[-1].values)
+        kwargs['parameters'] = kwargs.pop(
+                    'parameters',
+                    self.datos.columns.levels[-1].values
+                    )
+        # if self.scan == '3D':
+        #     self.datos.columns.set_levels(
+        #         self.datos.columns.levels[0].values + self.altitud,
+        #         level=0,
+        #         inplace=True
+        #     )
+
         if self.scan != 'Azimuth':
-            kwargs['ylim'] = [0,height]
+            kwargs['ylim']  = kwargs.get('ylim', [0,height] )
 
         _vlim = None if 'vlim' in kwargs.keys() else self.get_vlim(**kwargs)
 
-        _path               = kwargs.get('path','/')
-        kwargs['path']      = "{}{}/{}{}".format(
-                                self.plotbook_args['path'],
-                                self.scan,
-                                _path,
-                                '/' if _path[-1] != '/' else ''
-                            )
-        os.system(
-            'ssh {}@siata.gov.co "mkdir /var/www/{}"'.format(
-                self.plotbook_args['user'],
-                kwargs['path'] )
-        )
-        os.system('rm Figuras/*')
+        kwargs['path'] = self.handle_path(**kwargs)
+
 
 
         if self.scan == 'FixedPoint' :
@@ -681,14 +691,20 @@ class Lidar(PlotBook):
                 self.datos = tmpData.loc[ix]
 
                 kwargs['addText']   = ix.strftime('%b-%d\n%H:%M')
-                kwargs['title']     = "{} = {} ->".format(
+                kwargs['title']     = "{} = {} {}".format(
                                         self.degreeFixed,
                                         self.degrees_to_cardinal(
-                                            self.datosInfo.loc[ix, self.degreeFixed], self.degreeFixed )
+                                            self.datosInfo.loc[ix, self.degreeFixed], self.degreeFixed ),
+                                        '-->' if self.scan != 'Azimuth' else ''
                                     )
 
                 self.plot_parameters(_vlim=_vlim,**kwargs)
 
+        self.get_gif(
+            text=tmpData.index[0].strftime('%Y-%m-%d'),
+            **kwargs)
+
+    def get_gif(self,text='',**kwargs):
         if kwargs.get('makeGif',False) and self.scan != 'FixedPoint':
             gifKwd = {}
             for col in kwargs.pop('parameters'):
@@ -697,11 +713,42 @@ class Lidar(PlotBook):
                                                 self.output,
                                                 col )
                 gifKwd['textSaveGif'] = '_{}{}'.format(
-                                        tmpData.index[0].strftime('%Y-%m-%d'),
+                                        text,
                                         kwargs.pop('textSave',''),
                                         )
                 gifKwd['path']         = kwargs['path']
                 self._make_gif(**gifKwd)
+
+    @property
+    def DEM_profile(self):
+        dem = self.read_DEM()
+        dem = dem.loc[
+                dem.index[
+                    np.abs(dem.index.values-self.latitud).argmin()
+                    ]
+            ]
+        dem.index -= dem.index[np.abs(dem.index.values-self.longitud).argmin()]
+        dem.index *= -110
+        return dem
+
+    def handle_path(self,**kwargs):
+
+        _path      = "{}{}/{}".format(
+                                self.plotbook_args['path'],
+                                self.scan,
+                                kwargs.get('path',''),
+                            )
+        if _path[-1] != '/':
+            _path += '/'
+
+        os.system(
+            'ssh {}@siata.gov.co "mkdir /var/www/{}"'.format(
+                self.plotbook_args['user'],
+                _path )
+        )
+        os.system('rm Figuras/*')
+        return _path
+
 
     def plot_parameters(self,_vlim=None,**kwargs):
 
@@ -901,12 +948,17 @@ class Lidar(PlotBook):
 
     @property
     def average_filter(self):
-        return  self.datos.rolling(
-                    window=30,
-                    center=True,
-                    min_periods=1,
+        tmp = self.datos.groupby(
+                    level=[1,2],
                     axis=1
-                ).median()
+                    ).rolling(
+                        window=30,
+                        center=True,
+                        min_periods=1,
+                        axis=1
+                    ).mean()
+        tmp.columns = tmp.columns.droplevel([0,1])
+        return tmp.sort_index(axis=1)
 
     @staticmethod
     def average_filter2(obj,window=30):

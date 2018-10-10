@@ -3,6 +3,8 @@ from matplotlib import use
 use('PDF')
 
 import numpy as np
+import pandas as pd
+import gdal
 import matplotlib.pyplot as plt
 import os
 from matplotlib.colors import Normalize, LogNorm
@@ -198,3 +200,28 @@ class PlotBook(MPLPlot):
         else:
             ax.set_ylabel(self.kwargs['ylabel'],weight='bold')
             ax.set_xlabel(self.kwargs['xlabel'],weight='bold')
+
+    @staticmethod
+    def read_DEM(path='{}/DemAM.tif'.format(DATA_PATH),ajustar=False,**kwargs):
+
+        DataSet			= gdal.Open(path)
+        GeoTransform	= DataSet.GetGeoTransform()
+        DEM 			= pd.DataFrame(
+                DataSet.ReadAsArray(),
+                columns=np.array(
+                    [GeoTransform[0]+0.5*GeoTransform[1]+i*GeoTransform[1] for i in range(DataSet.RasterXSize)]),
+                index=np.array(
+                    [GeoTransform[3]+0.5*GeoTransform[-1]+i*GeoTransform[-1] for i in range(DataSet.RasterYSize)])
+                )
+
+        DEM.mask(DEM==-9999 ,inplace=True)
+        DEM.mask(DEM<0 ,inplace=True)
+        #~ DEM[DEM==-9999]= np.NaN
+
+        #~ DEM[DEM<0]= np.NaN
+        if ajustar: DEM = DEM.dropna(how='all').dropna(how='all',axis=1)
+
+        if kwargs.get('get_GeoTransform',False):
+            return DEM, GeoTransform
+        else:
+            return DEM
