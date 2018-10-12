@@ -201,10 +201,10 @@ locale.setlocale(locale.LC_TIME, ('en_GB','utf-8'))
 # vlim = {'analog-s':[0.2,16],'analog-p':[0.2,16],'analog':[0,0.7] }
 
 
-for date in pd.date_range('2018-06-01','2018-10-01',freq='d'): #'2018-06-27','2018-07-14',freq='d'):
+for date in pd.date_range('2018-06-01','2018-10-11',freq='d'): #'2018-06-27','2018-07-14',freq='d'):
     try:
-        # date = pd.date_range('2018-08-30','2018-08-30',freq='d')[0] #'2018-06-27','2018-07-14',freq='d'):
-                #
+# date = pd.date_range('2018-08-30','2018-08-30',freq='d')[0] #'2018-06-27','2018-07-14',freq='d'):
+        #
         binario =   Lidar(
             fechaI=date.strftime('%Y-%m-%d'),
             fechaF=date.strftime('%Y-%m-%d'),
@@ -286,9 +286,9 @@ for date in pd.date_range('2018-06-01','2018-10-01',freq='d'): #'2018-06-27','20
 
         binario.plot(output='fdLn(RCS)',  **kwgs)
 
-        binario.plot(output='dfLn(RCS)' **kwgs)
+        binario.plot(output='dfLn(RCS)', **kwgs)
 
-        binario.plot(output='fdfLn(RCS)'  **kwgs)
+        binario.plot(output='fdfLn(RCS)' , **kwgs)
 
         for location in ['amva','siata','itagui']:
             # binario = Lidar(fechaI='20180801',Fechaf='20180801',scan='FixedPoint',output='raw')
@@ -397,46 +397,46 @@ from lidar.lidar import Lidar
 locale.setlocale(locale.LC_TIME, ('en_GB','utf-8'))
 
 
-# for date in pd.date_range('2018-02-23','2018-10-04',freq='d'): #'2018-06-27','2018-07-14',freq='d'):
-#     try:
-date = pd.date_range('2018-06-30','2018-06-30',freq='d')[0] #'2018-06-27','2018-07-14',freq='d'):
+for date in pd.date_range('2018-02-23','2018-10-11',freq='d'): #'2018-06-27','2018-07-14',freq='d'):
+    try:
+# date = pd.date_range('2018-09-06','2018-09-06',freq='d')[0] #'2018-06-27','2018-07-14',freq='d'):
 
-binario = Lidar(
-    fechaI=date.strftime('%Y-%m-%d'),
-    fechaF=date.strftime('%Y-%m-%d'),
-    scan='3D',
-    output='fdfLn(RCS)'
-)
-binario.read()
-                # # backup = [binario.raw, binario.dataInfo]
-                # # binario.data        = backup[0]
-                # # binario.raw    = backup[0]
-                # # binario.dataInfo   = backup[1]
-                #
-                #
-                # kwgs = dict(parameters=['photon-p'], dates=binario.dataInfo.index, make_gif=True, path= date.strftime('%Y-%m-%d-bkg-nonan'),height=altura, background= bkg)
-                # kwgs = dict(height=altura,path='vlim',dates =binario.dataInfo.index[binario.dataInfo.index.hour <1 ])
+        binario = Lidar(
+        fechaI=date.strftime('%Y-%m-%d'),
+        fechaF=date.strftime('%Y-%m-%d'),
+        scan='Zenith',
+        output='raw'
+        )
+        binario.read()
+        # # backup = [binario.raw, binario.dataInfo]
+        # # binario.data        = backup[0]
+        # # binario.raw    = backup[0]
+        # # binario.dataInfo   = backup[1]
+        #
+        #
+        # kwgs = dict(parameters=['photon-p'], dates=binario.dataInfo.index, make_gif=True, path= date.strftime('%Y-%m-%d-bkg-nonan'),height=altura, background= bkg)
+        # kwgs = dict(height=altura,path='vlim',dates =binario.dataInfo.index[binario.dataInfo.index.hour <1 ])
         kwgs = dict(
-            height=7,
-            path= 'relieve', #date.strftime('%m-%d'),
-            textSave='relieve',
+            height=15,
+            path= date.strftime('%m-%d'),
+            textSave='',
             dates=binario.datos.index,
             makeGif=True,
         )
 
-        binario.plot(output = 'P(r)',
-            totalSignal=True,
-            vlim=[0,135],
-            parameters=['photon-s','photon-p'],
-            scp=False,
-            **kwgs )
-
-        binario.plot(output = 'P(r)',
-            totalSignal=True,
-            vlim=[5,34],
-            parameters=['analog-s','analog-p'],
-            scp=False,
-            **kwgs )
+        # binario.plot(output = 'P(r)',
+        #     totalSignal=True,
+        #     vlim=[0,135],
+        #     parameters=['photon-s','photon-p'],
+        #     scp=False,
+        #     **kwgs )
+        #
+        # binario.plot(output = 'P(r)',
+        #     totalSignal=True,
+        #     vlim=[5,34],
+        #     parameters=['analog-s','analog-p'],
+        #     scp=False,
+        #     **kwgs )
 
         binario.plot(
             parameters=['analog-s','analog-p'],
@@ -467,19 +467,19 @@ binario.read()
             vlim = [0.25,1],
             **kwgs
         )
-kwgs['scp'] = False
-# binario.plot( output='Ln(RCS)', **kwgs )
-# # #
-#
-# binario.plot(output='dLn(RCS)',colorbarKind='Anomaly',  **kwgs)
-#
-# binario.plot(scp=False,output='fLn(RCS)', **kwgs)
-#
-# binario.plot(output='fdLn(RCS)',colorbarKind='Anomaly',  **kwgs)
-#
-# binario.plot(output='dfLn(RCS)', colorbarKind='Anomaly', **kwgs)
-#
-# binario.plot(output='fdfLn(RCS)', colorbarKind='Anomaly',  **kwgs)
+        kwgs['scp'] = False
+        binario.plot( output='Ln(RCS)', **kwgs )
+        # #
+
+        binario.plot(output='dLn(RCS)', **kwgs)
+
+        binario.plot(output='fLn(RCS)', **kwgs)
+
+        binario.plot(output='fdLn(RCS)',  **kwgs)
+
+        binario.plot(output='dfLn(RCS)',  **kwgs)
+
+        binario.plot(output='fdfLn(RCS)', **kwgs)
 
 
     except:

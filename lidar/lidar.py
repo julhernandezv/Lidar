@@ -90,12 +90,12 @@ class Lidar(PlotBook):
                     'photon':r'RCS $[MHz*Km^2]$',
                     'cmap':shrunkCmap,
                     'colorbarKind':'Log'},
-                'Ln(RCS)': {'analog':r'Ln(RCS) $[Ln(mV*Km^2)]$',
-                    'photon':r'Ln(RCS) $[Ln(MHz*Km^2)]$',
+                'Ln(RCS)': {'analog':r'Ln(RCS)', #$[Ln(mV*Km^2)]$
+                    'photon':r'Ln(RCS)', # $[Ln(MHz*Km^2)]$
                     'cmap':shrunkCmap,
                     'colorbarKind':'Linear'},
-                'fLn(RCS)':{'analog':r'fLn(RCS) $[Ln(mV*Km^2)]$',
-                    'photon':r'fLn(RCS) $[Ln(MHz*Km^2)]$',
+                'fLn(RCS)':{'analog':r'fLn(RCS)', # $[Ln(mV*Km^2)]$
+                    'photon':r'fLn(RCS)', # $[Ln(MHz*Km^2)]$
                     'cmap':shrunkCmap,
                     'colorbarKind':'Linear'},
                 'dLn(RCS)':{'analog':r'dLn(RCS)',
@@ -141,9 +141,7 @@ class Lidar(PlotBook):
         self.degreeFixed       = 'Azimuth'  if self.scan in ['FixedPoint','3D','Zenith'] else 'Zenith'
         self.kwargs             = kwargs
 
-        if self.scan == '3D':
-            self.dem =  self.DEM_profile/1000. -self.altitud
-        # super()
+
 
 
     def read_file(self,filename,offset=None):
@@ -478,7 +476,7 @@ class Lidar(PlotBook):
             if self.output in ['RCS','LVD', 'Ln(RCS)', 'fLn(RCS)',
                         'dLn(RCS)', 'fdLn(RCS)', 'dfLn(RCS)', 'fdfLn(RCS)']:
 
-                print '{}\nGetting RCS \n{}'.format('-'*50,'-'*50)
+                print '{}\n Getting RCS \n{}'.format('-'*50,'-'*50)
                 # self.datos      = self.RCS
                 self.RCS
 
@@ -487,6 +485,7 @@ class Lidar(PlotBook):
                     self.datos = self.LVD
 
                 if self.output not in ['RCS','LVD']:
+                    print '{}\n Getting Ln(RCS) \n{}'.format('-'*50,'-'*50)
                     # self.datos.mask(self.datos<=0,inplace=True)
                     self.datos[ self.datos <= 0.1 ] = 0.1
                     self.datos       = np.log(self.datos)
@@ -524,9 +523,10 @@ class Lidar(PlotBook):
         """
 
         if self.scan not in ['FixedPoint']:
+            st                  = 10 if self.scan  == '3D' else 8
             rel                 = (Y.max()-Y.min())/(np.abs(X).max()-X.min())
-            kwargs['figsize']   = ( 10,10*rel) if rel <=1 else (10*(1./rel),10)
-            kwargs['xlim']      = [-np.abs(X).max() if self.scan !='Zeninth' else 0, np.abs(X).max()]
+            kwargs['figsize']   = ( st,st*rel) if rel <=1 else (st*(1./rel),st)
+            kwargs['xlim']      = [-np.abs(X).max() if self.scan !='Zenith' else 0, np.abs(X).max()]
             kwargs['xlabel']    = r'Range $[Km]$'
         else:
             kwargs['figsize']   = (10,5.6)
@@ -544,7 +544,7 @@ class Lidar(PlotBook):
             self.axes[0].xaxis.set_major_formatter(
                 DateFormatter('%H:%M \n%d-%b') )
 
-        elif self.scan == '3D':
+        elif self.scan in ['3D','Zenith']:
             self.axes[0].fill_between(
                 self.dem.index,
                 self.dem.values,
@@ -667,12 +667,6 @@ class Lidar(PlotBook):
                     'parameters',
                     self.datos.columns.levels[-1].values
                     )
-        # if self.scan == '3D':
-        #     self.datos.columns.set_levels(
-        #         self.datos.columns.levels[0].values + self.altitud,
-        #         level=0,
-        #         inplace=True
-        #     )
 
         if self.scan != 'Azimuth':
             kwargs['ylim']  = kwargs.get('ylim', [0,height] )
@@ -681,14 +675,17 @@ class Lidar(PlotBook):
 
         kwargs['path'] = self.handle_path(**kwargs)
 
-
+        _date = self.datos.index[0].strftime('%Y-%m-%d')
 
         if self.scan == 'FixedPoint' :
             self.plot_parameters(_vlim=_vlim, **kwargs)
+
         else:
             tmpData = self.datos.copy()
             for ix in tmpData.index:
                 self.datos = tmpData.loc[ix]
+                if self.scan in ['3D','Zenith']:
+                    self.dem =  self.DEM_profile(date=ix)
 
                 kwargs['addText']   = ix.strftime('%b-%d\n%H:%M')
                 kwargs['title']     = "{} = {} {}".format(
@@ -701,7 +698,7 @@ class Lidar(PlotBook):
                 self.plot_parameters(_vlim=_vlim,**kwargs)
 
         self.get_gif(
-            text=tmpData.index[0].strftime('%Y-%m-%d'),
+            text=_date,
             **kwargs)
 
     def get_gif(self,text='',**kwargs):
@@ -719,17 +716,32 @@ class Lidar(PlotBook):
                 gifKwd['path']         = kwargs['path']
                 self._make_gif(**gifKwd)
 
-    @property
-    def DEM_profile(self):
+
+    def DEM_profile(self,date):
+
         dem = self.read_DEM()
-        dem = dem.loc[
-                dem.index[
-                    np.abs(dem.index.values-self.latitud).argmin()
+        dg  = self.datosInfo.loc[date,'Azimuth']
+
+        if  np.around( np.cos( np.pi*dg/180 ) ) == 0:
+            dem = dem.loc[:,
+                    dem.columns[
+                        np.abs(dem.columns.values-self.longitud).argmin()
                     ]
-            ]
-        dem.index -= dem.index[np.abs(dem.index.values-self.longitud).argmin()]
-        dem.index *= -110
-        return dem
+                ]
+            dem.index -= dem.index[np.abs(dem.index.values-self.latitud).argmin()]
+
+        else:
+            dem = dem.loc[
+                    dem.index[
+                        np.abs(dem.index.values-self.latitud).argmin()
+                    ]
+                ]
+            dem.index -= dem.index[np.abs(dem.index.values-self.longitud).argmin()]
+        if self.degrees_to_cardinal(dg) in ['East','North']:
+            dem.index *= 110
+        else:
+            dem.index *= -110
+        return dem/1000. -self.altitud
 
     def handle_path(self,**kwargs):
 
