@@ -80,7 +80,7 @@ class PlotBook(MPLPlot):
         'colorbarKind': 'Linear',
         'ylabel': '',
         'xlabel':'',
-        'cbarlabel':'',
+        'cbarLabel':'',
         'format': '%.f',
         'vlim': None,
 
@@ -179,7 +179,7 @@ class PlotBook(MPLPlot):
             cax = kwargs['cax']
 
         cbar     = plt.colorbar(cf, cax = cax , **colorbarKwd)
-        cbar.set_label(self.kwargs['cbarlabel'],weight='bold')
+        cbar.set_label(self.kwargs['cbarLabel'],weight='bold')
 
         if self.kwargs['colorbarKind']  == 'Log':
             cbar.ax.yaxis.set_ticks(cf.norm(minorTicks), minor=True)

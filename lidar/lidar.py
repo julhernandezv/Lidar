@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from matplotlib import use, cm, colors
+from matplotlib import use, cm, colors, markers
 use('PDF')
 
 import datetime as dt
@@ -86,16 +86,20 @@ class Lidar(PlotBook):
                     'photon':r'LPD $(\delta^p)$',
                     'cmap':shrunkCmap,
                     'colorbarKind':'Linear'},
-                'RCS': {'analog':r'RCS $[mV*Km^2]$',
-                    'photon':r'RCS $[MHz*Km^2]$',
+                'RCS': {'analog':r'RCS $[mV*km^2]$',
+                    'photon':r'RCS $[MHz*km^2]$',
                     'cmap':shrunkCmap,
                     'colorbarKind':'Log'},
-                'Ln(RCS)': {'analog':r'Ln(RCS)', #$[Ln(mV*Km^2)]$
-                    'photon':r'Ln(RCS)', # $[Ln(MHz*Km^2)]$
+                'AB': {'analog':r'Attenuated Backscatter $[km^-1 *sr^-1]$',
+                    'photon':r'Attenuated Backscatter $[km^-1 *sr^-1]$',
+                    'cmap':shrunkCmap,
+                    'colorbarKind':'Log'},
+                'Ln(RCS)': {'analog':r'Ln(RCS)', #$[Ln(mV*km^2)]$
+                    'photon':r'Ln(RCS)', # $[Ln(MHz*km^2)]$
                     'cmap':shrunkCmap,
                     'colorbarKind':'Linear'},
-                'fLn(RCS)':{'analog':r'fLn(RCS)', # $[Ln(mV*Km^2)]$
-                    'photon':r'fLn(RCS)', # $[Ln(MHz*Km^2)]$
+                'fLn(RCS)':{'analog':r'fLn(RCS)', # $[Ln(mV*km^2)]$
+                    'photon':r'fLn(RCS)', # $[Ln(MHz*km^2)]$
                     'cmap':shrunkCmap,
                     'colorbarKind':'Linear'},
                 'dLn(RCS)':{'analog':r'dLn(RCS)',
@@ -139,7 +143,14 @@ class Lidar(PlotBook):
 
         self.degreeVariable    = 'Zenith' if self.scan in ['FixedPoint','3D'] else self.scan
         self.degreeFixed       = 'Azimuth'  if self.scan in ['FixedPoint','3D','Zenith'] else 'Zenith'
-        self.kwargs             = kwargs
+        # self.kwargs = self.plotbook_args.copy()
+
+        for kw in self.plotbook_args.keys():
+            if kw in kwargs.keys():
+                self.plotbook_args[kw] = kwargs.pop(kw)
+        # self.kwargs             = kwargs
+
+        self.read(output=self.output)
 
 
 
@@ -438,6 +449,8 @@ class Lidar(PlotBook):
         self.datosInfo.sort_index(inplace=True)
         self.datosInfo.index.name   = 'Dates'
 
+        self.datos      = self.datos[self.fechaI:self.fechaF]
+        self.datosInfo  = self.datosInfo[self.fechaI:self.fechaF]
         self.raw                    = self.datos.copy()
         self.get_output(**kwargs)
 
@@ -480,6 +493,9 @@ class Lidar(PlotBook):
                 # self.datos      = self.RCS
                 self.RCS
 
+                if self.output == 'AB':
+                    self.datos  = self.AB
+
                 if self.output == 'LVD':
                     print '{}\n Getting Linear Volume Depolarization Ratio \n{}'.format('-'*50,'-'*50)
                     self.datos = self.LVD
@@ -512,7 +528,7 @@ class Lidar(PlotBook):
         self._make_contour(cax = cax)
 
 
-    def plot_lidar(self,X,Y,Z,**kwargs):
+    def plot_lidar(self,X,Y,Z,CLA=None,**kwargs):
         """Function for ploting lidar profiles
 
         Parameters
@@ -526,12 +542,12 @@ class Lidar(PlotBook):
             st                  = 10 if self.scan  == '3D' else 8
             rel                 = (Y.max()-Y.min())/(np.abs(X).max()-X.min())
             kwargs['figsize']   = ( st,st*rel) if rel <=1 else (st*(1./rel),st)
-            kwargs['xlim']      = [-np.abs(X).max() if self.scan !='Zenith' else 0, np.abs(X).max()]
-            kwargs['xlabel']    = r'Range $[Km]$'
+            kwargs['xlim']      = kwargs.get('xlim',[-np.abs(X).max() , np.abs(X).max()] )
+            kwargs['xlabel']    = r'Range $[km]$'
         else:
             kwargs['figsize']   = (10,5.6)
 
-        kwargs['ylabel']        = r'{} $[Km]$'.format('Range' ) #if self.scan !='3D' else 'Altitude'
+        kwargs['ylabel']        = r'{} $[km]$'.format('Range' ) #if self.scan !='3D' else 'Altitude'
         kwargs['colormap']      = kwargs.get('colormap',self.lidarProperties[self.output]['cmap'])
 
 
@@ -543,13 +559,41 @@ class Lidar(PlotBook):
         if self.scan  == 'FixedPoint':
             self.axes[0].xaxis.set_major_formatter(
                 DateFormatter('%H:%M \n%d-%b') )
+            if CLA is not None:
+                self.axes[0].scatter( CLA.index, CLA['VM'],
+                    color=(0.45098039,0,0),
+                    marker='X',
+                    label='VM'  )
+                self.axes[0].scatter( CLA.index, CLA['GM'],
+                    color='black',
+                    marker='o',
+                    facecolors='none',
+                    linewidth=2,
+                    label='GM')
+                self.axes[0].legend(
+                    bbox_to_anchor=(1.0,.9),
+                    loc='center left',ncol=1,
+                    handletextpad=0.1)
 
-        elif self.scan in ['3D','Zenith']:
-            self.axes[0].fill_between(
-                self.dem.index,
-                self.dem.values,
-                color=(0.875,0.875,0.875)
-            )
+
+
+        elif self.scan in ['3D','Zenith','Azimuth']:
+            self.axes[0].scatter( CLA['xVM'], CLA['yVM'],
+                color=(0.45098039,0,0),
+                marker='X',
+                label='VM' )
+            self.axes[0].scatter( CLA['xGM'], CLA['yGM'],
+                color='black',
+                marker='o',
+                facecolors='none',
+                linewidth=2,
+                label='GM')
+            self.axes[0].legend(
+                bbox_to_anchor=(1.0,.9),
+                loc='center left', ncol=1,
+                handletextpad=0.1)
+            self.axes[0].fill_between( self.dem.index, self.dem.values,
+                color=(0.875,0.875,0.875) )
 
         if 'addText' in kwargs.keys():
             self.axes[0].text(
@@ -562,11 +606,12 @@ class Lidar(PlotBook):
         self._save_fig(**kwargs)
 
 
-    def profiler(self,df, **kwargs):
+    def profiler(self,df,cla=None, **kwargs):
         """Method for building scanning profiles with variations at Zenith or Azimuth
 
         Parameters
             df          = DataFrame object with Height as columns and Degree variations as index
+            cla         = DataFrame object with Degree variations as index  and Heights as values
             """
 
         profile   = df.copy()
@@ -578,7 +623,6 @@ class Lidar(PlotBook):
         dh      = np.nanmin(profile.columns.values[1:] - profile.columns.values[:-1])
         dg      = np.nanmin(profile.index.values[1:] - profile.index.values[:-1])
 
-        # for ix in range():
 
         for ix, angle in enumerate(profile.index.values):
             print "{}\n {} = {}".format('='*50,self.degreeVariable,angle)
@@ -591,6 +635,7 @@ class Lidar(PlotBook):
             y[ix,-1]     = (profile.columns.values[-1] + dh/2.) * np.sin(
                                     (angle - dg/2.) * np.pi/180.)
 
+
         y[-1,:-1]    = (profile.columns.values - dh/2.) * np.sin(
                                     (angle + dg/2.) * np.pi/180.)
         y[-1,-1]     = (profile.columns.values[-1] + dh/2.) * np.sin(
@@ -600,8 +645,14 @@ class Lidar(PlotBook):
         x[-1,-1]     = (profile.columns.values[-1] + dh/2.) * np.cos(
                                     (angle + dg/2.) * np.pi/180.)
 
+        if cla is not None:
+            cla.reset_index(inplace=True)
+            cla['xGM'] = cla['GM'] * np.cos( cla[self.degreeVariable] * np.pi/180 )
+            cla['yGM'] = cla['GM'] * np.sin( cla[self.degreeVariable] * np.pi/180 )
+            cla['xVM'] = cla['VM'] * np.cos( cla[self.degreeVariable] * np.pi/180 )
+            cla['yVM'] = cla['VM'] * np.sin( cla[self.degreeVariable] * np.pi/180 )
 
-        self.plot_lidar(x, y, profile, **kwargs )
+        self.plot_lidar(x, y, profile, cla, **kwargs )
 
     # def fixedpoint(self, df,**kwargs):
     #     """Method for building fixed point profiles with variations at Zenith or Azimuth
@@ -627,12 +678,13 @@ class Lidar(PlotBook):
     #     #
     #     return dataInfo[angulo_fijo].drop_duplicates().values
 
-    def plot(self, height=4.5, **kwargs):
+    def plot(self, height=4.5, cla=False, **kwargs):
         """Method for building scanning or fixed point profiles with variations
         at Zenith or Azimuth
 
         Parameters
             height  = int - to select plot height
+            cla     = bolean - to get CLA
 
             **kwargs
             dates       = DatetimeIndex - Used to plot. Default .index[0]
@@ -640,6 +692,15 @@ class Lidar(PlotBook):
             df          = DataFrame object with Height as index and Degree variations as columns - Allow to use data insted heritance
             parameters  = List like - Choice  parameter to plot - Default use all parameters in self.datos
             output      = Allowed {} """.format(self.lidarProperties.keys())
+
+        if cla :
+            self.cla    = self.get_cla
+            tmpCla      = self.cla.copy()
+        else:
+            try: delattr(self, 'cla')
+            except: pass
+
+        print '\n{}\n Getting Output\n{}\n'.format('='*50,'='*50)
 
         if 'df' in kwargs.keys():
             self.datos = kwargs.pop('df')
@@ -652,38 +713,47 @@ class Lidar(PlotBook):
             )
             self.datos = self.datos.loc[
                 kwargs.pop('dates',
-                    self.datos.index[:1]
+                    self.datos.index[-1:]
                     if self.scan != 'FixedPoint' else
                     self.datos.index),
                 self.datos.columns.levels[0][
-                    self.datos.columns.levels[0] < height ]
+                    self.datos.columns.levels[0] < height + 3 ]
             ]
             kwargs['colorbarKind'] = kwargs.pop(
                         'colorbarKind',
                         self.lidarProperties[ self.output ] ['colorbarKind']
                         )
 
+
         kwargs['parameters'] = kwargs.pop(
                     'parameters',
                     self.datos.columns.levels[-1].values
                     )
+        kwargs['path'] = self.handle_path(**kwargs)
+
 
         if self.scan != 'Azimuth':
             kwargs['ylim']  = kwargs.get('ylim', [0,height] )
+            kwargs['xlim']  = kwargs.get('xlim', [-height,height]
+                                if self.scan == '3D' else [0,height]
+                                if self.scan == 'Zenith' else
+                                self.datos.index[[0,-1]] )
 
         _vlim = None if 'vlim' in kwargs.keys() else self.get_vlim(**kwargs)
 
-        kwargs['path'] = self.handle_path(**kwargs)
+        _date = self.datos.index[0].strftime('_%Y-%m-%d')
 
-        _date = self.datos.index[0].strftime('%Y-%m-%d')
 
         if self.scan == 'FixedPoint' :
             self.plot_parameters(_vlim=_vlim, **kwargs)
 
         else:
             tmpData = self.datos.copy()
+
             for ix in tmpData.index:
                 self.datos = tmpData.loc[ix]
+                if cla:
+                    self.cla   = tmpCla.loc[ix]
                 if self.scan in ['3D','Zenith']:
                     self.dem =  self.DEM_profile(date=ix)
 
@@ -697,19 +767,19 @@ class Lidar(PlotBook):
 
                 self.plot_parameters(_vlim=_vlim,**kwargs)
 
-        self.get_gif(
-            text=_date,
-            **kwargs)
+        self.get_gif( text=_date, **kwargs)
+
 
     def get_gif(self,text='',**kwargs):
         if kwargs.get('makeGif',False) and self.scan != 'FixedPoint':
+            if kwargs.get('operational', False):   text=''
             gifKwd = {}
             for col in kwargs.pop('parameters'):
                 gifKwd['textSave']     = "_{}_{}_{}".format(
                                                 self.scan,
                                                 self.output,
                                                 col )
-                gifKwd['textSaveGif'] = '_{}{}'.format(
+                gifKwd['textSaveGif'] = '{}{}'.format(
                                         text,
                                         kwargs.pop('textSave',''),
                                         )
@@ -775,14 +845,16 @@ class Lidar(PlotBook):
 
     def plot_by_parameter(self,parameter, **kwargs):
 
-        if self.scan != 'FixedPoint':
-            tmpDate = self.datos.name.strftime('%H:%M')
+        if kwargs.get('operational',False):
+            tmpDate = ''
+        elif self.scan != 'FixedPoint':
+            tmpDate = self.datos.name.strftime('_%H:%M')
         else:
-            tmpDate = self.datos.index[0].strftime('%m-%d')
+            tmpDate = self.datos.index[0].strftime('_%m-%d')
 
 
-        kwargs['cbarlabel'] = self.lidarProperties[self.output][parameter[:6]]
-        kwargs['textSave']  = "_{}_{}_{}_{}{}".format(
+        kwargs['cbarLabel'] = kwargs.get('cbarLabel',self.lidarProperties[self.output][parameter[:6]])
+        kwargs['textSave']  = "_{}_{}_{}{}{}".format(
                                     self.scan,
                                     self.output,
                                     parameter,
@@ -791,12 +863,13 @@ class Lidar(PlotBook):
                                     )
 
 
-        dataframe           =  self.get_parameter( parameter )
+        dataframe, cla           =  self.get_parameter( parameter, **kwargs )
 
         if self.scan not in ['FixedPoint']:
 
             self.profiler(
                 dataframe,
+                cla,
                 **kwargs
             )
         else:
@@ -804,10 +877,11 @@ class Lidar(PlotBook):
                 dataframe.columns.values,
                 dataframe.index.values,
                 dataframe,
+                cla,
                 **kwargs
             )
 
-    def get_parameter(self, parameter):
+    def get_parameter(self, parameter,**kwargs):
         if self.scan == 'FixedPoint':
             dataframe   = self.datos.xs(
                     (90,parameter),
@@ -818,11 +892,28 @@ class Lidar(PlotBook):
                 parameter,
                 level=-1,
                 ).unstack(0)
-        return dataframe
+
+        if kwargs.get('operational',False):
+            dataframe.replace(np.nan,kwargs['vlim'][0],inplace=True)
+
+        if hasattr(self, 'cla'):
+            if self.scan == 'FixedPoint':
+                cla   = self.cla.xs(
+                        (90,parameter),
+                        level=[1,2],
+                        axis=1 )
+            else:
+                cla   = self.cla.xs(
+                    parameter,
+                    level=-1,
+                    ).unstack(0)
+        else:
+            cla = None
+        return dataframe, cla
 
     def get_vlim(self, **kwrgs):
         vlim = self.datos.stack( [0,1] ).apply(
-                        lambda x: np.nanpercentile(x,[1,99])  )
+                        lambda x: np.nanpercentile(x,[1,90])  )
 
         if kwrgs.get('colorbarKind','Linear') == 'Log':
             vlim [ vlim < 0.1 ]     = 0.1
@@ -928,8 +1019,14 @@ class Lidar(PlotBook):
         pc =    self.datos.xs('photon-p',axis=1,level=2
                 ) + self.datos.xs('photon-s',axis=1,level=2) * self.vPc
         return  pd.concat(
-                    [ self.datos, pd.concat({'analog-b':an,'photon-b':pc}).unstack(0) ],
-                    axis=1 ).sort_index(axis=1)
+                    [   self.datos,
+                        pd.concat(
+                            {'analog-b':an,'photon-b':pc},
+                            names=['Parameters','Dates']
+                        ).unstack(0)
+                    ],
+                    axis=1
+                ).sort_index(axis=1)
 
     @property
     def LVD(self):
@@ -939,7 +1036,14 @@ class Lidar(PlotBook):
         pc =    self.datos.xs('photon-s',axis=1,level=2
                     ) / self.datos.xs('photon-p',axis=1,level=2)  * self.vPc
         pc [(pc==np.inf) | (pc==-np.inf)] = np.NaN
-        return pd.concat({'analog':an,'photon':pc}).unstack(0)
+        return pd.concat({'analog':an,'photon':pc},names=['Parameters','Dates']).unstack(0)
+
+    @property
+    def AB(self):
+        # self.get_output(output='RCS')
+        self.datos = self.datos*1e6/(3e8/2.*np.pi*1e-2*25e-3)
+        self.datos.loc(axis=1)[:,:,['analog-s','analog-p']] *= 2e-11*1e-3
+        self.datos.loc(axis=1)[:,:,['photon-s','photon-p']] *= 6.63e-34*3e8/(355e-9)*1e6
 
     @property
     def derived(self):
@@ -999,6 +1103,105 @@ class Lidar(PlotBook):
             return dirs[ix % 16]
         else:
             return d
+
+    @staticmethod
+    def cloud_filter(data, clouds):
+
+        tmpData = {}
+        for col in clouds.columns.levels[2]:
+            tmpData[col+'-p'] = data.xs(col+'-p',axis=1,level=2).mask(clouds.xs(col,axis=1,level=2) >=0.9 )
+            tmpData[col+'-s'] = data.xs(col+'-s',axis=1,level=2).mask(clouds.xs(col,axis=1,level=2) >=0.9 )
+            tmpData[col+'-b'] = data.xs(col+'-b',axis=1,level=2).mask(clouds.xs(col,axis=1,level=2) >=0.9 )
+        return pd.concat(tmpData,names=['Parameters','Dates']).unstack(0)
+
+
+    @property
+    def get_cla(self):
+        height = 3
+
+        print '\n{}\n Getting Clouds\n{}\n'.format('='*50,'='*50)
+        self.get_output(output='LVD')
+
+        lvd = self.datos.loc(axis=1) [
+            self.datos.columns.levels[0] [
+                (self.datos.columns.levels[0] < height) & (
+                self.datos.columns.levels[0] > .25)
+            ]
+        ]
+
+
+        print '\n{}\n Getting CLA\n{}\n'.format('='*50,'='*50)
+        self.get_output(output='RCS',totalSignal=True)
+
+        cla = self.datos.loc(axis=1) [
+            self.datos.columns.levels[0] [
+                (self.datos.columns.levels[0] < height) & (
+                self.datos.columns.levels[0] > .25)
+            ]
+        ]
+
+        print '{}\n Getting Smoothing \n{}'.format('-'*50,'-'*50)
+        #Espacial
+        cla = cla.groupby(
+                level=[1,2], axis=1
+                ).rolling(16,
+                    center=True,
+                    min_periods=1,
+                    axis=1
+                    ).mean()
+        cla.columns = cla.columns.droplevel([0,1])
+        # Temporal
+        if self.scan == 'FixedPoint':
+            cla = cla.rolling(6,
+                    center=True,
+                    min_periods=1).mean()
+
+            cla = cla.resample('10T').mean()
+            lvd = lvd.resample('10T').mean()
+
+        # cla = self.cloud_filter(cla, lvd)
+
+        return pd.concat({
+                    'GM':self.get_gm(cla),
+                    'VM':self.get_vm(cla)
+                },
+                axis=1)
+
+    @staticmethod
+    def get_vm(vm):
+        print '{}\n Getting Maximum Variance \n{}'.format('-'*50,'-'*50)
+
+        tmpData = vm.groupby(
+                level=[1,2], axis=1
+                ).rolling(54,
+                    center=True,
+                    min_periods=1,
+                    axis=1).var()
+        tmpData.columns = tmpData.columns.droplevel([0,1])
+
+        tmpData = tmpData.groupby(level=[1,2],axis=1).idxmax(axis=1)
+        for col in tmpData.columns:
+            tmpData[col] = tmpData[col].str[0]
+
+        return tmpData
+
+    @staticmethod
+    def get_gm(gm):
+        print '{}\n Getting Minimal Gradient \n{}'.format('-'*50,'-'*50)
+
+        dr  = (gm.columns.levels[0][2] - gm.columns.levels[0][0])
+        tmpData  = gm.groupby(level=[1,2],axis=1).diff(axis=1,periods=2) /dr
+
+        tmpData = tmpData.groupby(level=[1,2],axis=1).idxmin(axis=1)
+        for col in tmpData.columns:
+            tmpData[col] = tmpData[col].str[0]
+
+        return tmpData
+
+
+
+
+#===============================================================================
 
 # def ceilometro(Fecha_Inicio, Fecha_Fin,ceilometro='amva'): #'siata', 'itagui'
 #     locale.setlocale(locale.LC_TIME, ('en_us','utf-8'))
