@@ -485,7 +485,10 @@ kwgs = dict(
     # path= date.strftime('%m-%d'),
     cla=True
 )
-
+binario.plot(
+    output='RCS',
+    **kwgs
+)
 # binario.plot(output = 'raw',**kwgs )
 # binario.plot(output = 'S(r)',totalSignal=True,**kwgs )
 

@@ -81,7 +81,12 @@ class Lidar(PlotBook):
                 'LVD': {'analog':r'LVD $(\delta^v)$',
                     'photon':r'LVD $(\delta^v)$',
                     'cmap':shrunkCmap3,
-                    'colorbarKind':'Linear'},
+                    'colorbarKind':'Linear',
+                    'vlim': {
+                        'analog':[0.25,1],
+                        'photon':[0.25,1],
+                        }
+                    },
                 'LPD': {'analog':r'LPD $(\delta^p)$',
                     'photon':r'LPD $(\delta^p)$',
                     'cmap':shrunkCmap,
@@ -89,7 +94,16 @@ class Lidar(PlotBook):
                 'RCS': {'analog':r'RCS $[mV*km^2]$',
                     'photon':r'RCS $[MHz*km^2]$',
                     'cmap':shrunkCmap,
-                    'colorbarKind':'Log'},
+                    'colorbarKind':'Log',
+                    'vlim':{
+                        'analog-b':[0.15,20],
+                        'analog-s':[0.1,16],
+                        'analog-p':[0.1,16],
+                        'photon-s':[9,200],
+                        'photon-p':[9,200],
+                        'photon-b':[10,210],
+                        }
+                    },
                 'AB': {'analog':r'Attenuated Backscatter $[km^-1 *sr^-1]$',
                     'photon':r'Attenuated Backscatter $[km^-1 *sr^-1]$',
                     'cmap':shrunkCmap,
@@ -151,6 +165,12 @@ class Lidar(PlotBook):
         # self.kwargs             = kwargs
 
         self.read(output=self.output)
+        if not os.path.exists('Figuras/'):
+            os.makedirs('Figuras/')
+
+        if not os.path.exists('Datos/'):
+            os.makedirs('Datos/')
+
 
 
 
@@ -170,12 +190,12 @@ class Lidar(PlotBook):
 
         lineaMeasurementName = fileObj.readline ()
         # lineaMeasurementName = lineaMeasurementName.strip ()
-        print lineaMeasurementName
-        print "***********************************************************************************************************************************************"
+        # print lineaMeasurementName
+        # print "***********************************************************************************************************************************************"
 
         lineaLocation = fileObj.readline ()
         lineaLocationArray = lineaLocation.strip ().split()
-        print lineaLocationArray
+        # print lineaLocationArray
 
         description = {}
 
@@ -197,19 +217,19 @@ class Lidar(PlotBook):
         # description ['Temp'] = float (lineaLocationArray[10])
         # description ['Press'] = float (lineaLocationArray[11])
 #
-        print description
-        print "***********************************************************************************************************************************************"
+        # print description
+        # print "***********************************************************************************************************************************************"
 
         # The third line contains information about the lidar’s offset from the North (En el file que descargue de FixedPoint no estaba esta linea - en Scan si)
         if self.scan not in ['FixedPoint']:
             lineaOffsetNorth = fileObj.readline ()
             lineaOffsetNorth = lineaOffsetNorth.strip ()
-            print lineaOffsetNorth
-            print "***********************************************************************************************************************************************"
+            # print lineaOffsetNorth
+            # print "***********************************************************************************************************************************************"
 
         lineaInfoLaser = fileObj.readline ()
         lineaInfoLaserArray = lineaInfoLaser.strip ().split ()
-        print lineaInfoLaserArray
+        # print lineaInfoLaserArray
 
         description ['NumberShotsLaser1'] = int (lineaInfoLaserArray[0])
         description ['PulseRepFreqLaser1'] = int (lineaInfoLaserArray[1])
@@ -217,7 +237,7 @@ class Lidar(PlotBook):
         # description ['PulseRepFreqLaser2'] = int (lineaInfoLaserArray[3])
         valorNumDatasets = int (lineaInfoLaserArray[4])
 
-        print "***********************************************************************************************************************************************"
+        # print "***********************************************************************************************************************************************"
 
         dictDescripcionDataset = {}
 
@@ -225,7 +245,7 @@ class Lidar(PlotBook):
 
             lineaInfoDataset = fileObj.readline ()
             lineaInfoDatasetArray = lineaInfoDataset.strip ().split ()
-            print lineaInfoDatasetArray
+            # print lineaInfoDatasetArray
 
 
             dictDescripcionDataset[idiDataset + 1] = {}
@@ -258,12 +278,12 @@ class Lidar(PlotBook):
             dictDescripcionDataset[idiDataset + 1]["datasetDescriptor"] = lineaInfoDatasetArray[15][0:2]
             # dictDescripcionDataset[idiDataset + 1]["datasetHexTransientRecNum"] = int (lineaInfoDatasetArray[15][-1], 16)
 
-            print dictDescripcionDataset[idiDataset + 1]
+            # print dictDescripcionDataset[idiDataset + 1]
 
-        print "***********************************************************************************************************************************************"
+        # print "***********************************************************************************************************************************************"
 
         # The dataset description is followed by an extra CRLF.
-        print 'CRLF after description = {}'.format(fileObj.readline ())
+        # print 'CRLF after description = {}'.format(fileObj.readline ())
 
         if self.ascii:
             fileObj.close ()
@@ -292,7 +312,7 @@ class Lidar(PlotBook):
 
                         dictDescripcionDataset[ix+1]["datasetLista"].append ((struct.unpack ('i', fileObj.read (4)))[0])
 
-                    print 'CRLF integrity {} = {}'.format(dictDescripcionDataset[ix+1]["datasetDescriptor"],fileObj.readline ())
+                    # print 'CRLF integrity {} = {}'.format(dictDescripcionDataset[ix+1]["datasetDescriptor"],fileObj.readline ())
 
                     ejeX = np.arange(1,dictDescripcionDataset[ix+1]["datasetBinNums"]-17
                                 ) * dictDescripcionDataset[ix+1]["datasetBinWidth"] / 1000.
@@ -303,7 +323,7 @@ class Lidar(PlotBook):
 
                     # print dictDescripcionDataset[ix]
 
-            print "***********************************************************************************************************************************************"
+            # print "***********************************************************************************************************************************************"
 
             dataset             = pd.concat(dataset,axis=1)
             dataset.sort_index(axis=1,inplace=True)
@@ -414,8 +434,7 @@ class Lidar(PlotBook):
     def read(self, **kwargs):
 
         kindFolder = {'3D':'3D','Zenith':'Z','Azimuth':'A','FixedPoint':'RM'}
-        ## os.system('rm Figuras/*')
-        os.system('mkdir Datos')
+
         # dates = pd.date_range('20180624','20180717',freq='d')
         dates = pd.date_range(self.fechaI,self.fechaF,freq='d')
         print dates
@@ -434,7 +453,7 @@ class Lidar(PlotBook):
 
                 for folder in folders:
                     archivos   = glob.glob('{}{}*'.format(folder, '/RM' if self.scan != 'FixedPoint' else ''))
-                    print folder
+                    # print folder
                     df3, df4 = self.read_folder(archivos, inplace=False)
                     self.datos[ df4.index[0].strftime('%Y-%m-%d %H:%M:%S') ] = df3.stack([0,1])
 
@@ -836,7 +855,10 @@ class Lidar(PlotBook):
 
         for par in  kwargs.pop('parameters'):
             if _vlim is not None:
-                kwargs['vlim'] = _vlim[par].values
+                if isinstance(_vlim,dict):
+                    kwargs['vlim'] = _vlim[par]
+                else:
+                    kwargs['vlim'] = _vlim[par].values
             self.plot_by_parameter(
                 parameter = par,
                 **kwargs)
@@ -912,7 +934,10 @@ class Lidar(PlotBook):
         return dataframe, cla
 
     def get_vlim(self, **kwrgs):
-        vlim = self.datos.stack( [0,1] ).apply(
+        if 'vlim' in self.lidarProperties[self.output].keys():
+            vlim = self.lidarProperties[self.output]['vlim']
+        else:
+            vlim = self.datos.stack( [0,1] ).apply(
                         lambda x: np.nanpercentile(x,[1,90])  )
 
         if kwrgs.get('colorbarKind','Linear') == 'Log':

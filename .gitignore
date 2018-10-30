@@ -1,3 +1,9 @@
+#Folder for Crons
+crones/FixedPoint/
+crones/3D/
+crones/Azimuth/
+crones/Zenith
+
 ### Python ###
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -117,4 +123,3 @@ ENV/
 .mypy_cache/
 
 pip-selfcheck.json
-
