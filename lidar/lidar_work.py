@@ -286,9 +286,9 @@ binario =   Lidar(
 # # binario.raw    = backup[0].copy()
 # # binario.datosInfo   = backup[1]'cython_test', #
 #
-# binario.datos = binario.datos.resample('30s').mean()
-# binario.raw = binario.raw.resample('30s').mean()
-# binario.datosInfo = binario.datosInfo.resample('30s').mean()
+binario.datos = binario.datos.resample('30s').mean()
+binario.raw = binario.raw.resample('30s').mean()
+binario.datosInfo = binario.datosInfo.resample('30s').mean()
 #
 
 
@@ -299,7 +299,10 @@ kwgs = dict(
     # path= date.strftime('%m-%d'),
     cla=True
 )
-
+binario.plot(
+    output='RCS',
+    **kwgs
+)
 # binario.plot(output = 'raw',**kwgs )
 # binario.plot(output = 'S(r)',totalSignal=True,**kwgs )
 
