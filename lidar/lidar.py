@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from matplotlib import use, cm, colors, markers
+from matplotlib import use, cm, markers
 use('PDF')
 
 import datetime as dt
@@ -9,6 +9,7 @@ import struct
 import sys, os, glob, locale
 
 from .core.plotbook import PlotBook
+from .utils.utils import shiftedColorMap
 from cytools import (cy_range_corrected, cy_mVolts, cy_mHz, cy_brackground)
 
 from dateutil.relativedelta import relativedelta
@@ -20,30 +21,6 @@ locale.setlocale(locale.LC_TIME, ('es_co','utf-8'))
 
 
 
-#
-def shiftedColorMap(cmap, start=0, midpoint=0.5, stop=1.0, name='shiftedcmap'):
-
-    cdict = {'red': [],'green': [],'blue': [],'alpha': []}
-
-    regIndex = np.linspace(start, stop, 257)
-#
-    shiftIndex = np.hstack([
-
-        np.linspace(0.0, midpoint, 128, endpoint=False),
-        np.linspace(midpoint, 1.0, 129, endpoint=True)])
-
-    for ri, si in zip(regIndex, shiftIndex):
-        r, g, b, a = cmap(ri)
-
-        cdict['red'].append((si, r, r))
-        cdict['green'].append((si, g, g))
-        cdict['blue'].append((si, b, b))
-        cdict['alpha'].append((si, a, a))
-
-    newcmap = colors.LinearSegmentedColormap(name, cdict)
-
-    register_cmap(cmap=newcmap)
-    return newcmap
 
 shrunkCmap  = shiftedColorMap(cm.jet, start=0.15,midpoint=0.45, stop=0.85, name='shrunk')
 shrunkCmap2 = shiftedColorMap(cm.jet, start=0.0,midpoint=0.65, stop=0.85, name='shrunk_ceil')
@@ -264,7 +241,7 @@ class Lidar(PlotBook):
             parameter = "{}-{}".format('analog' if dictDescripcionDataset[idiDataset + 1]["datasetModoAnalogo"] else 'photon', dictDescripcionDataset[idiDataset + 1]["datasetPolarization"])
 
             if lineaInfoDatasetArray[15][0:2] == 'BT': #dictDescripcionDataset[idiDataset + 1]["datasetModoAnalogo"]:
-                print int (lineaInfoDatasetArray[12]),dictDescripcionDataset[idiDataset + 1]["datasetPolarization"]
+                # print int (lineaInfoDatasetArray[12]),dictDescripcionDataset[idiDataset + 1]["datasetPolarization"]
                 description ['ADCBits_'+parameter]      = int (lineaInfoDatasetArray[12])
                 description ['InputRange_'+parameter]   = float (lineaInfoDatasetArray[14])
                 description ['ShotNumber_'+parameter]   = int (lineaInfoDatasetArray[13])
@@ -349,7 +326,7 @@ class Lidar(PlotBook):
         data        = {}
 
         for ix, file in enumerate(sorted(filenames)):
-            print "{} \n {} \n {}".format("="*50,file,"="*50)
+            # print "{} \n  {}\n".format("="*50,file)
 
             offset  = None if ix == 0 else  df2[self.degreeFixed].values[0]
             # print offset
@@ -435,6 +412,7 @@ class Lidar(PlotBook):
 
         kindFolder = {'3D':'3D','Zenith':'Z','Azimuth':'A','FixedPoint':'RM'}
 
+        print "{}\n Reading Files\n{}".format('-'*50,'-'*50)
         # dates = pd.date_range('20180624','20180717',freq='d')
         dates = pd.date_range(self.fechaI,self.fechaF,freq='d')
         print dates
@@ -444,8 +422,9 @@ class Lidar(PlotBook):
 
         for d in dates:
         # d = dates[0]
+            print "{}\n{}".format('-'*50,d.strftime('%Y-%m-%d'))
             os.system('rm -r Datos/*')
-            os.system('scp -r jhernandezv@192.168.1.62:/mnt/ALMACENAMIENTO/LIDAR/{}/{}/* Datos/'.format('Scanning_Measurements' if self.scan != 'FixedPoint' else 'Fixed_Point', d.strftime('%Y%m%d')))
+            os.system('scp -rq jhernandezv@192.168.1.62:/mnt/ALMACENAMIENTO/LIDAR/{}/{}/* Datos/'.format('Scanning_Measurements' if self.scan != 'FixedPoint' else 'Fixed_Point', d.strftime('%Y%m%d')))
 
             folders = glob.glob('Datos/{}*'.format( kindFolder[self.scan]))
             if len(folders) > 0 :
@@ -622,7 +601,8 @@ class Lidar(PlotBook):
                 va='bottom',
                 transform=self.axes[0].transAxes )
 
-        self._save_fig(**kwargs)
+        if kwargs.get('saveFig',True):
+            self._save_fig(**kwargs)
 
 
     def profiler(self,df,cla=None, **kwargs):

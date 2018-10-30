@@ -5,13 +5,15 @@ import numpy as np
 import datetime as dt
 import sys, os, time, locale
 import multiprocessing as mp
-from functools import wraps
-from lidar.utils.utils import LoggingPool
 
 
-baseDir = os.path.dirname(os.path.abspath(__file__))
-print sys.argv
-kind = sys.argv[1]
+# from lidar.utils.utils import LoggingPool
+
+baseDir = '/home/jhernandezv/Lidar/lidar/crones/'
+kind    = 'FixedPoint'
+# baseDir = os.path.dirname(os.path.abspath(__file__))
+# print sys.argv
+# kind = sys.argv[1]
 
 baseDir = os.path.join( baseDir, kind )
 print baseDir
@@ -65,12 +67,6 @@ def worker_wrapper(arg):
 def main(scan):
     print 'cpu_count() = %d\n' % mp.cpu_count()
 
-    PROCESSES = 5
-    print 'Creating pool with %d processes\n' % PROCESSES
-    pool = LoggingPool(processes=PROCESSES)
-    print 'pool = %s' % pool
-
-
     instance =   Lidar(
         fechaI=(now-dt.timedelta(hours=48)).strftime('%Y-%m-%d %H:%M'),
         fechaF=now.strftime('%Y-%m-%d %H:%M'),
@@ -84,6 +80,11 @@ def main(scan):
         instance.raw = instance.raw.resample('30s').mean()
         instance.datosInfo = instance.datosInfo.resample('30s').mean()
 
+    PROCESSES = 5
+    print 'Creating pool with %d processes\n' % PROCESSES
+    pool = mp.Pool(PROCESSES)
+    print 'pool = %s' % pool
+
     args = (instance, scan)
     TASKS = [(args, dict(hora=h,textSave='_%dh' %h)) for h in [48,24,12,6,3]]
 
@@ -93,15 +94,18 @@ def main(scan):
     for worker in pool._pool:
         assert worker.is_alive()
 
-    pool.close()
-    pool.join()
+    # pool.close()
+    # pool.join()
 
-    for worker in pool._pool:
-        assert not worker.is_alive()
+    # for r in result:
+    # print result.get()
+
+    # for worker in pool._pool:
+    #     assert not worker.is_alive()
 
     print '\tclose() succeeded\n'
 
-    print  "Time: {}".fromat( (dt.datetime.now()-start).total_seconds() )
+    print  "Time: {} minutos".format( (dt.datetime.now()-now).total_seconds() /60. )
 
 
 
