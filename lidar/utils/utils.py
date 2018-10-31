@@ -8,6 +8,7 @@ import logging.handlers
 from functools import wraps
 from multiprocessing.pool import Pool
 
+from matplotlib.pyplot import register_cmap
 from matplotlib import colors
 ################################################################################
 def shiftedColorMap(cmap, start=0, midpoint=0.5, stop=1.0, name='shiftedcmap'):
