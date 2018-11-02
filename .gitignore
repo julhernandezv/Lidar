@@ -3,6 +3,10 @@ crones/FixedPoint/
 crones/3D/
 crones/Azimuth/
 crones/Zenith
+crones/lidarCron_LOG.txt
+files.txt
+lidar/_libs/cytools.c
+lidar/_libs/cytools.html
 
 ### Python ###
 # Byte-compiled / optimized / DLL files

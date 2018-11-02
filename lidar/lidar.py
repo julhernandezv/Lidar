@@ -6,10 +6,10 @@ import datetime as dt
 import numpy as np
 import pandas as pd
 import struct
-import sys, os, glob, locale
+import sys, os, glob, locale, logging
 
 from .core.plotbook import PlotBook
-from .utils.utils import shiftedColorMap
+from .utils.utils import shiftedColorMap, listener_configurer
 from cytools import (cy_range_corrected, cy_mVolts, cy_mHz, cy_brackground)
 
 from dateutil.relativedelta import relativedelta
@@ -19,6 +19,8 @@ from matplotlib.dates import DateFormatter
 # sys.setdefaultencoding ("utf-8")
 locale.setlocale(locale.LC_TIME, ('es_co','utf-8'))
 
+logger = listener_configurer(name='lidar_module')
+logger.setLevel(logging.INFO)
 
 shrunkCmap  = shiftedColorMap(cm.jet, start=0.15,midpoint=0.45, stop=0.85, name='shrunk')
 shrunkCmap2 = shiftedColorMap(cm.jet, start=0.0,midpoint=0.65, stop=0.85, name='shrunk_ceil')
@@ -257,10 +259,10 @@ class Lidar(PlotBook):
 
             # print dictDescripcionDataset[idiDataset + 1]
 
-        print "***********************************************************************************************************************************************"
+        # print "***********************************************************************************************************************************************"
 
         #The dataset description is followed by an extra CRLF.
-        print 'CRLF after description = {}'.format(fileObj.readline ())
+        logger.debug( 'CRLF after description = {}'.format(fileObj.readline ()) )
 
         if self.ascii:
             fileObj.close ()
@@ -289,7 +291,7 @@ class Lidar(PlotBook):
 
                         dictDescripcionDataset[ix+1]["datasetLista"].append ((struct.unpack ('i', fileObj.read (4)))[0])
 
-                    print 'CRLF integrity {} = {}'.format(dictDescripcionDataset[ix+1]["datasetDescriptor"],fileObj.readline ())
+                    logger.debug( 'CRLF integrity {} = {}'.format(dictDescripcionDataset[ix+1]["datasetDescriptor"],fileObj.readline ()) )
 
                     ejeX = np.arange(1,dictDescripcionDataset[ix+1]["datasetBinNums"]-17
                                 ) * dictDescripcionDataset[ix+1]["datasetBinWidth"] / 1000.
@@ -300,7 +302,7 @@ class Lidar(PlotBook):
 
                     # print dictDescripcionDataset[ix]
 
-            print "***********************************************************************************************************************************************"
+            # print "***********************************************************************************************************************************************"
 
             dataset             = pd.concat(dataset,axis=1)
             dataset.sort_index(axis=1,inplace=True)

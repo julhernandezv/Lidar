@@ -28,7 +28,7 @@ from lidar.lidar import Lidar
 from lidar.utils.utils import LoggingPool, listener_configurer
 locale.setlocale(locale.LC_TIME, ('en_GB','utf-8'))
 
-now = dt.datetime.now() - dt.timedelta(days=15)
+now = dt.datetime.now() #- dt.timedelta(days=15)
 
 
 
@@ -97,7 +97,7 @@ def main(scan):
                         textSave='_%dh' %h)
                     ) for h in [48,24,12,6,3]
                 ]
-        pool.map( worker_wrapper, TASKS)
+        result = pool.map_async( worker_wrapper, TASKS)
 
     else:
         args    = (instance, scan)
@@ -125,40 +125,18 @@ def main(scan):
                         oneOutput='RCS',
                         parameters=['photon-s','photon-p','photon-b'] ) ),
                 ]
-        pool.map( worker_wrapper, task )
+        result = pool.map_async( worker_wrapper, task )
 
 
-    # pool.map(worker_wrapper, TASKS)
-    # time.sleep(300)
-    # print 'Testing close():'
-    # for worker in pool._pool:
-    #     assert worker.is_alive()
+    print result
+    print 'Waiting'
+    result.wait(timeout=300)
 
-    # pool.close()
-
-    # while True:
-    #     for worker in pool._pool:
-    #         if not worker.is_alive():
-    #             worker.close()
-    #             worker.join()
-    #         else:
-    #             print 'Waiting to finish worker processes'
-    #             time.sleep(10)
-
-    pool.join()
-
-    # for r in result:
-    # print result.get()
-
-    # for worker in pool._pool:
-    #     assert not worker.is_alive()
-
-    print '\tclose() succeeded\n'
-
+    if result.ready():
+        print result.get(timeout=1)
     print  "Time: {} minutos".format( (dt.datetime.now()-now).total_seconds() /60. )
-
-
-# main(kind)
+    print 'Close() succeeded\n'
+    pool.join()
 
 
 if __name__ == '__main__':
