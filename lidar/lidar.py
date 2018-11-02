@@ -20,8 +20,6 @@ from matplotlib.dates import DateFormatter
 locale.setlocale(locale.LC_TIME, ('es_co','utf-8'))
 
 
-
-
 shrunkCmap  = shiftedColorMap(cm.jet, start=0.15,midpoint=0.45, stop=0.85, name='shrunk')
 shrunkCmap2 = shiftedColorMap(cm.jet, start=0.0,midpoint=0.65, stop=0.85, name='shrunk_ceil')
 shrunkCmap3 = shiftedColorMap(cm.jet, start=0.15,midpoint=0.45, stop=.85, name='shrunk_LDV')
