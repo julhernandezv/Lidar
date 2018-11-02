@@ -28,25 +28,27 @@ from lidar.lidar import Lidar
 from lidar.utils.utils import LoggingPool, listener_configurer
 locale.setlocale(locale.LC_TIME, ('en_GB','utf-8'))
 
-now = dt.datetime.now() #- dt.timedelta(days=8)
+now = dt.datetime.now() - dt.timedelta(days=15)
 
 
 
 def plots (obj,  scan, **kwargs):
 
     kwgs = dict(
-        height=4.5 if scan  != 'Zenith' else 6,
+        height=4.5, #if scan  != 'Zenith' else 6,
         # cla=True
     )
     kwgs.update(kwargs)
 
-    obj.plot( output='LVD', totalSignal=True, **kwgs )
+    if 'oneOutput' in kwgs.keys():
+        obj.plot(output=kwargs['oneOutput'], **kwgs)
 
-    obj.plot( output='RCS', totalSignal=True, **kwgs )
+    else:
+        obj.plot( output='LVD',  **kwgs )
+        obj.plot( output='RCS', totalSignal=True, **kwgs )
 
-    if kwargs.get('operational', False):
-        obj.plot( output='fdfLn(RCS)', **kwgs)
-
+        if kwargs.get('operational', False):
+            obj.plot( output='fdfLn(RCS)', **kwgs)
 
 
 def plotting(element, scan,  **kwargs):
@@ -55,19 +57,14 @@ def plotting(element, scan,  **kwargs):
                         (now-dt.timedelta(hours=kwargs.pop('hora'))
                             ).strftime('%Y-%m-%d %H:%M'):]
     if element.raw.shape[0] > 1:
-        plots(element, scan, operational=True, **kwargs)
-        if scan != 'FixedPoint':
-            plots(element, scan,
-                dates=element.raw.index,
-                scp=False,
-                makeGif=True,
-                **kwargs)
+        plots(element, scan, **kwargs)
+
     else:
         print "No values to draw"
         pass
 
 
-def worker_wrapper(arg):
+def worker_wrapper(arg, **kwd):
     args, kwargs = arg
     return plotting(*args, **kwargs)
 
@@ -76,12 +73,13 @@ def main(scan):
     print 'cpu_count() = %d\n' % mp.cpu_count()
 
     instance =   Lidar(
-        fechaI=(now-dt.timedelta(hours=48)).strftime('%Y-%m-%d %H:%M'),
-        fechaF=now.strftime('%Y-%m-%d %H:%M'),
-        scan=scan,
-        output='raw',
-        path='CalidadAire/Lidar/'
+    fechaI=(now-dt.timedelta(hours=48 if scan == 'FixedPoint' else 12)).strftime('%Y-%m-%d %H:%M'),
+    fechaF=now.strftime('%Y-%m-%d %H:%M'),
+    scan=scan,
+    output='raw',
+    path='CalidadAire/Lidar/'
     )
+
     PROCESSES = 5
     print 'Creating pool with %d processes\n' % PROCESSES
     pool = LoggingPool(PROCESSES)
@@ -93,12 +91,40 @@ def main(scan):
         instance.datosInfo = instance.datosInfo.resample('30s').mean()
 
         args    = (instance, scan)
-        TASKS   = [(args, dict(hora=h,textSave='_%dh' %h)) for h in [48,24,12,6,3]]
+        TASKS   = [ (args,
+                    dict(operational=True,
+                        hora=h,
+                        textSave='_%dh' %h)
+                    ) for h in [48,24,12,6,3]
+                ]
         pool.map( worker_wrapper, TASKS)
 
     else:
         args    = (instance, scan)
-        task    = [(args, dict(hora=12,textSave='_last'))]
+        task    = [ (args,
+                    dict(textSave='_last',
+                        operational=True) ),
+                    (args,
+                    dict(scp=False,
+                        dates=instance.raw.index,
+                        makeGif=True,
+                        textSave='_last',
+                        oneOutput='LVD') ),
+                    (args,
+                    dict(scp=False,
+                        dates=instance.raw.index,
+                        makeGif=True,
+                        textSave='_last',
+                        oneOutput='RCS',
+                        parameters=['analog-s','analog-p','analog-b']) ),
+                    (args,
+                    dict(scp=False,
+                        dates=instance.raw.index,
+                        makeGif=True,
+                        textSave='_last',
+                        oneOutput='RCS',
+                        parameters=['photon-s','photon-p','photon-b'] ) ),
+                ]
         pool.map( worker_wrapper, task )
 
 
@@ -136,7 +162,7 @@ def main(scan):
 
 
 if __name__ == '__main__':
-    listener_configurer(kind)
+    # listener_configurer(kind)
     main(kind)
     # p = Process(target=lidar_cron, args=(kind,), name="r")
     # print "time start {}".format(dt.datetime.now())

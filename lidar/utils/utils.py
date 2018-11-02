@@ -36,24 +36,27 @@ def shiftedColorMap(cmap, start=0, midpoint=0.5, stop=1.0, name='shiftedcmap'):
     return newcmap
 
 ################################################################################
-def listener_configurer(name):
-    root = logging.getLogger(__name__)
-    h = logging.handlers.RotatingFileHandler('{}.log'.format(name), 'a', 300, 10)
+def listener_configurer(name,getLogger=None):
+    if getLogger is None:
+        getLogger = __name__
+    root = logging.getLogger(getLogger)
+    h = logging.handlers.RotatingFileHandler('{}.log'.format(name), 'a', 3000, 10)
     f = logging.Formatter('%(asctime)s %(processName)-10s %(name)s %(levelname)-8s %(message)s')
     h.setFormatter(f)
     root.addHandler(h)
-    # return root
+    return root
 
 # Decorator for logging errors
 # Shortcut to multiprocessing's logger
 def error(msg, *args):
-    name    = mp.current_process().name
-    logger  = logging.getLogger(name) #mp.get_logger() #log_to_stderr()
+    pname    = mp.current_process().name
+    logger  = listener_configurer(name='Lidar',getLogger=pname)
+    # logger  = logging.getLogger(name) #mp.get_logger() #log_to_stderr()
+    # h = logging.handlers.RotatingFileHandler('Lidar.log', 'a', 3000, 10)
+    # f = logging.Formatter('%(asctime)s %(processName)-10s %(name)s %(levelname)-8s %(message)s')
+    # h.setFormatter(f)
+    # logger.addHandler(h)
     logger.setLevel(logging.WARNING)
-    h = logging.handlers.RotatingFileHandler('Lidar.log', 'a', 3000, 10)
-    f = logging.Formatter('%(asctime)s %(processName)-10s %(name)s %(levelname)-8s %(message)s')
-    h.setFormatter(f)
-    logger.addHandler(h)
     return logger.error(msg, *args)
 
 class LogExceptions(object):
@@ -76,8 +79,9 @@ class LogExceptions(object):
         return result
 
 class LoggingPool(Pool):
-    def apply_async(self, func, args=(), kwds={}, callback=None):
-        return Pool.apply_async(self, LogExceptions(func), callback=callback, args=args, kwds=kwds )
+    def apply_async(self, func, *args, **kwds):
+        kwds['callback'] = kwds.get('callback',None)
+        return Pool.apply_async(self, LogExceptions(func), *args, **kwds )
 
     def map(self, func, iterable, chunksize=None ):
         return Pool.map(self, LogExceptions(func), iterable, chunksize)

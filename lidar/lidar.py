@@ -144,6 +144,8 @@ class Lidar(PlotBook):
         self.read(output=self.output)
         if not os.path.exists('Figuras/'):
             os.makedirs('Figuras/')
+        else:
+            os.system('rm Figuras/*')
 
         if not os.path.exists('Datos/'):
             os.makedirs('Datos/')
@@ -439,9 +441,14 @@ class Lidar(PlotBook):
                     df4.loc[df4.index[0], 'Fecha_fin'] = df4.index[-1]
                     self.datosInfo = self.datosInfo.append(df4.iloc[0])
 
-        self.datos              = pd.concat(self.datos,axis=1).T.astype(np.float64)
+        try:
+            self.datos          = pd.concat(self.datos,axis=1).T.astype(np.float64)
+        except:
+            raise ValueError("Oops!  There aren't any files.  Try again with another dates...")
+
+
         self.datos.index        = pd.to_datetime( self.datos.index )
-        self.datos.index.name       = 'Dates'
+        self.datos.index.name   = 'Dates'
 
 
         self.datosInfo.sort_index(inplace=True)
@@ -781,7 +788,7 @@ class Lidar(PlotBook):
                                                 self.scan,
                                                 self.output,
                                                 col )
-                gifKwd['textSaveGif']  = kwargs.pop('textSave',text)
+                gifKwd['textSaveGif']  = kwargs.get('textSave',text)
                 gifKwd['path']         = kwargs['path']
                 self._make_gif(**gifKwd)
 
@@ -827,7 +834,6 @@ class Lidar(PlotBook):
                 self.plotbook_args['user'],
                 _path )
         )
-        os.system('rm Figuras/*')
         return _path
 
 

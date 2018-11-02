@@ -268,15 +268,24 @@ locale.setlocale(locale.LC_TIME, ('en_GB','utf-8'))
 #     try:
 date = pd.date_range('2018-08-28','2018-08-28',freq='d')[0]
 # date = pd.date_range('2018-06-30','2018-06-30',freq='d')[0] #'2018-06-27','2018-07-14',freq='d'):
-        #
-binario =   Lidar(
-    fechaI=date.strftime('%Y-%m-%d'),
-    fechaF=date.strftime('%Y-%m-%d'),
-    scan='FixedPoint',
-    # scan='3D',
-    output='raw',
-    # path='CalidadAire/Lidar'
-)
+
+scan= '3D'
+now = dt.datetime.now()
+instance =   Lidar(
+        fechaI=(now-dt.timedelta(hours=48)).strftime('%Y-%m-%d %H:%M'),
+        fechaF=now.strftime('%Y-%m-%d %H:%M'),
+        scan=scan,
+        output='raw',
+        path='CalidadAire/Lidar/'
+    )
+# binario =   Lidar(
+#     fechaI=date.strftime('%Y-%m-%d'),
+#     fechaF=date.strftime('%Y-%m-%d'),
+#     scan='FixedPoint',
+#     # scan='3D',
+#     output='raw',
+#     # path='CalidadAire/Lidar'
+# )
 
 
 # binario.get_output(output='RCS')
@@ -286,36 +295,36 @@ binario =   Lidar(
 # # binario.raw    = backup[0].copy()
 # # binario.datosInfo   = backup[1]'cython_test', #
 #
-binario.datos = binario.datos.resample('30s').mean()
-binario.raw = binario.raw.resample('30s').mean()
-binario.datosInfo = binario.datosInfo.resample('30s').mean()
+# binario.datos = binario.datos.resample('30s').mean()
+# binario.raw = binario.raw.resample('30s').mean()
+# binario.datosInfo = binario.datosInfo.resample('30s').mean()
 #
 
 
 kwgs = dict(
     height=4.5,
     # height=12,
-    path= 'claTest',
+    # path= 'claTest',
     # path= date.strftime('%m-%d'),
     cla=False #True
 )
 
-binario.plot(output = 'raw',**kwgs )
-
-
-binario.plot(output = 'P(r)',
-    totalSignal=True,
-    vlim=[0,135],
-    parameters=['photon-s','photon-p'],
-    **kwgs )
+# binario.plot(output = 'raw',**kwgs )
 #
-binario.plot(output = 'P(r)',
-    totalSignal=True,
-    vlim=[5,34],
-    parameters=['analog-s','analog-p'],
-    **kwgs )
-
-binario.plot(output = 'S(r)',totalSignal=True,**kwgs )
+#
+# binario.plot(output = 'P(r)',
+#     totalSignal=True,
+#     vlim=[0,135],
+#     parameters=['photon-s','photon-p'],
+#     **kwgs )
+# #
+# binario.plot(output = 'P(r)',
+#     totalSignal=True,
+#     vlim=[5,34],
+#     parameters=['analog-s','analog-p'],
+#     **kwgs )
+#
+# binario.plot(output = 'S(r)',totalSignal=True,**kwgs )
 # binario.plot(output = 'LVD',
 #     totalSignal=True,
 #     vlim=[0.25,1],
