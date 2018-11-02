@@ -5,7 +5,7 @@ import traceback
 import multiprocessing as mp
 import logging
 import logging.handlers
-from functools import wraps
+# from functools import wraps
 from multiprocessing.pool import Pool
 
 from matplotlib.pyplot import register_cmap
@@ -36,46 +36,54 @@ def shiftedColorMap(cmap, start=0, midpoint=0.5, stop=1.0, name='shiftedcmap'):
     return newcmap
 
 ################################################################################
-# def listener_configurer():
-#     root = logging.getLogger(__main__)
-#     h = logging.handlers.RotatingFileHandler('Lidar.log', 'a', 300, 10)
-#     f = logging.Formatter('%(asctime)s %(processName)-10s %(name)s %(levelname)-8s %(message)s')
-#     h.setFormatter(f)
-#     root.addHandler(h)
+def listener_configurer(name):
+    root = logging.getLogger(__name__)
+    h = logging.handlers.RotatingFileHandler('{}.log'.format(name), 'a', 300, 10)
+    f = logging.Formatter('%(asctime)s %(processName)-10s %(name)s %(levelname)-8s %(message)s')
+    h.setFormatter(f)
+    root.addHandler(h)
+    # return root
 
 # Decorator for logging errors
 # Shortcut to multiprocessing's logger
-# def error(msg, *args):
-#     return mp.get_logger().error(msg, *args)
-#
-# class LogExceptions(object):
-#     def __init__(self, callable):
-#         self.__callable = callable
-#
-#     def __call__(self, *args, **kwargs):
-#         try:
-#             result = self.__callable(*args, **kwargs)
-#
-#         except Exception as e:
-#             # Here we add some debugging help. If multiprocessing's
-#             # debugging is on, it will arrange to log the traceback
-#             error(traceback.format_exc())
-#             # Re-raise the original exception so the Pool worker can
-#             # clean up
-#             raise
-#
-#         # It was fine, give a normal answer
-#         return result
-#
-# class LoggingPool(Pool):
-#     def apply_async(self, func, args=(), kwds={}, callback=None):
-#         return Pool.apply_async(self, LogExceptions(func), args, kwds, callback)
-#
-#     def map(self, func, iterable, chunksize=None ):
-#         return Pool.map(self, LogExceptions(func), iterable, chunksize)
-#
-#     def map_async(self, func, iterable, chunksize=None, callback=None ):
-#         return Pool.map_async(self, LogExceptions(func), iterable, chunksize, callback)
+def error(msg, *args):
+    name    = mp.current_process().name
+    logger  = logging.getLogger(name) #mp.get_logger() #log_to_stderr()
+    logger.setLevel(logging.WARNING)
+    h = logging.handlers.RotatingFileHandler('Lidar.log', 'a', 3000, 10)
+    f = logging.Formatter('%(asctime)s %(processName)-10s %(name)s %(levelname)-8s %(message)s')
+    h.setFormatter(f)
+    logger.addHandler(h)
+    return logger.error(msg, *args)
+
+class LogExceptions(object):
+    def __init__(self, callable):
+        self.__callable = callable
+
+    def __call__(self, *args, **kwargs):
+        try:
+            result = self.__callable(*args, **kwargs)
+
+        except Exception as e:
+            # Here we add some debugging help. If multiprocessing's
+            # debugging is on, it will arrange to log the traceback
+            error(traceback.format_exc())
+            # Re-raise the original exception so the Pool worker can
+            # clean up
+            raise
+
+        # It was fine, give a normal answer
+        return result
+
+class LoggingPool(Pool):
+    def apply_async(self, func, args=(), kwds={}, callback=None):
+        return Pool.apply_async(self, LogExceptions(func), callback=callback, args=args, kwds=kwds )
+
+    def map(self, func, iterable, chunksize=None ):
+        return Pool.map(self, LogExceptions(func), iterable, chunksize)
+
+    def map_async(self, func, iterable, chunksize=None, callback=None ):
+        return Pool.map_async(self, LogExceptions(func), iterable, chunksize, callback)
 ################################################################################
 #Decorator for logfile
 # def log(func):

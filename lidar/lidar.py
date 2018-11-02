@@ -576,20 +576,23 @@ class Lidar(PlotBook):
 
 
         elif self.scan in ['3D','Zenith','Azimuth']:
-            self.axes[0].scatter( CLA['xVM'], CLA['yVM'],
-                color=(0.45098039,0,0),
-                marker='X',
-                label='VM' )
-            self.axes[0].scatter( CLA['xGM'], CLA['yGM'],
-                color='black',
-                marker='o',
-                facecolors='none',
-                linewidth=2,
-                label='GM')
-            self.axes[0].legend(
-                bbox_to_anchor=(1.0,.9),
-                loc='center left', ncol=1,
-                handletextpad=0.1)
+
+            if CLA is not None:
+                self.axes[0].scatter( CLA['xVM'], CLA['yVM'],
+                    color=(0.45098039,0,0),
+                    marker='X',
+                    label='VM' )
+                self.axes[0].scatter( CLA['xGM'], CLA['yGM'],
+                    color='black',
+                    marker='o',
+                    facecolors='none',
+                    linewidth=2,
+                    label='GM')
+                self.axes[0].legend(
+                    bbox_to_anchor=(1.0,.9),
+                    loc='center left', ncol=1,
+                    handletextpad=0.1)
+
             self.axes[0].fill_between( self.dem.index, self.dem.values,
                 color=(0.875,0.875,0.875) )
 
@@ -778,10 +781,7 @@ class Lidar(PlotBook):
                                                 self.scan,
                                                 self.output,
                                                 col )
-                gifKwd['textSaveGif'] = '{}{}'.format(
-                                        text,
-                                        kwargs.pop('textSave',''),
-                                        )
+                gifKwd['textSaveGif']  = kwargs.pop('textSave',text)
                 gifKwd['path']         = kwargs['path']
                 self._make_gif(**gifKwd)
 
