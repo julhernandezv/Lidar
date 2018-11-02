@@ -10,7 +10,8 @@ import multiprocessing as mp
 # from lidar.utils.utils import LoggingPool
 
 baseDir = '/home/jhernandezv/Lidar/lidar/crones/'
-kind    = 'FixedPoint'
+# kind    = 'FixedPoint'
+kind    = '3D'
 # baseDir = os.path.dirname(os.path.abspath(__file__))
 # print sys.argv
 # kind = sys.argv[1]
@@ -67,35 +68,34 @@ def worker_wrapper(arg):
 def main(scan):
     print 'cpu_count() = %d\n' % mp.cpu_count()
 
+    PROCESSES = 5
+    print 'Creating pool with %d processes\n' % PROCESSES
+    pool = mp.Pool(PROCESSES)
+    print 'pool = %s' % pool
+
     instance =   Lidar(
         fechaI=(now-dt.timedelta(hours=48)).strftime('%Y-%m-%d %H:%M'),
         fechaF=now.strftime('%Y-%m-%d %H:%M'),
         scan=scan,
         output='raw',
         path='CalidadAire/Lidar/'
-
     )
     if scan == 'FixedPoint':
         # instance.datos = instance.datos.resample('30s').mean()
         instance.raw = instance.raw.resample('30s').mean()
         instance.datosInfo = instance.datosInfo.resample('30s').mean()
 
-    PROCESSES = 5
-    print 'Creating pool with %d processes\n' % PROCESSES
-    pool = mp.Pool(PROCESSES)
-    print 'pool = %s' % pool
-
     args = (instance, scan)
     TASKS = [(args, dict(hora=h,textSave='_%dh' %h)) for h in [48,24,12,6,3]]
 
     pool.map(worker_wrapper, TASKS)
 
-    print 'Testing close():'
-    for worker in pool._pool:
-        assert worker.is_alive()
+    # print 'Testing close():'
+    # for worker in pool._pool:
+    #     assert worker.is_alive()
 
     # pool.close()
-    # pool.join()
+    pool.join()
 
     # for r in result:
     # print result.get()

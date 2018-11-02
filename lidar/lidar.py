@@ -13,7 +13,7 @@ from .utils.utils import shiftedColorMap
 from cytools import (cy_range_corrected, cy_mVolts, cy_mHz, cy_brackground)
 
 from dateutil.relativedelta import relativedelta
-from matplotlib.pyplot import register_cmap, get_cmap
+from matplotlib.pyplot import get_cmap
 from matplotlib.dates import DateFormatter
 # reload (sys)
 # sys.setdefaultencoding ("utf-8")
@@ -257,10 +257,10 @@ class Lidar(PlotBook):
 
             # print dictDescripcionDataset[idiDataset + 1]
 
-        # print "***********************************************************************************************************************************************"
+        print "***********************************************************************************************************************************************"
 
-        # The dataset description is followed by an extra CRLF.
-        # print 'CRLF after description = {}'.format(fileObj.readline ())
+        #The dataset description is followed by an extra CRLF.
+        print 'CRLF after description = {}'.format(fileObj.readline ())
 
         if self.ascii:
             fileObj.close ()
@@ -289,7 +289,7 @@ class Lidar(PlotBook):
 
                         dictDescripcionDataset[ix+1]["datasetLista"].append ((struct.unpack ('i', fileObj.read (4)))[0])
 
-                    # print 'CRLF integrity {} = {}'.format(dictDescripcionDataset[ix+1]["datasetDescriptor"],fileObj.readline ())
+                    print 'CRLF integrity {} = {}'.format(dictDescripcionDataset[ix+1]["datasetDescriptor"],fileObj.readline ())
 
                     ejeX = np.arange(1,dictDescripcionDataset[ix+1]["datasetBinNums"]-17
                                 ) * dictDescripcionDataset[ix+1]["datasetBinWidth"] / 1000.
@@ -300,7 +300,7 @@ class Lidar(PlotBook):
 
                     # print dictDescripcionDataset[ix]
 
-            # print "***********************************************************************************************************************************************"
+            print "***********************************************************************************************************************************************"
 
             dataset             = pd.concat(dataset,axis=1)
             dataset.sort_index(axis=1,inplace=True)

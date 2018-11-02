@@ -266,7 +266,7 @@ locale.setlocale(locale.LC_TIME, ('en_GB','utf-8'))
 
 # for date in pd.date_range('2018-06-01','2018-10-11',freq='d'): #'2018-06-27','2018-07-14',freq='d'):
 #     try:
-date = pd.date_range('2018-08-30','2018-08-30',freq='d')[0]
+date = pd.date_range('2018-08-28','2018-08-28',freq='d')[0]
 # date = pd.date_range('2018-06-30','2018-06-30',freq='d')[0] #'2018-06-27','2018-07-14',freq='d'):
         #
 binario =   Lidar(
@@ -297,31 +297,40 @@ kwgs = dict(
     # height=12,
     path= 'claTest',
     # path= date.strftime('%m-%d'),
-    cla=True
+    cla=False #True
 )
-binario.plot(
-    output='RCS',
-    **kwgs
-)
-# binario.plot(output = 'raw',**kwgs )
-# binario.plot(output = 'S(r)',totalSignal=True,**kwgs )
 
-# binario.plot(output = 'P(r)',
-#     totalSignal=True,
-#     vlim=[0,135],
-#     parameters=['photon-s','photon-p'],
-#     **kwgs )
+binario.plot(output = 'raw',**kwgs )
+
+
+binario.plot(output = 'P(r)',
+    totalSignal=True,
+    vlim=[0,135],
+    parameters=['photon-s','photon-p'],
+    **kwgs )
 #
-# binario.plot(output = 'P(r)',
-#     totalSignal=True,
-#     vlim=[5,34],
-#     parameters=['analog-s','analog-p'],
-#     **kwgs )
-#
+binario.plot(output = 'P(r)',
+    totalSignal=True,
+    vlim=[5,34],
+    parameters=['analog-s','analog-p'],
+    **kwgs )
+
+binario.plot(output = 'S(r)',totalSignal=True,**kwgs )
 # binario.plot(output = 'LVD',
 #     totalSignal=True,
 #     vlim=[0.25,1],
 #     **kwgs )
+
+binario.plot(
+    output='RCS',
+    **kwgs
+)
+binario.plot(
+    output='LVD',
+    **kwgs
+)
+
+
 
 binario.plot(
     output='RCS',
