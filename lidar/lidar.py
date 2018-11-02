@@ -582,7 +582,7 @@ class Lidar(PlotBook):
 
 
 
-        elif self.scan in ['3D','Zenith','Azimuth']:
+        elif self.scan in ['3D','Zenith']:
 
             if CLA is not None:
                 self.axes[0].scatter( CLA['xVM'], CLA['yVM'],
