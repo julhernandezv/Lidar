@@ -36,7 +36,7 @@ for fp in fpFiles:
     if not os.path.exists(path):
         os.makedirs(path)
     os.system('mv {} {}'.format(fp,path))
-
+    os.system('chmod -R ugo+rx %s' %path)
 # #Moving Scanning Folders
 # for sm in smFiles:
 #     s   = sm.strip(smPath)

@@ -68,7 +68,7 @@ class PlotBook(MPLPlot):
     """
 
     os.system('mkdir Figuras')
-    plotbook_args         = {
+    plotbookArgs         = {
         'formato': 'png',
         'localPath':'Figuras/Lidar',
         'path': 'jhernandezv/Lidar/',
@@ -88,9 +88,9 @@ class PlotBook(MPLPlot):
 
     def __init__(self, data, x, y, *args, **kwargs):
 
-        self.kwargs = self.plotbook_args.copy()
+        self.kwargs = self.plotbookArgs.copy()
 
-        for kw in self.plotbook_args.keys():
+        for kw in self.plotbookArgs.keys():
             if kw in kwargs.keys():
                 self.kwargs[kw] = kwargs.pop(kw)
 
@@ -104,7 +104,7 @@ class PlotBook(MPLPlot):
 
         # print 'Kwargs PlotBook.method \n {}'.format(kwargs)
         # self.kwargs.update(kwargs)
-        kwg = self.plotbook_args.copy()
+        kwg = self.plotbookArgs.copy()
         kwg.update(kwargs)
         plt.savefig(
             '{localPath}{textSave}.{formato}'.format(**kwg) ,
@@ -117,7 +117,7 @@ class PlotBook(MPLPlot):
 
     def _make_gif(self,**kwargs):
 
-        kwg = self.plotbook_args.copy()
+        kwg = self.plotbookArgs.copy()
         kwg.update(kwargs)
         os.system( 'convert -delay {delay} -loop 0 "{localPath}{textSave}*" "{localPath}{textSave}{textSaveGif}.gif"'.format(**kwg))
         os.system('scp "{localPath}{textSave}{textSaveGif}.gif" {user}@siata.gov.co:/var/www/{path}'.format(**kwg) )

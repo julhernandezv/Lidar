@@ -134,11 +134,11 @@ class Lidar(PlotBook):
 
         self.degreeVariable    = 'Zenith' if self.scan in ['FixedPoint','3D'] else self.scan
         self.degreeFixed       = 'Azimuth'  if self.scan in ['FixedPoint','3D','Zenith'] else 'Zenith'
-        # self.kwargs = self.plotbook_args.copy()
+        # self.kwargs = self.plotbookArgs.copy()
 
-        for kw in self.plotbook_args.keys():
+        for kw in self.plotbookArgs.keys():
             if kw in kwargs.keys():
-                self.plotbook_args[kw] = kwargs.pop(kw)
+                self.plotbookArgs[kw] = kwargs.pop(kw)
         # self.kwargs             = kwargs
 
         self.read(output=self.output)
@@ -822,7 +822,7 @@ class Lidar(PlotBook):
     def handle_path(self,**kwargs):
 
         _path      = "{}{}/{}".format(
-                                self.plotbook_args['path'],
+                                self.plotbookArgs['path'],
                                 self.scan,
                                 kwargs.get('path',''),
                             )
@@ -831,7 +831,7 @@ class Lidar(PlotBook):
 
         os.system(
             'ssh {}@siata.gov.co "mkdir /var/www/{}"'.format(
-                self.plotbook_args['user'],
+                self.plotbookArgs['user'],
                 _path )
         )
         return _path

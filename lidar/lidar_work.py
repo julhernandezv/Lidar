@@ -51,7 +51,7 @@ from pandas.plotting._core import MPLPlot
 # # #
 # #
 # # # ################################################################################
-# # # Binario
+# # # instance
 # files = glob.glob('InfoLidar/AS0_180307-035517/RM*')
 # files = glob.glob('InfoLidar/ZS0_180223-131945/RM*')
 import glob
@@ -60,65 +60,65 @@ import glob
 files = sorted(glob.glob('/home/jhernandezv/Lidar/InfoLidar/3Ds_180703-135028/RM*') )       # test2
 # files = glob.glob('InfoLidar/3Ds_180704-105519/RM*')        # test3
 from lidar.lidar import Lidar
-binario = Lidar(scan='Zenith',output='raw')
-df1,df2 = binario.read_folder(files)
-t1,t2 = binario.read_file(files[0])
-t3,t4 = binario.read_file(files[1])
-t5,t6 = binario.read_file(files[-1],180)
+instance = Lidar(scan='Zenith',output='raw')
+df1,df2 = instance.read_folder(files)
+t1,t2 = instance.read_file(files[0])
+t3,t4 = instance.read_file(files[1])
+t5,t6 = instance.read_file(files[-1],180)
 # plt.close('all')
-# binario.data.groupby(axis=1,level=1).median().boxplot(column=['analog-p','analog-s'])
-# binario._save_fig(textSave='_boxplot_median_analog')
+# instance.data.groupby(axis=1,level=1).median().boxplot(column=['analog-p','analog-s'])
+# instance._save_fig(textSave='_boxplot_median_analog')
 # plt.close('all')
-# binario.data.groupby(axis=1,level=1).median().boxplot(column=['photon-p','photon-s'])
-# binario._save_fig(textSave='_boxplot_median_photon')
+# instance.data.groupby(axis=1,level=1).median().boxplot(column=['photon-p','photon-s'])
+# instance._save_fig(textSave='_boxplot_median_photon')
 
-# binario.data.quantile(np.arange(0,1,0.01)).groupby(axis=1,level=1).median()
+# instance.data.quantile(np.arange(0,1,0.01)).groupby(axis=1,level=1).median()
 a=6+5
 
 
 
 
-# binario = Lidar(fechaI='2018-07-04',Fechaf='2018-07-04',scan='3D')
+# instance = Lidar(fechaI='2018-07-04',Fechaf='2018-07-04',scan='3D')
 # ()
 
-# backup = [binario.data, binario.dataInfo]
-# binario.data        = backup[0]
-# binario.raw    = backup[0]
-# binario.dataInfo   = backup[1]
+# backup = [instance.data, instance.dataInfo]
+# instance.data        = backup[0]
+# instance.raw    = backup[0]
+# instance.dataInfo   = backup[1]
 #
-# binario.plot(textSave='_test5_',parameters=['photon-p'])
-# binario.plot(textSave='_test5_log',parameters=['photon-p'],output='RCS',colorbarKind='Log')
-# binario.plot(textSave='_test_4D',parameters=['photon-p'],output='RCS')
-# # dd, di = binario.read_folder(files)
+# instance.plot(textSave='_test5_',parameters=['photon-p'])
+# instance.plot(textSave='_test5_log',parameters=['photon-p'],output='RCS',colorbarKind='Log')
+# instance.plot(textSave='_test_4D',parameters=['photon-p'],output='RCS')
+# # dd, di = instance.read_folder(files)
 # # '-75.5686', '6.2680'io.data.stack([1,2]).resample('30s', axis=1, level=0 ).mean().unstack([1,2])
 
 #
-# binario.plot(textSave='_test_1',parameters=['photon-p'])
-# binario.plot(textSave='_test_1',parameters=['photon-p'],output='RCS')
-# binario.plot(textSave='_log_test_1',output='RCS',parameters=['photon-p'],colorbarKind='Log')
-# binario.plot(textSave='_test_1',output='Ln(RCS)',parameters=['photon-p'])
-# binario.plot(textSave='_test_1',output='dLn(RCS)',parameters=['photon-p'],colorbarKind='Anomaly')
-# binario.plot(textSave='_test_1',output='fLn(RCS)',parameters=['photon-p'])
-# binario.plot(textSave='_test_1',output='fdLn(RCS)',parameters=['photon-p'],colorbarKind='Anomaly')
-# binario.plot(textSave='_test_1',output='dfLn(RCS)',parameters=['photon-p'],colorbarKind='Anomaly')
-# binario.plot(textSave='_test_1',output='fdfLn(RCS)',parameters=['photon-p'],colorbarKind='Anomaly')
+# instance.plot(textSave='_test_1',parameters=['photon-p'])
+# instance.plot(textSave='_test_1',parameters=['photon-p'],output='RCS')
+# instance.plot(textSave='_log_test_1',output='RCS',parameters=['photon-p'],colorbarKind='Log')
+# instance.plot(textSave='_test_1',output='Ln(RCS)',parameters=['photon-p'])
+# instance.plot(textSave='_test_1',output='dLn(RCS)',parameters=['photon-p'],colorbarKind='Anomaly')
+# instance.plot(textSave='_test_1',output='fLn(RCS)',parameters=['photon-p'])
+# instance.plot(textSave='_test_1',output='fdLn(RCS)',parameters=['photon-p'],colorbarKind='Anomaly')
+# instance.plot(textSave='_test_1',output='dfLn(RCS)',parameters=['photon-p'],colorbarKind='Anomaly')
+# instance.plot(textSave='_test_1',output='fdfLn(RCS)',parameters=['photon-p'],colorbarKind='Anomaly')
 
 ################################################################################
 # FixedPoint#
 ################################################################################
 # date = pd.date_range('2018-08-06','2018-08-06',freq='d')[0] #'2018-06-27','2018-07-14',freq='d'):
 # altura = 4.5
-# binario = Lidar(fechaI=date.strftime('%Y-%m-%d'),Fechaf=date.strftime('%Y-%m-%d'),scan='FixedPoint')
-# binario.read()
-# binario.data = binario.data.stack([1,2]).resample('30s', axis=1, level=0 ).mean().unstack([1,2])
-# binario.raw = binario.data
-# binario.dataInfo = binario.dataInfo.resample('30s').mean()
-# binario.dataInfo = binario.dataInfo.reindex( pd.date_range(binario.data.columns.levels[0][0],binario.data.columns.levels[0][-1],freq='30s'))
+# instance = Lidar(fechaI=date.strftime('%Y-%m-%d'),Fechaf=date.strftime('%Y-%m-%d'),scan='FixedPoint')
+# instance.read()
+# instance.data = instance.data.stack([1,2]).resample('30s', axis=1, level=0 ).mean().unstack([1,2])
+# instance.raw = instance.data
+# instance.dataInfo = instance.dataInfo.resample('30s').mean()
+# instance.dataInfo = instance.dataInfo.reindex( pd.date_range(instance.data.columns.levels[0][0],instance.data.columns.levels[0][-1],freq='30s'))
 # kwgs = dict( height=altura,)# background= bkg)
-# binario.plot(**kwgs )
+# instance.plot(**kwgs )
 
-# binario.data.reindex( pd.date_range(binario.data.columns[0],binario.data.columns[-1],freq='30s'), axis=1)
-# binario.data.reindex(pd.date_range(binario.data.columns.levels[0][0],binario.data.columns.levels[0][-1],freq='30s'))
+# instance.data.reindex( pd.date_range(instance.data.columns[0],instance.data.columns[-1],freq='30s'), axis=1)
+# instance.data.reindex(pd.date_range(instance.data.columns.levels[0][0],instance.data.columns.levels[0][-1],freq='30s'))
 
 #################################################################################
 #Calculo CLA
@@ -147,7 +147,7 @@ def cloud_filter(data,clouds):
 # date = pd.date_range('2018-06-30','2018-06-30',freq='d')[0] #'2018-06-27','2018-07-14',freq='d'):
 date = pd.date_range('2018-08-28','2018-08-28',freq='d')[0]
         #
-binario =   Lidar(
+instance =   Lidar(
     fechaI=date.strftime('%Y-%m-%d'),
     fechaF=date.strftime('%Y-%m-%d'),
     scan='FixedPoint',
@@ -157,60 +157,60 @@ binario =   Lidar(
 height = 4.5
 
 
-binario.get_output(output='LVD')
+instance.get_output(output='LVD')
 
-lvd = binario.datos.loc(axis=1) [
-    binario.datos.columns.levels[0] [
-        binario.datos.columns.levels[0] < height
+lvd = instance.datos.loc(axis=1) [
+    instance.datos.columns.levels[0] [
+        instance.datos.columns.levels[0] < height
     ]
 ]
 
-binario.get_output(output='RCS')
+instance.get_output(output='RCS')
 
 
 
-binario.datos = binario.datos.loc(axis=1) [
-    binario.datos.columns.levels[0] [
-        binario.datos.columns.levels[0] < height
+instance.datos = instance.datos.loc(axis=1) [
+    instance.datos.columns.levels[0] [
+        instance.datos.columns.levels[0] < height
     ]
 ]
 
 # Suavizado
 #Espacial
-binario.datos = binario.datos.groupby(
+instance.datos = instance.datos.groupby(
                     level=[1,2], axis=1
                     ).rolling(16,
                         center=True,
                         min_periods=1,
                         axis=1
                         ).mean()
-binario.datos.columns = binario.datos.columns.droplevel([0,1])
+instance.datos.columns = instance.datos.columns.droplevel([0,1])
 # Temporal
-binario.datos = binario.datos.rolling(6,
+instance.datos = instance.datos.rolling(6,
                         center=True,
                         min_periods=1).mean()
 
 
-binario.datos = binario.datos.resample('10T').mean()
+instance.datos = instance.datos.resample('10T').mean()
 
 lvd = lvd.resample('10T').mean()
-backup = binario.datos.copy()
+backup = instance.datos.copy()
 #------------------------
 # Varianza Maxima
 # ------------------------
 
-# binario.datos = cloud_filter(backup, lvd)
+# instance.datos = cloud_filter(backup, lvd)
 
-binario.datos = binario.datos.groupby(
+instance.datos = instance.datos.groupby(
                     level=[1,2], axis=1
                     ).rolling(54,
                         center=True,
                         min_periods=1,
                         axis=1).var()
-binario.datos.columns = binario.datos.columns.droplevel([0,1])
+instance.datos.columns = instance.datos.columns.droplevel([0,1])
 
-binario.plot(
-    df=binario.datos,
+instance.plot(
+    df=instance.datos,
     path='claTest',
     textSave='_VM',
     colorbarKind='Linear',
@@ -218,20 +218,20 @@ binario.plot(
     colormap='jet',
     cbarLabel=r'$\sigma(RCS)$')
 
-vm = binario.datos.groupby(level=[1,2],axis=1).idxmin(axis=1)
+vm = instance.datos.groupby(level=[1,2],axis=1).idxmin(axis=1)
 for col in vm.columns:
     vm[col] = vm[col].str[0]
 #------------------------
 # Gradiente minimo
 #------------------------
-# binario.datos = cloud_filter(backup, lvd)
-binario.datos = backup.copy()
-dr  = (binario.datos.columns.levels[0][2] - binario.datos.columns.levels[0][0])
-binario.datos = binario.datos.groupby(level=[1,2],axis=1).diff(axis=1,periods=2) /dr
+# instance.datos = cloud_filter(backup, lvd)
+instance.datos = backup.copy()
+dr  = (instance.datos.columns.levels[0][2] - instance.datos.columns.levels[0][0])
+instance.datos = instance.datos.groupby(level=[1,2],axis=1).diff(axis=1,periods=2) /dr
 
 
-# binario.plot(
-#     df=binario.datos,
+# instance.plot(
+#     df=instance.datos,
 #     path='claTest',
 #     textSave='_GM',
 #     colorbarKind='Anomaly',
@@ -242,7 +242,7 @@ binario.datos = binario.datos.groupby(level=[1,2],axis=1).diff(axis=1,periods=2)
 #     )
 
 #get cla
-gm = binario.datos.groupby(level=[1,2],axis=1).idxmin(axis=1)
+gm = instance.datos.groupby(level=[1,2],axis=1).idxmin(axis=1)
 for col in gm.columns:
     gm[col] = gm[col].str[0]
 
@@ -250,6 +250,8 @@ for col in gm.columns:
 #################################################################################
 #Calculo CLA
 ################################################################################
+# ps -fea | grep {}
+
 
 from Funciones_Lectura import lee_Ceil,lee_data_ceil
 # import pandas as pd
@@ -266,20 +268,20 @@ locale.setlocale(locale.LC_TIME, ('en_GB','utf-8'))
 
 # for date in pd.date_range('2018-06-01','2018-10-11',freq='d'): #'2018-06-27','2018-07-14',freq='d'):
 #     try:
-date = pd.date_range('2018-08-28','2018-08-28',freq='d')[0]
+date = pd.date_range('2018-10-11','2018-10-12',freq='d')
 # date = pd.date_range('2018-06-30','2018-06-30',freq='d')[0] #'2018-06-27','2018-07-14',freq='d'):
 
-scan= '3D'
+
 now = dt.datetime.now()
 instance =   Lidar(
-        fechaI=(now-dt.timedelta(hours=48)).strftime('%Y-%m-%d %H:%M'),
-        fechaF=now.strftime('%Y-%m-%d %H:%M'),
-        scan=scan,
+        fechaI=date[0].strftime('%Y-%m-%d'),
+        fechaF=date[-1].strftime('%Y-%m-%d'),
+        scan='Azimuth',
         output='raw',
-        path='CalidadAire/Lidar/'
+        # path='CalidadAire/Lidar/'
     )
-# binario =   Lidar(
-#     fechaI=date.strftime('%Y-%m-%d'),
+# instance =   Lidar(
+#     fechaI=
 #     fechaF=date.strftime('%Y-%m-%d'),
 #     scan='FixedPoint',
 #     # scan='3D',
@@ -288,86 +290,55 @@ instance =   Lidar(
 # )
 
 
-# binario.get_output(output='RCS')
-# binario.datos.loc(axis=1)[:,:,'photon-p'] * binario.datosInfo.loc[0,'BinWidth_photon-p']
-# backup = [binario.datos.copy(), binario.datosInfo.copy()]
-# # binario.datos        = backup[0]
-# # binario.raw    = backup[0].copy()
-# # binario.datosInfo   = backup[1]'cython_test', #
+# instance.get_output(output='RCS')
+# instance.datos.loc(axis=1)[:,:,'photon-p'] * instance.datosInfo.loc[0,'BinWidth_photon-p']
+# backup = [instance.datos.copy(), instance.datosInfo.copy()]
+# # instance.datos        = backup[0]
+# # instance.raw    = backup[0].copy()
+# # instance.datosInfo   = backup[1]'cython_test', #
 #
-# binario.datos = binario.datos.resample('30s').mean()
-# binario.raw = binario.raw.resample('30s').mean()
-# binario.datosInfo = binario.datosInfo.resample('30s').mean()
+# instance.datos = instance.datos.resample('30s').mean()
+# instance.raw = instance.raw.resample('30s').mean()
+# instance.datosInfo = instance.datosInfo.resample('30s').mean()
 #
 
 
 kwgs = dict(
     height=4.5,
     # height=12,
-    # path= 'claTest',
+    path= 'AzimuthTest',
     # path= date.strftime('%m-%d'),
     cla=False #True
 )
 
-# binario.plot(output = 'raw',**kwgs )
-#
-#
-# binario.plot(output = 'P(r)',
-#     totalSignal=True,
-#     vlim=[0,135],
-#     parameters=['photon-s','photon-p'],
-#     **kwgs )
-# #
-# binario.plot(output = 'P(r)',
-#     totalSignal=True,
-#     vlim=[5,34],
-#     parameters=['analog-s','analog-p'],
-#     **kwgs )
-#
-# binario.plot(output = 'S(r)',totalSignal=True,**kwgs )
-# binario.plot(output = 'LVD',
-#     totalSignal=True,
-#     vlim=[0.25,1],
-#     **kwgs )
+instance.plot(output = 'raw',**kwgs )
 
-binario.plot(
+
+instance.plot(output = 'P(r)',
+    totalSignal=True,
+    vlim=[0,135],
+    parameters=['photon-s','photon-p'],
+    **kwgs )
+#
+instance.plot(output = 'P(r)',
+    totalSignal=True,
+    vlim=[5,34],
+    parameters=['analog-s','analog-p'],
+    **kwgs )
+
+instance.plot(output = 'S(r)',totalSignal=True,**kwgs )
+
+instance.plot(
     output='RCS',
     **kwgs
 )
-binario.plot(
+instance.plot(
     output='LVD',
     **kwgs
 )
 
 
 
-binario.plot(
-    output='RCS',
-    parameters=['analog-b'],
-    vlim = [.15,20],#[1,20],
-    **kwgs
-)
-
-binario.plot(
-    parameters=['analog-s','analog-p'],
-    vlim=[.1,16], #[1,16]
-    output='RCS',
-    **kwgs
-)
-
-binario.plot(
-    parameters=['photon-s','photon-p'],
-    vlim=[9,200], #[15,350]
-    output='RCS',
-    **kwgs
-)
-
-binario.plot(
-    output='RCS',
-    parameters=['photon-b'],
-    vlim = [10,200],
-    **kwgs
-)
 import pandas as pd
 import numpy as np
 import datetime as dt
@@ -384,7 +355,7 @@ locale.setlocale(locale.LC_TIME, ('en_GB','utf-8'))
 date = pd.date_range('2018-09-07','2018-09-07',freq='d')[0]
 # date = pd.date_range('2018-06-30','2018-06-30',freq='d')[0] #'2018-06-27','2018-07-14',freq='d'):
         #
-binario =   Lidar(
+instance =   Lidar(
     fechaI=date.strftime('%Y-%m-%d'),
     fechaF=date.strftime('%Y-%m-%d'),
     scan='Zenith',
@@ -393,16 +364,16 @@ binario =   Lidar(
 )
 
 
-# binario.get_output(output='RCS')
-# binario.datos.loc(axis=1)[:,:,'photon-p'] * binario.datosInfo.loc[0,'BinWidth_photon-p']
-# backup = [binario.datos.copy(), binario.datosInfo.copy()]
-# # binario.datos        = backup[0]
-# # binario.raw    = backup[0].copy()
-# # binario.datosInfo   = backup[1]'cython_test', #
+# instance.get_output(output='RCS')
+# instance.datos.loc(axis=1)[:,:,'photon-p'] * instance.datosInfo.loc[0,'BinWidth_photon-p']
+# backup = [instance.datos.copy(), instance.datosInfo.copy()]
+# # instance.datos        = backup[0]
+# # instance.raw    = backup[0].copy()
+# # instance.datosInfo   = backup[1]'cython_test', #
 #
-# binario.datos = binario.datos.resample('30s').mean()
-# binario.raw = binario.raw.resample('30s').mean()
-# binario.datosInfo = binario.datosInfo.resample('30s').mean()
+# instance.datos = instance.datos.resample('30s').mean()
+# instance.raw = instance.raw.resample('30s').mean()
+# instance.datosInfo = instance.datosInfo.resample('30s').mean()
 #
 
 
@@ -414,48 +385,48 @@ kwgs = dict(
     cla=True
 )
 
-# binario.plot(output = 'raw',**kwgs )
-# binario.plot(output = 'S(r)',totalSignal=True,**kwgs )
+# instance.plot(output = 'raw',**kwgs )
+# instance.plot(output = 'S(r)',totalSignal=True,**kwgs )
 
-# binario.plot(output = 'P(r)',
+# instance.plot(output = 'P(r)',
 #     totalSignal=True,
 #     vlim=[0,135],
 #     parameters=['photon-s','photon-p'],
 #     **kwgs )
 #
-# binario.plot(output = 'P(r)',
+# instance.plot(output = 'P(r)',
 #     totalSignal=True,
 #     vlim=[5,34],
 #     parameters=['analog-s','analog-p'],
 #     **kwgs )
 #
-# binario.plot(output = 'LVD',
+# instance.plot(output = 'LVD',
 #     totalSignal=True,
 #     vlim=[0.25,1],
 #     **kwgs )
 
-binario.plot(
+instance.plot(
     output='RCS',
     parameters=['analog-b'],
     vlim = [.15,20],#[1,20],
     **kwgs
 )
 
-binario.plot(
+instance.plot(
     parameters=['analog-s','analog-p'],
     vlim=[.1,16], #[1,16]
     output='RCS',
     **kwgs
 )
 
-binario.plot(
+instance.plot(
     parameters=['photon-s','photon-p'],
     vlim=[9,200], #[15,350]
     output='RCS',
     **kwgs
 )
 
-binario.plot(
+instance.plot(
     output='RCS',
     parameters=['photon-b'],
     vlim = [10,200],
@@ -477,7 +448,7 @@ locale.setlocale(locale.LC_TIME, ('en_GB','utf-8'))
 # date = pd.date_range('2018-08-17','2018-08-17',freq='d')[0]
 date = pd.date_range('2018-06-30','2018-06-30',freq='d')[0] #'2018-06-27','2018-07-14',freq='d'):
         #
-binario =   Lidar(
+instance =   Lidar(
     fechaI=date.strftime('%Y-%m-%d'),
     fechaF=date.strftime('%Y-%m-%d'),
     # scan='FixedPoint',
@@ -486,16 +457,16 @@ binario =   Lidar(
 )
 
 
-# binario.get_output(output='RCS')
-# binario.datos.loc(axis=1)[:,:,'photon-p'] * binario.datosInfo.loc[0,'BinWidth_photon-p']
-# backup = [binario.datos.copy(), binario.datosInfo.copy()]
-# # binario.datos        = backup[0]
-# # binario.raw    = backup[0].copy()
-# # binario.datosInfo   = backup[1]'cython_test', #
+# instance.get_output(output='RCS')
+# instance.datos.loc(axis=1)[:,:,'photon-p'] * instance.datosInfo.loc[0,'BinWidth_photon-p']
+# backup = [instance.datos.copy(), instance.datosInfo.copy()]
+# # instance.datos        = backup[0]
+# # instance.raw    = backup[0].copy()
+# # instance.datosInfo   = backup[1]'cython_test', #
 #
-# binario.datos = binario.datos.resample('30s').mean()
-# binario.raw = binario.raw.resample('30s').mean()
-# binario.datosInfo = binario.datosInfo.resample('30s').mean()
+# instance.datos = instance.datos.resample('30s').mean()
+# instance.raw = instance.raw.resample('30s').mean()
+# instance.datosInfo = instance.datosInfo.resample('30s').mean()
 #
 
 
@@ -506,88 +477,88 @@ kwgs = dict(
     # path= date.strftime('%m-%d'),
     cla=True
 )
-binario.plot(
+instance.plot(
     output='RCS',
     **kwgs
 )
-# binario.plot(output = 'raw',**kwgs )
-# binario.plot(output = 'S(r)',totalSignal=True,**kwgs )
+# instance.plot(output = 'raw',**kwgs )
+# instance.plot(output = 'S(r)',totalSignal=True,**kwgs )
 
-# binario.plot(output = 'P(r)',
+# instance.plot(output = 'P(r)',
 #     totalSignal=True,
 #     vlim=[0,135],
 #     parameters=['photon-s','photon-p'],
 #     **kwgs )
 #
-# binario.plot(output = 'P(r)',
+# instance.plot(output = 'P(r)',
 #     totalSignal=True,
 #     vlim=[5,34],
 #     parameters=['analog-s','analog-p'],
 #     **kwgs )
 #
-# binario.plot(output = 'LVD',
+# instance.plot(output = 'LVD',
 #     totalSignal=True,
 #     vlim=[0.25,1],
 #     **kwgs )
 
-binario.plot(
+instance.plot(
     output='RCS',
     parameters=['analog-b'],
     vlim = [.15,20],#[1,20],
     **kwgs
 )
 
-binario.plot(
+instance.plot(
     parameters=['analog-s','analog-p'],
     vlim=[.1,16], #[1,16]
     output='RCS',
     **kwgs
 )
 
-binario.plot(
+instance.plot(
     parameters=['photon-s','photon-p'],
     vlim=[9,200], #[15,350]
     output='RCS',
     **kwgs
 )
 
-binario.plot(
+instance.plot(
     output='RCS',
     parameters=['photon-b'],
     vlim = [10,200],
     **kwgs
 )
 
-        binario.plot( output='Ln(RCS)', **kwgs )
+        instance.plot( output='Ln(RCS)', **kwgs )
 
-        binario.plot(output='dLn(RCS)',  **kwgs)
+        instance.plot(output='dLn(RCS)',  **kwgs)
 
-        binario.plot(output='fLn(RCS)', **kwgs)
+        instance.plot(output='fLn(RCS)', **kwgs)
 
-        binario.plot(output='fdLn(RCS)',  **kwgs)
+        instance.plot(output='fdLn(RCS)',  **kwgs)
 
-        binario.plot(output='dfLn(RCS)', **kwgs)
+        instance.plot(output='dfLn(RCS)', **kwgs)
 
-        binario.plot(output='fdfLn(RCS)' , **kwgs)
+        instance.plot(output='fdfLn(RCS)' , **kwgs)
 
         for location in ['amva','siata','itagui']:
-            # binario = Lidar(fechaI='20180801',Fechaf='20180801',scan='FixedPoint',output='raw')
+            # instance = Lidar(fechaI='20180801',Fechaf='20180801',scan='FixedPoint',output='raw')
             ceil = lee_Ceil(
                 ceilometro=location,
-                Fecha_Inicio=binario.datosInfo.index[0].strftime('%Y%m%d %H:%M'), Fecha_Fin=binario.datosInfo.index[-1].strftime('%Y%m%d %H:%M') ) #'%Y-%m-%d %H:%M:%S'
+                Fecha_Inicio=instance.datosInfo.index[0].strftime('%Y%m%d %H:%M'), Fecha_Fin=instance.datosInfo.index[-1].strftime('%Y%m%d %H:%M') ) #'%Y-%m-%d %H:%M:%S'
             # ceil         = lee_Ceil(ceilometro=location,  Fecha_Inicio='20180801 10:45', Fecha_Fin='20180801 13:25' )
             ceil.columns            = (ceil.columns+1)/100.
             ceil[ceil < 100]        = 100
             ceil[ceil.isnull()]     = 100
             if ceil.size > 0:
-                binario.plot_lidar(
+                instance.plot_lidar(
                     ceil.index,ceil.columns,ceil.T,
                     textSave='Ceilometro_'+location,
                     colorbarKind='Log',
                     vlim=[10,13000],
                     cbarlabel=r'Intensidad Backscatter $[10^{-9}m^{-1}sr^{-1}]$',
                     path='jhernandezv/Lidar/FixedPoint/' +kwgs['path'],
-                    colormap = binario.ceilCmap
+                    colormap = instance.ceilCmap
                 )
     except:
         import traceback
@@ -595,54 +566,54 @@ binario.plot(
         pass
 # #
 
-# binario.plot( output='Ln(RCS)', **kwgs )
+# instance.plot( output='Ln(RCS)', **kwgs )
 ################################################################################
 # Ceilomoetro
 # from Funciones_Lectura import lee_Ceil,lee_data_ceil
 # # #
-# fecha_test = pd.date_range('2018-08-03 09:35:00', '2018-08-03 18:56:30',freq='30s')#binario.data.columns.levels[0]
+# fecha_test = pd.date_range('2018-08-03 09:35:00', '2018-08-03 18:56:30',freq='30s')#instance.data.columns.levels[0]
 # ceil =lee_data_ceil('amva',fecha_test[0].strftime('%Y-%m-%d %H:%M:%S'),fecha_test[-1].strftime('%Y-%m-%d %H:%M:%S') ) #fecha_test[0].strftime('%Y%m%d %H:%M'),fecha_test[-1].strftime('%Y%m%d %H:%M'),'amva')
 # ceil.columns = (ceil.columns+1)/100.
 # ceil[ceil < 100] = 100
 # ceil[ceil.isnull()] = 100
 # #
-# binario.plot_lidar(ceil.index,ceil.columns,ceil.T,textSave='Ceilometro_AMVA',colorbarKind='Log',vlim=[10,13000],cbarlabel='Intensidad Backscatter $[10^{-9}m^{-1}sr^{-1}]$',**kwgs)
+# instance.plot_lidar(ceil.index,ceil.columns,ceil.T,textSave='Ceilometro_AMVA',colorbarKind='Log',vlim=[10,13000],cbarlabel='Intensidad Backscatter $[10^{-9}m^{-1}sr^{-1}]$',**kwgs)
 ##############################################################################
         #
 
-        # binario.plot(output='dLn(RCS)',colorbarKind='Anomaly',  **kwgs)
+        # instance.plot(output='dLn(RCS)',colorbarKind='Anomaly',  **kwgs)
 
-        # binario.plot(output='fLn(RCS)', **kwgs)
+        # instance.plot(output='fLn(RCS)', **kwgs)
 
-        # binario.plot(output='fdLn(RCS)',colorbarKind='Anomaly',  **kwgs)
+        # instance.plot(output='fdLn(RCS)',colorbarKind='Anomaly',  **kwgs)
 
-        # binario.plot(output='dfLn(RCS)', colorbarKind='Anomaly', **kwgs)
+        # instance.plot(output='dfLn(RCS)', colorbarKind='Anomaly', **kwgs)
 
-        # binario.plot(output='fdfLn(RCS)', colorbarKind='Anomaly',  **kwgs)
+        # instance.plot(output='fdfLn(RCS)', colorbarKind='Anomaly',  **kwgs)
 
         #10 km
         # kwgs = dict(  height=10,textSave='_10km',path='10km')# background= bkg)
         #
-        # binario.plot(output = 'P(r)', **kwgs )
+        # instance.plot(output = 'P(r)', **kwgs )
         #
-        # binario.plot( output='RCS', **kwgs )
+        # instance.plot( output='RCS', **kwgs )
         #
         #
-        # binario.plot( output='Ln(RCS)', **kwgs )
+        # instance.plot( output='Ln(RCS)', **kwgs )
         # # #
         #
-        # # binario.plot(output='dLn(RCS)',colorbarKind='Anomaly',  **kwgs)
+        # # instance.plot(output='dLn(RCS)',colorbarKind='Anomaly',  **kwgs)
         #
-        # binario.plot(output='fLn(RCS)', **kwgs)
+        # instance.plot(output='fLn(RCS)', **kwgs)
         #
-        # # binario.plot(output='fdLn(RCS)',colorbarKind='Anomaly',  **kwgs)
+        # # instance.plot(output='fdLn(RCS)',colorbarKind='Anomaly',  **kwgs)
         #
-        # # binario.plot(output='dfLn(RCS)', colorbarKind='Anomaly', **kwgs)
+        # # instance.plot(output='dfLn(RCS)', colorbarKind='Anomaly', **kwgs)
         #
-        # binario.plot(output='fdfLn(RCS)', colorbarKind='Anomaly',  **kwgs)
+        # instance.plot(output='fdfLn(RCS)', colorbarKind='Anomaly',  **kwgs)
         #
         # kwgs.pop('textSave')
-        # binario.plot(textSave='_log_10km', output='RCS',colorbarKind='Log',  **kwgs)
+        # instance.plot(textSave='_log_10km', output='RCS',colorbarKind='Log',  **kwgs)
 
 
     # except:
@@ -681,51 +652,51 @@ locale.setlocale(locale.LC_TIME, ('en_GB','utf-8'))
 #     try:
 date = pd.date_range('2018-10-11','2018-10-11',freq='d')[0] #'2018-06-27','2018-07-14',freq='d'):
 
-binario = Lidar(
+instance = Lidar(
 fechaI=date.strftime('%Y-%m-%d'),
 fechaF=date.strftime('%Y-%m-%d'),
 scan='Azimuth',
 output='raw'
 )
 
-# # backup = [binario.raw, binario.dataInfo]
-# # binario.data        = backup[0]
-# # binario.raw    = backup[0]
-# # binario.dataInfo   = backup[1]
+# # backup = [instance.raw, instance.dataInfo]
+# # instance.data        = backup[0]
+# # instance.raw    = backup[0]
+# # instance.dataInfo   = backup[1]
 #
 #
-# kwgs = dict(parameters=['photon-p'], dates=binario.dataInfo.index, make_gif=True, path= date.strftime('%Y-%m-%d-bkg-nonan'),height=altura, background= bkg)
-# kwgs = dict(height=altura,path='vlim',dates =binario.dataInfo.index[binario.dataInfo.index.hour <1 ])
+# kwgs = dict(parameters=['photon-p'], dates=instance.dataInfo.index, make_gif=True, path= date.strftime('%Y-%m-%d-bkg-nonan'),height=altura, background= bkg)
+# kwgs = dict(height=altura,path='vlim',dates =instance.dataInfo.index[instance.dataInfo.index.hour <1 ])
 kwgs = dict(
     height=.8,
     path= date.strftime('%m-%d'),
     textSave='',
-    dates=binario.datos.index,
+    dates=instance.datos.index,
     makeGif=True,
 )
 
-binario.plot(output = 'P(r)',
+instance.plot(output = 'P(r)',
     totalSignal=True,
     vlim=[0,135],
     parameters=['photon-s','photon-p'],
     scp=False,
     **kwgs )
 
-binario.plot(output = 'P(r)',
+instance.plot(output = 'P(r)',
     totalSignal=True,
     vlim=[5,34],
     parameters=['analog-s','analog-p'],
     scp=False,
     **kwgs )
 
-binario.plot(
+instance.plot(
     parameters=['analog-s','analog-p'],
     vlim=[0.15,16], #[15,350]
     output='RCS',
     **kwgs
 )
 
-binario.plot(
+instance.plot(
     output='RCS',
     parameters=['analog-b'],
     vlim = [0.15,20],
@@ -734,37 +705,37 @@ binario.plot(
 
 
 
-binario.plot(
+instance.plot(
     parameters=['photon-s','photon-p','photon-b'],
     vlim=[9,200], #[15,350]
     output='RCS',
     **kwgs
 )
 
-binario.plot(
+instance.plot(
     output='LVD',
     totalSignal=True,
     vlim = [0.25,1],
     **kwgs
 )
 kwgs['scp'] = False
-binario.plot( output='Ln(RCS)', **kwgs )
+instance.plot( output='Ln(RCS)', **kwgs )
 # #
 
-binario.plot(output='dLn(RCS)', **kwgs)
+instance.plot(output='dLn(RCS)', **kwgs)
 
-binario.plot(output='fLn(RCS)', **kwgs)
+instance.plot(output='fLn(RCS)', **kwgs)
 
-binario.plot(output='fdLn(RCS)',  **kwgs)
+instance.plot(output='fdLn(RCS)',  **kwgs)
 
-binario.plot(output='dfLn(RCS)',  **kwgs)
+instance.plot(output='dfLn(RCS)',  **kwgs)
 
-binario.plot(output='fdfLn(RCS)', **kwgs)
+instance.plot(output='fdfLn(RCS)', **kwgs)
 
 
     except:
         pass
-# binario.plot(
+# instance.plot(
 #     output='RCS',
 #     parameters=['photon-b'],
 #     vlim = [10,200],
@@ -774,65 +745,65 @@ binario.plot(output='fdfLn(RCS)', **kwgs)
 #
 # #
 # #
-# binario.plot( output='P(r)',**kwgs )
+# instance.plot( output='P(r)',**kwgs )
 #
-# binario.plot( output='RCS', **kwgs )
+# instance.plot( output='RCS', **kwgs )
 #
-# binario.plot(textSave='_log', output='RCS',colorbarKind='Log',  **kwgs)
+# instance.plot(textSave='_log', output='RCS',colorbarKind='Log',  **kwgs)
 #
 #
-# binario.plot( output='Ln(RCS)', **kwgs )
+# instance.plot( output='Ln(RCS)', **kwgs )
 # # #
 #
-# binario.plot(output='dLn(RCS)',colorbarKind='Anomaly',  **kwgs)
+# instance.plot(output='dLn(RCS)',colorbarKind='Anomaly',  **kwgs)
 #
-# binario.plot(scp=False,output='fLn(RCS)', **kwgs)
+# instance.plot(scp=False,output='fLn(RCS)', **kwgs)
 #
-# binario.plot(output='fdLn(RCS)',colorbarKind='Anomaly',  **kwgs)
+# instance.plot(output='fdLn(RCS)',colorbarKind='Anomaly',  **kwgs)
 #
-# binario.plot(output='dfLn(RCS)', colorbarKind='Anomaly', **kwgs)
+# instance.plot(output='dfLn(RCS)', colorbarKind='Anomaly', **kwgs)
 #
-# binario.plot(output='fdfLn(RCS)', colorbarKind='Anomaly',  **kwgs)
+# instance.plot(output='fdfLn(RCS)', colorbarKind='Anomaly',  **kwgs)
 
     # except:
     #     pass
-# binario.plot(textSave='_test', parameters=['photon-p'], output='RCS', colorbarKind='Log', dates=binario.dataInfo.index, make_gif=True, path= '2018-07-04',scp=False)
-# binario.plot(textSave='_test', parameters=['photon-p'], output='fdfLn(RCS)', colorbarKind='Anomaly', dates=binario.dataInfo.index, make_gif=True, path= '2018-07-04') #,vlim=[-2,4]
-# binario.profiler(zenith=True,textSave='_RCS_log_test',parameter='analog-s',linear=False)
-# binario.profiler(zenith=True,textSave='_RCS_log_test',parameter='analog-p',linear=False)
-# binario.profiler(zenith=True,textSave='_RCS_log_test',parameter='photon-s',linear=False)
-# binario.profiler(zenith=True,textSave='_RCS_log_test',parameter='photon-p',linear=False)
+# instance.plot(textSave='_test', parameters=['photon-p'], output='RCS', colorbarKind='Log', dates=instance.dataInfo.index, make_gif=True, path= '2018-07-04',scp=False)
+# instance.plot(textSave='_test', parameters=['photon-p'], output='fdfLn(RCS)', colorbarKind='Anomaly', dates=instance.dataInfo.index, make_gif=True, path= '2018-07-04') #,vlim=[-2,4]
+# instance.profiler(zenith=True,textSave='_RCS_log_test',parameter='analog-s',linear=False)
+# instance.profiler(zenith=True,textSave='_RCS_log_test',parameter='analog-p',linear=False)
+# instance.profiler(zenith=True,textSave='_RCS_log_test',parameter='photon-s',linear=False)
+# instance.profiler(zenith=True,textSave='_RCS_log_test',parameter='photon-p',linear=False)
 #
-# binario.profiler(zenith=True,textSave='_RCS_log_test',parameter='photon-p',linear=False)
+# instance.profiler(zenith=True,textSave='_RCS_log_test',parameter='photon-p',linear=False)
 
 # plt.close('all')
-# # # #  pd.concat({'ascii':ascii.data[ascii.data.columns.levels[0][1]].sort_index(axis=1), 'binario':binario.data[binario.data.columns.levels[0][1]].sort_index(axis=1)} , axis = 1)
+# # # #  pd.concat({'ascii':ascii.data[ascii.data.columns.levels[0][1]].sort_index(axis=1), 'instance':instance.data[instance.data.columns.levels[0][1]].sort_index(axis=1)} , axis = 1)
 # # #
 # # ascii.data[ascii.data.columns.levels[0][1]]
-# binario.get_output(output='RCS')
-# x = binario.data[binario.data.columns.levels[0][1]]
+# instance.get_output(output='RCS')
+# x = instance.data[instance.data.columns.levels[0][1]]
 # # x.mask(x==0,inplace=True)
 # x.plot(xlim=(0,4000),subplots=True,figsize=(14,8),layout=(2,2),logy=True)
 # plt.savefig('Figuras/Datos_Lidar_RCS.png',bbox_inches='tight' )
 # os.system('scp Figuras/Datos_Lidar_RCS.png jhernandezv@siata.gov.co:/var/www/jhernandezv/Lidar/')
 # # #
 #
-# binario.data.mask(binario.data<=0,inplace=True)
-# binario.data = np.log(binario.data)
-# binario.profiler(zenith=True,textSave='_RCS_logdata_test',parameter='analog-s')
-# binario.profiler(zenith=True,textSave='_RCS_logdata_test',parameter='analog-p')
-# binario.profiler(zenith=True,textSave='_RCS_logdata_test',parameter='photon-s')
-# binario.profiler(zenith=True,textSave='_RCS_logdata_test',parameter='photon-p')
+# instance.data.mask(instance.data<=0,inplace=True)
+# instance.data = np.log(instance.data)
+# instance.profiler(zenith=True,textSave='_RCS_logdata_test',parameter='analog-s')
+# instance.profiler(zenith=True,textSave='_RCS_logdata_test',parameter='analog-p')
+# instance.profiler(zenith=True,textSave='_RCS_logdata_test',parameter='photon-s')
+# instance.profiler(zenith=True,textSave='_RCS_logdata_test',parameter='photon-p')
 #
 #
-# # #binario.data['2018-03-07 03:55:24'].iloc[:1200]
+# # #instance.data['2018-03-07 03:55:24'].iloc[:1200]
 #
 # # # #Plot
 # plt.close('all')
-# # # #  pd.concat({'ascii':ascii.data[ascii.data.columns.levels[0][1]].sort_index(axis=1), 'binario':binario.data[binario.data.columns.levels[0][1]].sort_index(axis=1)} , axis = 1)
+# # # #  pd.concat({'ascii':ascii.data[ascii.data.columns.levels[0][1]].sort_index(axis=1), 'instance':instance.data[instance.data.columns.levels[0][1]].sort_index(axis=1)} , axis = 1)
 # # #
 # # ascii.data[ascii.data.columns.levels[0][1]]
-# x = binario.data[binario.data.columns.levels[0][4]]
+# x = instance.data[instance.data.columns.levels[0][4]]
 # # x.mask(x==0,inplace=True)
 # x.plot(xlim=(0,4000),subplots=True,figsize=(14,8),layout=(2,2),logy=True)
 # plt.savefig('Figuras/Datos_Lidar_RCS_log.png',bbox_inches='tight' )
@@ -843,15 +814,15 @@ binario.plot(output='fdfLn(RCS)', **kwgs)
 #
 # #Plot
 # plt.close('all')
-# binario.data[binario.data.columns.levels[0][1]].plot(xlim=(0,4000),subplots=True,figsize=(14,8),layout=(2,2))
-# plt.savefig('Figuras/Datos_Lidar_Binario_derived_rezago18.png',bbox_inches='tight' )
-# os.system('scp Figuras/Datos_Lidar_Binario_derived_rezago18.png jhernandezv@siata.gov.co:/var/www/jhernandezv/Lidar/')
+# instance.data[instance.data.columns.levels[0][1]].plot(xlim=(0,4000),subplots=True,figsize=(14,8),layout=(2,2))
+# plt.savefig('Figuras/Datos_Lidar_instance_derived_rezago18.png',bbox_inches='tight' )
+# os.system('scp Figuras/Datos_Lidar_instance_derived_rezago18.png jhernandezv@siata.gov.co:/var/www/jhernandezv/Lidar/')
 #
 # # # ################################################################################
 # # # Regresion Mediana
 # x   = ascii.data.groupby(axis=1,level=1).median()
-# y   = binario.data.groupby(axis=1,level=1).median()
-# z = pd.concat({'ascii':x,'binario':y},axis=1)
+# y   = instance.data.groupby(axis=1,level=1).median()
+# z = pd.concat({'ascii':x,'instance':y},axis=1)
 #
 # plt.close('all')
 # z.plot(xlim=(0,4000),subplots=True,figsize=(24,12),layout=(2,4))
@@ -890,7 +861,7 @@ binario.plot(output='fdfLn(RCS)', **kwgs)
 #
 # y.loc[y.index[:-18],['analog-p','analog-s']] = y.loc[y.index[18:],['analog-p','analog-s']].values
 # y.loc[y.index[-18:],['analog-p','analog-s']] = np.NaN
-# z = pd.concat({'ascii':x,'binario':y},axis=1)
+# z = pd.concat({'ascii':x,'instance':y},axis=1)
 #
 # plt.close('all')
 # scatter_matrix(z, alpha=0.2, figsize=(24, 24), diagonal='kde')
@@ -902,12 +873,12 @@ binario.plot(output='fdfLn(RCS)', **kwgs)
 # ################################################################################
 # # # # Multiple Linear Regression
 #
-# z = pd.concat({'ascii':ascii.data,'binario':binario.data})
+# z = pd.concat({'ascii':ascii.data,'instance':instance.data})
 #
 # LR = pd.DataFrame() #columns =['slope','intercept','rvalue', 'pvalue', 'stderr'])
 # for col in z.columns:
 #     print col
-#     y = z.loc['binario',col]
+#     y = z.loc['instance',col]
 #     lr = stats.linregress(z.loc['ascii',col].values, (y.loc[y.index[18:]] if 'analog' in col[1] else y.loc[y.index[:-18]]).values  )
 #     LR = LR.append( pd.DataFrame({'slope':lr.slope, 'intercept':lr.intercept, 'rvalue':lr.rvalue, 'pvalue':lr.pvalue, 'stderr':lr.stderr}, index=[col] ) )
 #
