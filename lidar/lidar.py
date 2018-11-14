@@ -134,11 +134,11 @@ class Lidar(PlotBook):
 
         self.degreeVariable    = 'Zenith' if self.scan in ['FixedPoint','3D'] else self.scan
         self.degreeFixed       = 'Azimuth'  if self.scan in ['FixedPoint','3D','Zenith'] else 'Zenith'
-        # self.kwargs = self.plotbookArgs.copy()
+        # self.kwargs = self.plotBookArgs.copy()
 
-        for kw in self.plotbookArgs.keys():
+        for kw in self.plotBookArgs.keys():
             if kw in kwargs.keys():
-                self.plotbookArgs[kw] = kwargs.pop(kw)
+                self.plotBookArgs[kw] = kwargs.pop(kw)
         # self.kwargs             = kwargs
 
         self.read(output=self.output)
@@ -426,7 +426,7 @@ class Lidar(PlotBook):
         # d = dates[0]
             print "{}\n{}".format('-'*50,d.strftime('%Y-%m-%d'))
             os.system('rm -r Datos/*')
-            os.system('scp -rq jhernandezv@192.168.1.62:/mnt/ALMACENAMIENTO/LIDAR/{}/{}/* Datos/'.format('Scanning_Measurements' if self.scan != 'FixedPoint' else 'Fixed_Point', d.strftime('%Y%m%d')))
+            os.system('scp -rq {}@192.168.1.62:/mnt/ALMACENAMIENTO/LIDAR/{}/{}/* Datos/'.format(self.plotBookArgs['user'], 'Scanning_Measurements' if self.scan != 'FixedPoint' else 'Fixed_Point', d.strftime('%Y%m%d')))
 
             folders = glob.glob('Datos/{}*'.format( kindFolder[self.scan]))
             if len(folders) > 0 :
@@ -822,7 +822,7 @@ class Lidar(PlotBook):
     def handle_path(self,**kwargs):
 
         _path      = "{}{}/{}".format(
-                                self.plotbookArgs['path'],
+                                self.plotBookArgs['path'],
                                 self.scan,
                                 kwargs.get('path',''),
                             )
@@ -831,7 +831,7 @@ class Lidar(PlotBook):
 
         os.system(
             'ssh {}@siata.gov.co "mkdir /var/www/{}"'.format(
-                self.plotbookArgs['user'],
+                self.plotBookArgs['user'],
                 _path )
         )
         return _path
