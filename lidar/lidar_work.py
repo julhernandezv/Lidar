@@ -278,6 +278,7 @@ instance =   Lidar(
         fechaF=date[-1].strftime('%Y-%m-%d'),
         scan='Azimuth',
         output='raw',
+        user='torresiata',
         # path='CalidadAire/Lidar/'
     )
 # instance =   Lidar(

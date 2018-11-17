@@ -9,6 +9,7 @@ from multiprocessing.pool import Pool
 
 
 ##############################################################################
+#Handling paths
 
 # baseDir = '/home/jhernandezv/Lidar/lidar/crones/'
 # kind    = 'FixedPoint'
@@ -28,6 +29,8 @@ from lidar.lidar import Lidar
 from lidar.utils.utils import LoggingPool, listener_configurer
 locale.setlocale(locale.LC_TIME, ('en_GB','utf-8'))
 
+
+##############################################################################
 now = dt.datetime.now() #- dt.timedelta(days=15)
 
 

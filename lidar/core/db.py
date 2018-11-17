@@ -17,8 +17,7 @@ class Db:
         noId=True,
     )
 
-    def __init__(self, host, user, password, dbname, **kwargs )
-            ):
+    def __init__(self, host, user, password, dbname, **kwargs ):
 
         self.host       = host
         self.user       = user

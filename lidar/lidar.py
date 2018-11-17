@@ -984,11 +984,7 @@ class Lidar(PlotBook):
 
     @property
     def background(self):
-        bkg   = self.datos.loc(axis=1) [
-                self.datos.columns.levels[0] [
-                    (self.datos.columns.levels[0] > 18) &
-                    (self.datos.columns.levels[0] < 21)
-                ]
+        bkg   = self.datos.loc(axis=1) [ 18:21
             ].groupby(level=(1,2), axis=1).median()
         bkg [bkg.isnull()] = 0
 
@@ -1133,23 +1129,15 @@ class Lidar(PlotBook):
         print '\n{}\n Getting Clouds\n{}\n'.format('='*50,'='*50)
         self.get_output(output='LVD')
 
-        lvd = self.datos.loc(axis=1) [
-            self.datos.columns.levels[0] [
-                (self.datos.columns.levels[0] < height) & (
-                self.datos.columns.levels[0] > .25)
-            ]
-        ]
+        lvd = self.datos.loc(axis=1) [ 0.25:height ]
+
 
 
         print '\n{}\n Getting CLA\n{}\n'.format('='*50,'='*50)
         self.get_output(output='RCS',totalSignal=True)
 
-        cla = self.datos.loc(axis=1) [
-            self.datos.columns.levels[0] [
-                (self.datos.columns.levels[0] < height) & (
-                self.datos.columns.levels[0] > .25)
-            ]
-        ]
+        cla = self.datos.loc(axis=1) [ 0.25:height ]
+
 
         print '{}\n Getting Smoothing \n{}'.format('-'*50,'-'*50)
         #Espacial
