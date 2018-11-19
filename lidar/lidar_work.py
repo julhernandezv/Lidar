@@ -130,13 +130,40 @@ import os, locale
 # os.system('rm lidar/lidar/*.pyc')
 from lidar.lidar import Lidar
 locale.setlocale(locale.LC_TIME, ('en_GB','utf-8'))
+
+
+from matplotlib import use
+use('PDF')
+
+import matplotlib.pyplot as plt
+from matplotlib.colors import Normalize, LogNorm
+from matplotlib.font_manager import FontProperties
+from matplotlib.ticker import LogFormatterMathtext, LogLocator
+
+DATA_PATH = '/home/jhernandezv/Lidar/lidar/lidar/staticfiles/'
+
+plt.rc(    'font',
+    size = 18,
+    family = FontProperties(
+        fname = '{}/AvenirLTStd-Book.ttf'.format(DATA_PATH)
+        ).get_name()
+)
+
+typColor = '#%02x%02x%02x' % (115,115,115)
+plt.rc('axes',labelcolor=typColor, edgecolor=typColor,)#facecolor=typColor)
+plt.rc('axes.spines',right=False, top=False, )#left=False, bottom=False)
+plt.rc('text',color= typColor)
+plt.rc('xtick',color=typColor)
+plt.rc('ytick',color=typColor)
+plt.rc('figure.subplot', left=0, right=1, bottom=0, top=1)
+
 #
-def cloud_filter(data,clouds):
-    tmpData = {}
-    for col in clouds.columns.levels[2]:
-        tmpData[col+'-p'] = data.xs(col+'-p',axis=1,level=2).mask(clouds.xs(col,axis=1,level=2) >=.95 )
-        tmpData[col+'-s'] = data.xs(col+'-s',axis=1,level=2).mask(clouds.xs(col,axis=1,level=2) >=.95 )
-    return pd.concat(tmpData,names=['Parameters','Dates']).unstack(0)
+# def cloud_filter(data,clouds):
+#     tmpData = {}
+#     for col in clouds.columns.levels[2]:
+#         tmpData[col+'-p'] = data.xs(col+'-p',axis=1,level=2).mask(clouds.xs(col,axis=1,level=2) >=.95 )
+#         tmpData[col+'-s'] = data.xs(col+'-s',axis=1,level=2).mask(clouds.xs(col,axis=1,level=2) >=.95 )
+#     return pd.concat(tmpData,names=['Parameters','Dates']).unstack(0)
 
 
 # vlim = {'analog-s':[0.2,16],'analog-p':[0.2,16],'analog':[0,0.7] }
@@ -145,18 +172,273 @@ def cloud_filter(data,clouds):
 # for date in pd.date_range('2018-06-01','2018-10-01',freq='d'): #'2018-06-27','2018-07-14',freq='d'):
     # try:
 # date = pd.date_range('2018-06-30','2018-06-30',freq='d')[0] #'2018-06-27','2018-07-14',freq='d'):
-date = pd.date_range('2018-08-28','2018-08-28',freq='d')[0]
+# date = pd.date_range('2018-10-18','2018-10-28',freq='d')
+date = pd.date_range('2018-08-09','2018-11-17',freq='d')
         #
 instance =   Lidar(
-    fechaI=date.strftime('%Y-%m-%d'),
-    fechaF=date.strftime('%Y-%m-%d'),
+    fechaI=date.strftime('%Y-%m-%d')[0],
+    fechaF=date.strftime('%Y-%m-%d')[-1],
     scan='FixedPoint',
     output='raw'
 )
 
-height = 4.5
 
 
+instance.raw = instance.raw.resample('1T').mean()
+instance.datosInfo = instance.datosInfo.resample('1T').mean()
+instance.raw = instance.raw.loc(axis=0)[
+        (instance.raw.index.hour>=6) & (instance.raw.index.hour<18)
+    ]
+instance.get_output(output='RCS')
+
+
+###############################
+height=8
+dataset=instance.datos.loc(axis=1)[:height,:,'analog-s']
+dataset[dataset<.01] = .01
+dataset[dataset>16] = 16
+
+# Roll_min=A.rolling(window=10,center=True, closed='both',axis=0).mean()
+Clouds=A.rolling(window=5,center=True, closed='both',axis=1).min()
+Clouds=Clouds[Clouds>7]
+Clouds=Clouds.sum(axis=1)
+Clouds[Clouds>0]=1
+# Se escoge la zona entre 200 y 400 metros y se le filtran los valores muy altos pues pueden ser nubes
+Aerosols=instance.datos.loc(axis=1)[0.2:0.4,:,'analog-s']
+Aerosols=Aerosols[Aerosols<=7]
+
+# #plot:
+# ax=Aerosols.mean(axis=1).plot(ylim=([0,1]),figsize=([10.5,3]),alpha=0.5)
+# Aerosols.mean(axis=1).rolling(window=120, center=True, min_periods=10).mean(
+    #).plot(ylim=([0,1]),figsize=([10.5,3]),ax=ax)
+# pd.DataFrame(index=[Aerosols.index[0],Aerosols.index[-1]], data=[0.4,0.4]).plot(ax=ax, legend=False)
+# Se promedia verticalmente la zona entre 200 y 400 y se hace una media movil de la serie obtenida
+# Se considera que un umbral apropiado entre aerosol y no aerosol es 0.4
+Aerosols=Aerosols.mean(axis=1).rolling(window=120, center=True, min_periods=10).mean()
+
+Aerosols[Aerosols>=0.4]=1
+Aerosols[Aerosols<0.4]=0
+
+FilterDates = pd.concat({'Aerosols':Aerosols,'Clouds':Clouds}
+
+#Linealizando
+# A = np.log10(A)
+# Serie de RCS nocturno discriminada según el caso:
+Case_AC=dataset[FilterDates['Clouds'] + FilterDates['Aerosols']==2] # Nubes y aerosoles
+Case_aC=dataset[FilterDates['Clouds'] > FilterDates['Aerosols']]    # Nubes sin aerosoles
+Case_Ac=dataset[FilterDates['Clouds'] < FilterDates['Aerosols']]    # Sin nubes con aerosoles
+Case_ac=dataset[FilterDates['Clouds'] + FilterDates['Aerosols']==0] # Sin nubes ni aerosoles
+
+rango   = instance.lidarProperties['RCS']['vlim']['analog-s']
+bins    = np.logspace(np.log10(rango[0]),np.log10(rango[-1]),20)
+# bins    = np.linspace(rango[0],rango[-1],20)
+# bins    = np.log10(bins)
+# np.histogram( bins=bins,range=range, density=True )
+
+
+cases = {
+    'Cloudy skies and high aerosol load':Case_AC,
+    'Cloudy skies and low aerosol load':Case_aC,
+    'Cloud-free and high aerosol load':Case_Ac,
+    'Cloud-free and low aerosol load': Case_ac,
+}
+
+#---------------------------------------------------
+# Histograma
+
+plt.close('all')
+fig = plt.figure(figsize=(6,4))
+
+ax       = fig.add_subplot(1, 1, 1)
+for c,key in enumerate(cases.keys()):
+    hist, bn    = np.histogram(
+                    cases[key].values.reshape(cases[key].size),
+                    bins=bins,
+                    range=rango,
+                    density=False
+                )
+    # print hist, bn
+    hist = hist/np.float(hist.sum())*100.
+
+    ax.plot(bins[:-1]+(bins[1]-bins[0])/2., hist, label=key,marker='o',alpha=.8)
+
+ax.legend()
+ax.set_ylabel(r'Relative Frequency $[\%]$',weight='bold')
+ax.set_xlabel(r'RCS $[mV*km^2]$',weight='bold')
+ax.set_xscale('log')
+# plt.gca().xaxis.set_major_formatter(LogFormatterMathtext(10))
+instance._save_fig(localPath='Figuras/',textSave='Hist_Cases',path='jhernandezv/Lidar/FixedPoint/RadiacionTest/')
+
+#---------------------------------------------------
+# Histograma por segmentos en la altura
+
+each=.1
+Hist ={}
+
+plt.close('all')
+fig = plt.figure(figsize=(10,10))
+ax={}
+height_discrete = np.arange(0.1,height,each)
+norm = Normalize(0,18)
+for c,key in enumerate(cases.keys()):
+    ax[c]       = fig.add_subplot(2, 2, c+1)
+
+    hist = np.empty((height_discrete.size,bins.size-1))
+    for ix,h in enumerate(height_discrete):
+
+        seccion         = cases[key].loc(axis=1)[h:h+each]
+        hist[ix], bn    = np.histogram(
+                            seccion.values.reshape(seccion.size),
+                            bins=bins,
+                            range=range,
+                            density=False
+                        )
+        hist[ix] = hist[ix]/np.float(hist[ix].sum())*100.
+    Hist[key] =hist
+    # print "shapes: \nbins:{}\nheight:{}\nhist:{}".format(bins.size,height_discrete.size,hist.shape)
+    cf  = ax[c].pcolormesh(bins,np.arange(0.1,height+each,each),hist,norm=norm,cmap='jet')
+    ax[c].set_title(key,loc='left')
+    ax[c].set_xscale('log')
+    if c in [0,2]:
+        ax[c].set_ylabel(r'Altura $[km]$', weight='bold')
+    if c in [2,3]:
+        ax[c].set_xlabel(r'RCS $[mV*km^2]$',weight='bold') #, weight='bold')
+    ax[c].set_ylim(.1,5)
+
+cax      = fig.add_axes((1.02,.2,0.02,0.59))
+cbar     = plt.colorbar(cf, cax = cax , norm=norm,cmap='jet',extend='both')
+cbar.set_label(r'Relative Frequency $[\%]$',weight='bold')
+
+instance._save_fig(localPath='Figuras/',textSave='Hist_Height_Cases',path='jhernandezv/Lidar/FixedPoint/RadiacionTest/')
+
+#---------------------------------------------------
+# Histograma por segmentos en la altura
+# Caso - Total
+class MidpointNormalize(Normalize):
+    """
+    Normalise the colorbar so that diverging bars work there way either side from a prescribed midpoint value)
+
+    e.g. im=ax1.imshow(array, norm=MidpointNormalize(midpoint=0.,vmin=-100, vmax=100))
+    """
+    def __init__(self, vmin=None, vmax=None, midpoint=None, clip=False):
+        self.midpoint = midpoint
+        Normalize.__init__(self, vmin, vmax, clip)
+
+    def __call__(self, value, clip=None):
+        # I'm ignoring masked values and all kinds of edge cases to make a
+        # simple example...
+        x, y = [self.vmin, self.midpoint, self.vmax], [0, 0.5, 1]
+        return np.ma.masked_array(np.interp(value, x, y), np.isnan(value))
+
+each=.1
+HistT ={}
+
+plt.close('all')
+fig = plt.figure(figsize=(10,10))
+ax={}
+height_discrete = np.arange(0.1,height,each)
+norm = MidpointNormalize(midpoint=0.,
+                            vmin=-10,
+                            vmax=10)
+for c,key in enumerate(cases.keys()):
+    ax[c]       = fig.add_subplot(2, 2, c+1)
+
+    histT   = np.empty((height_discrete.size,bins.size-1))
+    hist    = np.empty((height_discrete.size,bins.size-1))
+    for ix,h in enumerate(height_discrete):
+        seccion         = A.loc(axis=1)[h:h+each]
+        histT[ix],bn    = np.histogram(
+                            seccion.values.reshape(seccion.size),
+                            bins=bins,
+                            range=range,
+                            density=False
+                        )
+        histT[ix] = histT[ix]/np.float(histT[ix].sum())*100.
+        seccion         = cases[key].loc(axis=1)[h:h+each]
+        hist[ix], bn    = np.histogram(
+                            seccion.values.reshape(seccion.size),
+                            bins=bins,
+                            range=range,
+                            density=False
+                        )
+        hist[ix] = hist[ix]/np.float(hist[ix].sum())*100.
+    hist = hist - histT
+    HistT[key] =hist
+    # print "shapes: \nbins:{}\nheight:{}\nhist:{}".format(bins.size,height_discrete.size,hist.shape)
+    cf  = ax[c].pcolormesh(bins,np.arange(0.1,height+each,each),hist,norm=norm,cmap='seismic')
+    ax[c].set_title(key,loc='left')
+    ax[c].set_xscale('log')
+    if c in [0,2]:
+        ax[c].set_ylabel(r'Altura $[km]$', weight='bold')
+    if c in [2,3]:
+        ax[c].set_xlabel(r'RCS $[mV*km^2]$',weight='bold') #, weight='bold')
+    ax[c].set_ylim(.1,5)
+
+cax      = fig.add_axes((1.02,.2,0.02,0.59))
+cbar     = plt.colorbar(cf, cax = cax , norm=norm,cmap='seismic')
+cbar.set_label(r'Relative Frequency Anomaly $[\%]$',weight='bold')
+
+instance._save_fig(localPath='Figuras/',textSave='Hist_Height_Cases_Diff',path='jhernandezv/Lidar/FixedPoint/RadiacionTest/')
+
+#########################################################
+# Radiación
+
+import glob as gb
+def lee_Pira(fechaInicio, fechaFin, Piranometro='siata'):
+    path    = "torresiata@192.168.1.62:/mnt/ALMACENAMIENTO/piranometros/{}/".format(Piranometro)
+    fechas  = pd.date_range(fechaInicio,fechaFin,freq='D')
+    data    = []
+    for fecha in fechas:
+        archivo = fecha.strftime("LOG%y%m%d*.csv")
+        print archivo
+        os.system("scp {}{} Datos/".format(path,archivo))
+        os.system("scp {}{} Datos/".format(path,archivo))
+        archivos = gb.glob('Datos/'+archivo)
+        for arc in archivos:
+            data.append(
+                pd.read_csv(arc,
+                        sep=';',
+                        usecols=[1,2,5],
+                        skiprows=4,
+                        parse_dates=[[0,1]],
+                        names=['Fecha','Hora','Radiacion']
+                ).set_index('Fecha_Hora')
+            )
+            # os.system('rm {}'.format(arc))
+    data = pd.concat(data)
+    data.mask(data<0,inplace=True)
+    if Piranometro=='siata':
+        data.index = data.index - dt.timedelta(hours=5)
+    return data
+
+# FechaiInicio='20181018 00:00'
+# FechaFinal='20181028 23:59'
+pira=lee_Pira(date[0], date[-1])
+pira = pira.groupby(pira.index.hour).apply(lambda x: x -x.mean())
+
+plt.close('all')
+fig = plt.figure(figsize=(10,10))
+for c,key in enumerate(cases.keys()):
+    ax[c]      = fig.add_subplot(2, 2, c+1)
+    idx = cases[key].index
+    ax[c].scatter(RCS400mean.loc[idx].values,pira.loc[idx].values,alpha=.5)# label=key,
+    ax[c].set_title(key,loc='left')
+    ax[c].set_xscale('log')
+    ax[c].set_xlim(rango[0],rango[-1])
+    if c in [0,2]:
+        ax[c].set_ylabel(r'Radiacion $[W/m^2]$',weight='bold')
+    if c in [2,3]:
+        ax[c].set_xlabel('RCS promedio 0.2-0.4 km')
+
+# ax.legend()
+
+# plt.gca().xaxis.set_major_formatter(LogFormatterMathtext(10))
+instance._save_fig(localPath='Figuras/',textSave='Scatter_Cases2',path='jhernandezv/Lidar/FixedPoint/RadiacionTest/')
+
+
+
+
+###',################33
 instance.get_output(output='LVD')
 
 lvd = instance.datos.loc(axis=1) [

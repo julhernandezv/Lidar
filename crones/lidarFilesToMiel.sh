@@ -34,10 +34,11 @@ verify_ssh_connection () {
         printf "%s\n" "SSH command successful"
     elif [ $? -eq 255 ]; then
 
-        while [ $? -eq 255 ]
+        # while [ $? -eq 255 ]
+        for ((i=1;i<=10;i++))
         do
             printf "%s\n%s" "SSH failed with following error:" "$out"
-            sleep 2
+            sleep 5
             local out=$("$@" 2>$1)
             if [ $? -eq 0 ]; then
                 printf "%s\n" "SSH command successful"

@@ -8,10 +8,12 @@ import pandas as pd
 import struct
 import sys, os, glob, locale, logging
 
+
 from .core.plotbook import PlotBook
 from .utils.utils import shiftedColorMap, listener_configurer
 from cytools import (cy_range_corrected, cy_mVolts, cy_mHz, cy_brackground)
 
+from tqdm import tqdm
 from dateutil.relativedelta import relativedelta
 from matplotlib.pyplot import get_cmap
 from matplotlib.dates import DateFormatter
@@ -141,7 +143,7 @@ class Lidar(PlotBook):
                 self.plotBookArgs[kw] = kwargs.pop(kw)
         # self.kwargs             = kwargs
 
-        self.read(output=self.output)
+        self.read(output=self.output,**kwargs)
         if not os.path.exists('Figuras/'):
             os.makedirs('Figuras/')
         else:
@@ -326,20 +328,27 @@ class Lidar(PlotBook):
 
         dataInfo   = []
         data        = {}
+        ix =0
+        files = sorted(filenames)
+        pbar = tqdm(total=len(files),desc="Unpacking: ")
 
-        for ix, file in enumerate(sorted(filenames)):
+
+        for filename in files:
             # print "{} \n  {}\n".format("="*50,file)
 
             offset  = None if ix == 0 else  df2[self.degreeFixed].values[0]
             # print offset
-            df1, df2    = self.read_file(file,offset)
+            df1, df2    = self.read_file(filename,offset)
             # print df2.index.strftime('%Y-%m-%d %H:%M:%S')
             # print '\n index= {}'.format(df2['Zenith' if self.scan in ['FixedPoint','3D'] else self.scan].values[0])
             # data[ df2.index[0].strftime('%Y-%m-%d %H:%M:%S') ] = df1
 
-
+            # update the bar
             data[ df2[self.degreeVariable].values[0] ] = df1
             dataInfo.append(df2)
+            ix+=1
+            pbar.update(1)
+        pbar.close()
 
         data        = pd.concat(data,axis=1,names=[self.degreeVariable,'Parameters'])
         dataInfo    = pd.concat(dataInfo)
@@ -425,10 +434,17 @@ class Lidar(PlotBook):
         for d in dates:
         # d = dates[0]
             print "{}\n{}".format('-'*50,d.strftime('%Y-%m-%d'))
-            os.system('rm -r Datos/*')
-            os.system('scp -rq {}@192.168.1.62:/mnt/ALMACENAMIENTO/LIDAR/{}/{}/* Datos/'.format(self.plotBookArgs['user'], 'Scanning_Measurements' if self.scan != 'FixedPoint' else 'Fixed_Point', d.strftime('%Y%m%d')))
-
-            folders = glob.glob('Datos/{}*'.format( kindFolder[self.scan]))
+            if kwargs.get('source','gomita') == 'miel':
+                os.system('rm -r Datos/*')
+                os.system('scp -rq {}@192.168.1.62:/mnt/ALMACENAMIENTO/LIDAR/{}/{}/* Datos/'.format(self.plotBookArgs['user'], 'Scanning_Measurements' if self.scan != 'FixedPoint' else 'Fixed_Point', d.strftime('%Y%m%d')))
+                folders = glob.glob('Datos/{}*'.format( kindFolder[self.scan]))
+            else:
+                folders = glob.glob('/media/jhernandezv/disco1/Lidar/{}/{}/{}*'.format(
+                        'Scanning_Measurements' if self.scan != 'FixedPoint' else 'Fixed_Point',
+                         d.strftime('%Y%m%d'),
+                         kindFolder[self.scan]
+                    )
+                )
             if len(folders) > 0 :
                 # os.system('ssh jhernandezv@siata.gov.co "mkdir /var/www/jhernandezv/Lidar/{}/{}/"'.format(self.scan, d.strftime('%Y%m%d')))
 
@@ -984,7 +1000,11 @@ class Lidar(PlotBook):
 
     @property
     def background(self):
-        bkg   = self.datos.loc(axis=1) [ 18:21
+        bkg   = self.datos.loc(axis=1) [
+                self.datos.columns.levels[0] [
+                    (self.datos.columns.levels[0] > 18) &
+                    (self.datos.columns.levels[0] < 21)
+                ]
             ].groupby(level=(1,2), axis=1).median()
         bkg [bkg.isnull()] = 0
 
