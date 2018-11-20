@@ -580,7 +580,7 @@ scatter = [
 station = ['I.E. Concejo de Itagüí', 'AMVA', 'Torre Siata']
 self.Plot_Mapa2(
 	textsave='_Lidar',
-	path='jhernandezv@siata.gov.co:/var/www/jhernandezv/Figuras/',
+	path='jhernandezv@siata.gov.co:/var/www/jhernandezv/Lidar/FixedPoint/Poster/',
 	hillshade=True,
 	clim=[1300,3400],
 	macroLocalizacion=False,
@@ -594,6 +594,9 @@ self.m.scatter(self.X,self.Y,s=700,facecolor='g',edgecolor=(0.0078,0.227,0.26),z
 
 self.X,self.Y		= self.m(-75.578526, 6.201328)
 self.m.scatter(self.X,self.Y,s=700,facecolor='b',edgecolor=(0.0078,0.227,0.26),zorder=11)
+
+self.X,self.Y		= self.m( -75.5887, 6.2593)
+self.m.scatter(self.X,self.Y,s=700,facecolor='k',marker='x',edgecolor=(0.0078,0.227,0.26),zorder=12)
 
 leg={}
 leg['Ceilometers'] = plt.Line2D( #\nPyranometers
@@ -616,6 +619,16 @@ leg['Scanning Lidar'] = plt.Line2D(
 		lw=2,
 		fillstyle='full'
 	)
+leg['Radiometer'] = plt.Line2D(
+		(0,1),(0,0),
+		ls='',
+		marker='x',
+		markersize=18,
+		mfc='k',
+		mec=(0.0078,0.227,0.26),
+		lw=2,
+		fillstyle='full'
+	)
 legend =self.ax[0].legend(
 	leg.values(),
 	leg.keys(),
@@ -630,7 +643,7 @@ legend.get_title().set_fontsize(22)
 # plt.setp(self.leg.get_title(),fontsize=self.fontsize,weight='bold',color=(0.45, 0.45, 0.45))
 
 textsave='_Lidar'
-path='jhernandezv@siata.gov.co:/var/www/jhernandezv/Figuras/'
+path='jhernandezv@siata.gov.co:/var/www/jhernandezv/Lidar/FixedPoint/Poster/'
 plt.savefig('Figuras/Mapa%s.pdf' %textsave, bbox_inches='tight')
 os.system('scp Figuras/Mapa%s.pdf %s' %(textsave,path))
 
@@ -746,50 +759,57 @@ locale.setlocale(locale.LC_TIME, ('en_GB','utf-8'))
 # vlim = {'analog-s':[0.2,16],'analog-p':[0.2,16],'analog':[0,0.7] }
 
 
-# for date in pd.date_range('2018-08-07','2018-11-19',freq='d'): #'2018-06-27','2018-07-14',freq='d'):
+for date in pd.date_range('2018-06-15','2018-11-19',freq='d'): #'2018-06-27','2018-07-14',freq='d'):
 # for date in pd.date_range('2018-10-07','2018-10-10',freq='d'): #'2018-06-27','2018-07-14',freq='d'):
-# try:
-date = pd.date_range('2018-10-07','2018-10-10',freq='d')
+    try:
+# date = pd.date_range('2018-10-07','2018-10-10',freq='d')
 # date = pd.date_range('2018-10-23','2018-10-28',freq='d')
 # date = pd.date_range('2018-06-30','2018-06-30',freq='d')[0] #'2018-06-27','2018-07-14',freq='d'):
 
 
-# now = dt.datetime.now()
-instance =   Lidar(
-        fechaI=date[0].strftime('%Y-%m-%d'),
-        fechaF=date[-1].strftime('%Y-%m-%d'),
-        # fechaI=date[0].strftime('%Y-%m-%d'),
-        # fechaF=date[-1].strftime('%Y-%m-%d'),
-        scan='FixedPoint',
-        output='raw',
-        user='torresiata',
-        # path='CalidadAire/Lidar/'
-        source='miel',
-    )
+        # now = dt.datetime.now()
+        instance =   Lidar(
+                fechaI=date.strftime('%Y-%m-%d'),
+                fechaF=date.strftime('%Y-%m-%d'),
+                # fechaI=date[0].strftime('%Y-%m-%d'),
+                # fechaF=date[-1].strftime('%Y-%m-%d'),
+                scan='3D',
+                output='raw',
+                user='torresiata',
+                # path='CalidadAire/Lidar/'
+                source='miel',
+            )
+        #
+        # instance.datos = instance.datos.resample('30s').mean()
+        # instance.raw = instance.raw.resample('30s').mean()
+        # instance.datosInfo = instance.datosInfo.resample('30s').mean()
+        #
 
-instance.datos = instance.datos.resample('30s').mean()
-instance.raw = instance.raw.resample('30s').mean()
-instance.datosInfo = instance.datosInfo.resample('30s').mean()
-#
 
+        kwgs = dict(
+            height=7,
+            # height=12,
+            path= 'Poster/Scannings/',
+            # path= date.strftime('%m-%d'),
+            cla=False, #True
+            user='jhernandezv',
+        )
 
-kwgs = dict(
-    height=14,
-    # height=12,
-    path= 'GOES',
-    # path= date.strftime('%m-%d'),
-    cla=False, #True
-    user='jhernandezv',
-)
-
-for date in pd.date_range('2018-10-07','2018-10-10',freq='d'):
-    instance.get_output(output='RCS',totalSignal=True)
-    instance.plot(
-        # output='RCS',
-        dates=instance.datos[date.strftime('%Y-%m-%d')].index,
-        # parameters=['analog-s','analog-p','analog-b'],
-        **kwgs
-    )
+    # for date in pd.date_range('2018-10-07','2018-10-10',freq='d'):
+        # instance.get_output(output='RCS',totalSignal=True)
+        instance.plot(
+            output='RCS',
+            dates=instance.datos[date.strftime('%Y-%m-%d')].index,
+            # parameters=['analog-s','analog-p','analog-b'],
+            **kwgs
+        )
+        instance.plot(
+            output='LVD',
+            dates=instance.datos[date.strftime('%Y-%m-%d')].index,
+            # parameters=['analog-s','analog-p','analog-b'],
+            **kwgs
+        )
+        del instance
 # instance.plot(
 #     output='P(r)',
 #     totalSignal=True,
@@ -803,10 +823,10 @@ for date in pd.date_range('2018-10-07','2018-10-10',freq='d'):
 #     **kwgs
 # )
 
-except:
-import traceback
-traceback.print_exc()
-pass
+    except:
+        import traceback
+        traceback.print_exc()
+        pass
 
 
 
@@ -853,15 +873,20 @@ locale.setlocale(locale.LC_TIME, ('en_GB','utf-8'))
 
 # for date in pd.date_range('2018-06-01','2018-10-11',freq='d'): #'2018-06-27','2018-07-14',freq='d'):
 #     try:
-date = pd.date_range('2018-09-07','2018-09-07',freq='d')[0]
+date = pd.date_range('2018-06-29','2018-06-29',freq='d')
+# date = pd.date_range('2018-10-07','2018-10-08',freq='d')
+# '10-07'
+# '11-12 06:00' '20'
 # date = pd.date_range('2018-06-30','2018-06-30',freq='d')[0] #'2018-06-27','2018-07-14',freq='d'):
         #
 instance =   Lidar(
-    fechaI=date.strftime('%Y-%m-%d'),
-    fechaF=date.strftime('%Y-%m-%d'),
-    scan='Zenith',
-    # scan='3D',
-    output='raw'
+    fechaI=date[0].strftime('%Y-%m-%d'),
+    fechaF=date[-1].strftime('%Y-%m-%d'),
+    # scan='FixedPoint',
+    scan='3D',
+    output='raw',
+    user='torresiata',
+    source='miel'
 )
 
 
@@ -875,16 +900,52 @@ instance =   Lidar(
 # instance.datos = instance.datos.resample('30s').mean()
 # instance.raw = instance.raw.resample('30s').mean()
 # instance.datosInfo = instance.datosInfo.resample('30s').mean()
-#
 
 
+# '2018-07-29 09:58'
 kwgs = dict(
-    height=6,
+    height=1.5,
     # height=12,
-    path= 'claTest',
+    # path= 'Poster/LVD/',
+    path= 'Poster/Scanning/',
     # path= date.strftime('%m-%d'),
-    cla=True
+    # dates=instance.datos['2018-06-29 09:58'].index,
+    textSave='_1.5km',
+    cla=False,
+    user='jhernandezv',
+    saveFig=False,
 )
+instance.plot(
+    output = 'RCS',
+    **kwgs )
+xx,yy,zz = instance.X, instance.Y, instance.Z
+dx = xx[0,1]-xx[0,0]
+xx += dx
+xx = xx[:-1,:-1]
+dy = xx[1,0]-xx[0,0]
+yy += dy
+yy = yy[:-1,:-1]
+
+kwgs['path'] ='jhernandezv/Lidar/FixedPoint/Poster/Scannings'
+instance.axes[0].contour(xx,yy, zz, [0.35], colors='k',)
+instance._save_fig(**kwgs)
+
+instance.plot(
+    output = 'LVD',
+    **kwgs )
+
+instance.axes[0].contour(xx,yy, zz, [0.35], colors='k',)
+instance._save_fig(**kwgs)
+
+
+kwgs['textSave'] = '_09-00'
+kwgs['height'] = 7
+instance.plot(
+    output = 'RCS',
+    **kwgs )
+instance.plot(
+    output = 'LVD',
+    **kwgs )
 
 # instance.plot(output = 'raw',**kwgs )
 # instance.plot(output = 'S(r)',totalSignal=True,**kwgs )

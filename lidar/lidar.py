@@ -441,6 +441,7 @@ class Lidar(PlotBook):
                     )
                 )
             if len(folders) > 0 :
+                # from tqdm import tqdm
                 # os.system('ssh jhernandezv@siata.gov.co "mkdir /var/www/jhernandezv/Lidar/{}/{}/"'.format(self.scan, d.strftime('%Y%m%d')))
                 pbar = tqdm(total=len(folders),desc="Unpacking: ")
 
@@ -615,7 +616,7 @@ class Lidar(PlotBook):
                     handletextpad=0.1)
 
             self.axes[0].fill_between( self.dem.index, self.dem.values,
-                color=(0.875,0.875,0.875) )
+                color='k' )
 
         if 'addText' in kwargs.keys():
             self.axes[0].text(
@@ -627,6 +628,10 @@ class Lidar(PlotBook):
 
         if kwargs.get('saveFig',True):
             self._save_fig(**kwargs)
+        else:
+            self.X =X
+            self.Y =Y
+            self.Z =Z
 
 
     def profiler(self,df,cla=None, **kwargs):
