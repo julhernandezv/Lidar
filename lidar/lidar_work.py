@@ -143,7 +143,7 @@ from matplotlib.ticker import LogFormatterMathtext, LogLocator
 DATA_PATH = '/home/jhernandezv/Lidar/lidar/lidar/staticfiles/'
 
 plt.rc(    'font',
-    size = 18,
+    size = 20,
     family = FontProperties(
         fname = '{}/AvenirLTStd-Book.ttf'.format(DATA_PATH)
         ).get_name()
@@ -172,8 +172,8 @@ plt.rc('figure.subplot', left=0, right=1, bottom=0, top=1)
 # for date in pd.date_range('2018-06-01','2018-10-01',freq='d'): #'2018-06-27','2018-07-14',freq='d'):
     # try:
 # date = pd.date_range('2018-06-30','2018-06-30',freq='d')[0] #'2018-06-27','2018-07-14',freq='d'):
-# date = pd.date_range('2018-10-18','2018-10-28',freq='d')
-date = pd.date_range('2018-08-09','2018-11-17',freq='d')
+date = pd.date_range('2018-10-18','2018-10-28',freq='d')
+# date = pd.date_range('2018-10-01','2018-10-30',freq='d')
         #
 instance =   Lidar(
     fechaI=date.strftime('%Y-%m-%d')[0],
@@ -186,17 +186,17 @@ instance =   Lidar(
 
 instance.raw = instance.raw.resample('1T').mean()
 instance.datosInfo = instance.datosInfo.resample('1T').mean()
-instance.raw = instance.raw.loc(axis=0)[
-        (instance.raw.index.hour>=6) & (instance.raw.index.hour<18)
-    ]
+# instance.raw = instance.raw.loc(axis=0)[
+#         (instance.raw.index.hour>=6) & (instance.raw.index.hour<18)
+#     ]
 instance.get_output(output='RCS')
 
 
 ###############################
 height=8
-dataset=instance.datos.loc(axis=1)[:height,:,'analog-s']
-dataset[dataset<.01] = .01
-dataset[dataset>16] = 16
+A=instance.datos.loc(axis=1)[:height,:,'analog-s']
+A[A<.01] = .01
+A[A>16] = 16
 
 # Roll_min=A.rolling(window=10,center=True, closed='both',axis=0).mean()
 Clouds=A.rolling(window=5,center=True, closed='both',axis=1).min()
@@ -219,17 +219,17 @@ Aerosols=Aerosols.mean(axis=1).rolling(window=120, center=True, min_periods=10).
 Aerosols[Aerosols>=0.4]=1
 Aerosols[Aerosols<0.4]=0
 
-FilterDates = pd.concat({'Aerosols':Aerosols,'Clouds':Clouds}
+FilterDates = pd.concat({'Aerosols':Aerosols,'Clouds':Clouds},axis=1)
 
 #Linealizando
 # A = np.log10(A)
 # Serie de RCS nocturno discriminada según el caso:
-Case_AC=dataset[FilterDates['Clouds'] + FilterDates['Aerosols']==2] # Nubes y aerosoles
-Case_aC=dataset[FilterDates['Clouds'] > FilterDates['Aerosols']]    # Nubes sin aerosoles
-Case_Ac=dataset[FilterDates['Clouds'] < FilterDates['Aerosols']]    # Sin nubes con aerosoles
-Case_ac=dataset[FilterDates['Clouds'] + FilterDates['Aerosols']==0] # Sin nubes ni aerosoles
+Case_AC=A[FilterDates['Clouds'] + FilterDates['Aerosols']==2] # Nubes y aerosoles
+Case_aC=A[FilterDates['Clouds'] > FilterDates['Aerosols']]    # Nubes sin aerosoles
+Case_Ac=A[FilterDates['Clouds'] < FilterDates['Aerosols']]    # Sin nubes con aerosoles
+Case_ac=A[FilterDates['Clouds'] + FilterDates['Aerosols']==0] # Sin nubes ni aerosoles
 
-rango   = instance.lidarProperties['RCS']['vlim']['analog-s']
+rango   = instance.lidarProperties['RCS']['vlim']['analog-b']
 bins    = np.logspace(np.log10(rango[0]),np.log10(rango[-1]),20)
 # bins    = np.linspace(rango[0],rango[-1],20)
 # bins    = np.log10(bins)
@@ -237,12 +237,125 @@ bins    = np.logspace(np.log10(rango[0]),np.log10(rango[-1]),20)
 
 
 cases = {
-    'Cloudy skies and high aerosol load':Case_AC,
-    'Cloudy skies and low aerosol load':Case_aC,
-    'Cloud-free and high aerosol load':Case_Ac,
-    'Cloud-free and low aerosol load': Case_ac,
+    'Cloudy skies and\nhigh aerosol load':Case_AC,
+    'Cloudy skies and\nlow aerosol load':Case_aC,
+    'Cloud-free and\nhigh aerosol load':Case_Ac,
+    'Cloud-free and\nlow aerosol load': Case_ac,
 }
+cases_name = ['Cloudy skies and\nlow aerosol load',
+'Cloudy skies and\nhigh aerosol load',
+ 'Cloud-free and\nlow aerosol load',
+ 'Cloud-free and\nhigh aerosol load',
+ ]
 
+##########################################
+#----------------LVD vs RCS--------------------
+height=5
+instance.get_output(output='RCS',totalSignal=True)
+rcs=instance.datos.loc(axis=1)[.2:height,:,'analog-b']
+
+instance.get_output(output='LVD')
+lvd=instance.datos.loc(axis=1)[.2:height,:,'analog']
+lvd = lvd.replace([np.inf, -np.inf], np.NaN)
+# lvd[lvd>1] =1
+# rcs[rcs>20] =20
+
+rango_lvd   = [0.,1] #instance.lidarProperties['LVD']['vlim']['analog']
+bins_lvd    = np.linspace(rango_lvd[0],rango_lvd[1],30)
+rango_rcs   = [.01,20] #instance.lidarProperties['RCS']['vlim']['analog-b']
+bins_rcs    = np.logspace(np.log10(rango_rcs[0]),np.log10(rango_rcs[-1]),30)
+
+hist,xbn,ybn = np.histogram2d(
+                x=lvd.values.reshape(lvd.values.size),
+                y=rcs.values.reshape(rcs.values.size),
+                bins=[bins_lvd,bins_rcs],
+                range=[rango_lvd,rango_rcs],
+                normed=False,
+            )
+hist = hist/np.float(hist.sum())*100.
+
+
+
+# #########################################################
+#----------Histograma 2d
+plt.close('all')
+fig = plt.figure(figsize=(6,6))
+# Histograma por segmentos en la altura
+plt.subplots_adjust(hspace=.3, )
+ax={}
+# height_discrete = np.arange(0.1,height,each)
+# norm = Normalize(0,18)
+# for c,key in enumerate(cases_name):
+kwd = dict(
+    # norm=Normalize(0,18),
+    cmap='jet'
+)
+c=0
+ax[c]       = fig.add_subplot(1, 1, c+1)
+
+cf  = ax[c].pcolormesh(bins_lvd,bins_rcs,hist.T,**kwd)
+# ax[c].set_title(key,loc='left')
+ax[c].set_xlabel(r'LVD $(\delta^v)$', weight='bold')
+
+ax[c].set_yscale('log')
+# ax[c].set_xscale('log')
+ax[c].set_ylabel(r'RCS $[mV*km^2]$',weight='bold') #, weight='bold')
+ax[c].set_ylim(rango_rcs[0],rango_rcs[1])
+ax[c].set_xlim(rango_lvd[0],rango_lvd[1])
+
+cax      = fig.add_axes((1.02,.2,0.02,0.59))
+cbar     = plt.colorbar(cf, cax = cax ,extend='max',**kwd)
+cbar.set_label(r'Joint Probability $[\%]$',weight='bold')
+
+instance._save_fig(localPath='Figuras/',textSave='Hist2d_LVDvsRCS',path='jhernandezv/Lidar/FixedPoint/Poster/Resultados/')
+
+#########################################################
+#----------Scatter
+ht = np.array(
+        list(
+            lvd.columns.levels[0][
+                (lvd.columns.levels[0]>.2) &
+                (lvd.columns.levels[0]<height)]
+        )* lvd.index.size
+        )
+ll = lvd.values.reshape(lvd.values.size)
+rr = rcs.values.reshape(rcs.values.size)
+
+
+plt.close('all')
+fig = plt.figure(figsize=(6,6))
+kwd = dict(
+    norm=Normalize(0,height),
+    cmap='jet',
+    alpha=.3
+)
+c=0
+ax[c]       = fig.add_subplot(1, 1, c+1)
+cf = ax[c].scatter(ll,rr,c=ht,**kwd)
+ax[c].set_yscale('log')
+ax[c].set_ylabel(r'RCS $[mV*km^2]$',weight='bold') #, weight='bold')
+ax[c].set_xlabel(r'LVD $(\delta^v)$', weight='bold')
+ax[c].set_ylim(rango_rcs[0],rango_rcs[1])
+ax[c].set_xlim(rango_lvd[0],rango_lvd[1])
+
+cax      = fig.add_axes((1.02,.2,0.02,0.59))
+cbar     = plt.colorbar(cf, cax = cax ,**kwd)
+cbar.set_label(r'Height $[km]$',weight='bold')
+
+instance._save_fig(localPath='Figuras/',textSave='Scatter_LVDvsRCS_Height',path='jhernandezv/Lidar/FixedPoint/Poster/Resultados/')
+
+
+
+ax =lvd.stack(0).quantile(np.arange(0.01,1.,.01)).plot()
+ax.set_ylabel(r'LVD $(\delta^v)$', weight='bold')
+ax.set_xlabel(r'Percentile', weight='bold')
+instance._save_fig(localPath='Figuras/',textSave='Percentile_LVD',path='jhernandezv/Lidar/FixedPoint/Poster/Resultados/')
+
+ax=rcs.stack(0).quantile(np.arange(0.01,1.,.01)).plot()
+ax.set_yscale('log')
+ax.set_ylabel(r'RCS $[mV*km^2]$',weight='bold')
+ax.set_xlabel(r'Percentile', weight='bold')
+instance._save_fig(localPath='Figuras/',textSave='Percentile_RCS',path='jhernandezv/Lidar/FixedPoint/Poster/Resultados/')
 #---------------------------------------------------
 # Histograma
 
@@ -250,7 +363,7 @@ plt.close('all')
 fig = plt.figure(figsize=(6,4))
 
 ax       = fig.add_subplot(1, 1, 1)
-for c,key in enumerate(cases.keys()):
+for c,key in enumerate(cases_name):
     hist, bn    = np.histogram(
                     cases[key].values.reshape(cases[key].size),
                     bins=bins,
@@ -270,17 +383,18 @@ ax.set_xscale('log')
 instance._save_fig(localPath='Figuras/',textSave='Hist_Cases',path='jhernandezv/Lidar/FixedPoint/RadiacionTest/')
 
 #---------------------------------------------------
-# Histograma por segmentos en la altura
-
+#bottom=0.,left=0.,right=1,top=1,wspace=.05,)
 each=.1
 Hist ={}
 
 plt.close('all')
-fig = plt.figure(figsize=(10,10))
+fig = plt.figure(figsize=(8,8))
+# Histograma por segmentos en la altura
+plt.subplots_adjust(hspace=.3, )
 ax={}
 height_discrete = np.arange(0.1,height,each)
 norm = Normalize(0,18)
-for c,key in enumerate(cases.keys()):
+for c,key in enumerate(cases_name):
     ax[c]       = fig.add_subplot(2, 2, c+1)
 
     hist = np.empty((height_discrete.size,bins.size-1))
@@ -290,7 +404,7 @@ for c,key in enumerate(cases.keys()):
         hist[ix], bn    = np.histogram(
                             seccion.values.reshape(seccion.size),
                             bins=bins,
-                            range=range,
+                            range=rango,
                             density=False
                         )
         hist[ix] = hist[ix]/np.float(hist[ix].sum())*100.
@@ -300,7 +414,7 @@ for c,key in enumerate(cases.keys()):
     ax[c].set_title(key,loc='left')
     ax[c].set_xscale('log')
     if c in [0,2]:
-        ax[c].set_ylabel(r'Altura $[km]$', weight='bold')
+        ax[c].set_ylabel(r'Height $[km]$', weight='bold')
     if c in [2,3]:
         ax[c].set_xlabel(r'RCS $[mV*km^2]$',weight='bold') #, weight='bold')
     ax[c].set_ylim(.1,5)
@@ -334,13 +448,14 @@ each=.1
 HistT ={}
 
 plt.close('all')
-fig = plt.figure(figsize=(10,10))
+fig = plt.figure(figsize=(8,8))
+plt.subplots_adjust(hspace=.3, )
 ax={}
 height_discrete = np.arange(0.1,height,each)
 norm = MidpointNormalize(midpoint=0.,
                             vmin=-10,
                             vmax=10)
-for c,key in enumerate(cases.keys()):
+for c,key in enumerate(cases_name):
     ax[c]       = fig.add_subplot(2, 2, c+1)
 
     histT   = np.empty((height_discrete.size,bins.size-1))
@@ -350,7 +465,7 @@ for c,key in enumerate(cases.keys()):
         histT[ix],bn    = np.histogram(
                             seccion.values.reshape(seccion.size),
                             bins=bins,
-                            range=range,
+                            range=rango,
                             density=False
                         )
         histT[ix] = histT[ix]/np.float(histT[ix].sum())*100.
@@ -358,7 +473,7 @@ for c,key in enumerate(cases.keys()):
         hist[ix], bn    = np.histogram(
                             seccion.values.reshape(seccion.size),
                             bins=bins,
-                            range=range,
+                            range=rango,
                             density=False
                         )
         hist[ix] = hist[ix]/np.float(hist[ix].sum())*100.
@@ -369,7 +484,7 @@ for c,key in enumerate(cases.keys()):
     ax[c].set_title(key,loc='left')
     ax[c].set_xscale('log')
     if c in [0,2]:
-        ax[c].set_ylabel(r'Altura $[km]$', weight='bold')
+        ax[c].set_ylabel(r'Height $[km]$', weight='bold')
     if c in [2,3]:
         ax[c].set_xlabel(r'RCS $[mV*km^2]$',weight='bold') #, weight='bold')
     ax[c].set_ylim(.1,5)
@@ -379,6 +494,15 @@ cbar     = plt.colorbar(cf, cax = cax , norm=norm,cmap='seismic')
 cbar.set_label(r'Relative Frequency Anomaly $[\%]$',weight='bold')
 
 instance._save_fig(localPath='Figuras/',textSave='Hist_Height_Cases_Diff',path='jhernandezv/Lidar/FixedPoint/RadiacionTest/')
+
+
+
+
+
+
+
+
+
 
 #########################################################
 # Radiación
@@ -417,7 +541,7 @@ pira=lee_Pira(date[0], date[-1])
 pira = pira.groupby(pira.index.hour).apply(lambda x: x -x.mean())
 
 plt.close('all')
-fig = plt.figure(figsize=(10,10))
+fig = plt.figure(figsize=(9,9))
 for c,key in enumerate(cases.keys()):
     ax[c]      = fig.add_subplot(2, 2, c+1)
     idx = cases[key].index
@@ -435,6 +559,80 @@ for c,key in enumerate(cases.keys()):
 # plt.gca().xaxis.set_major_formatter(LogFormatterMathtext(10))
 instance._save_fig(localPath='Figuras/',textSave='Scatter_Cases2',path='jhernandezv/Lidar/FixedPoint/RadiacionTest/')
 
+
+#---------------------------------------------
+# Mapa
+
+import AirNew as Air
+
+# est = pd.read_csv('EstacionesBogota.csv')
+reload(Air)
+self= Air.Air()
+#~ ext = ['latmax','latmin','lonmin','longmax']
+# 75.4W a 75.7W
+# 6.1N a 6.4N
+# ext=[6.515,5.975,-75.725,-75.1255]
+ext=[6.4,6.1,-75.7,-75.401]
+scatter = [
+	[-75.6443, -75.5742, -75.5887],
+	[6.1681, 6.2422, 6.2593]
+]
+station = ['I.E. Concejo de Itagüí', 'AMVA', 'Torre Siata']
+self.Plot_Mapa2(
+	textsave='_Lidar',
+	path='jhernandezv@siata.gov.co:/var/www/jhernandezv/Figuras/',
+	hillshade=True,
+	clim=[1300,3400],
+	macroLocalizacion=False,
+	georef=ext,
+	extendSquare=False,
+	saveFig=False
+)
+
+self.X,self.Y		= self.m(scatter[0] ,scatter[1])
+self.m.scatter(self.X,self.Y,s=700,facecolor='g',edgecolor=(0.0078,0.227,0.26),zorder=10)
+
+self.X,self.Y		= self.m(-75.578526, 6.201328)
+self.m.scatter(self.X,self.Y,s=700,facecolor='b',edgecolor=(0.0078,0.227,0.26),zorder=11)
+
+leg={}
+leg['Ceilometers'] = plt.Line2D( #\nPyranometers
+		(0,1),(0,0),
+		ls='',
+		marker='o',
+		markersize=18,
+		mfc='g',
+		mec=(0.0078,0.227,0.26),
+		lw=2,
+		fillstyle='full'
+	)
+leg['Scanning Lidar'] = plt.Line2D(
+		(0,1),(0,0),
+		ls='',
+		marker='o',
+		markersize=18,
+		mfc='b',
+		mec=(0.0078,0.227,0.26),
+		lw=2,
+		fillstyle='full'
+	)
+legend =self.ax[0].legend(
+	leg.values(),
+	leg.keys(),
+	bbox_to_anchor=(1,.15),
+	fontsize=22,
+	loc='lower right',
+	title='Remote Sensors',
+	labelspacing=.8)
+# self.leg.get_frame().set_edgecolor('w')
+# for text in self.leg.get_texts(): plt.setp(text, color = (0.45, 0.45, 0.45))
+legend.get_title().set_fontsize(22)
+# plt.setp(self.leg.get_title(),fontsize=self.fontsize,weight='bold',color=(0.45, 0.45, 0.45))
+
+textsave='_Lidar'
+path='jhernandezv@siata.gov.co:/var/www/jhernandezv/Figuras/'
+plt.savefig('Figuras/Mapa%s.pdf' %textsave, bbox_inches='tight')
+os.system('scp Figuras/Mapa%s.pdf %s' %(textsave,path))
 
 
 
@@ -548,51 +746,71 @@ locale.setlocale(locale.LC_TIME, ('en_GB','utf-8'))
 # vlim = {'analog-s':[0.2,16],'analog-p':[0.2,16],'analog':[0,0.7] }
 
 
-# for date in pd.date_range('2018-06-01','2018-10-11',freq='d'): #'2018-06-27','2018-07-14',freq='d'):
-#     try:
-date = pd.date_range('2018-10-11','2018-10-12',freq='d')
+# for date in pd.date_range('2018-08-07','2018-11-19',freq='d'): #'2018-06-27','2018-07-14',freq='d'):
+# for date in pd.date_range('2018-10-07','2018-10-10',freq='d'): #'2018-06-27','2018-07-14',freq='d'):
+# try:
+date = pd.date_range('2018-10-07','2018-10-10',freq='d')
+# date = pd.date_range('2018-10-23','2018-10-28',freq='d')
 # date = pd.date_range('2018-06-30','2018-06-30',freq='d')[0] #'2018-06-27','2018-07-14',freq='d'):
 
 
-now = dt.datetime.now()
+# now = dt.datetime.now()
 instance =   Lidar(
         fechaI=date[0].strftime('%Y-%m-%d'),
         fechaF=date[-1].strftime('%Y-%m-%d'),
-        scan='Azimuth',
+        # fechaI=date[0].strftime('%Y-%m-%d'),
+        # fechaF=date[-1].strftime('%Y-%m-%d'),
+        scan='FixedPoint',
         output='raw',
         user='torresiata',
         # path='CalidadAire/Lidar/'
+        source='miel',
     )
-# instance =   Lidar(
-#     fechaI=
-#     fechaF=date.strftime('%Y-%m-%d'),
-#     scan='FixedPoint',
-#     # scan='3D',
-#     output='raw',
-#     # path='CalidadAire/Lidar'
-# )
 
-
-# instance.get_output(output='RCS')
-# instance.datos.loc(axis=1)[:,:,'photon-p'] * instance.datosInfo.loc[0,'BinWidth_photon-p']
-# backup = [instance.datos.copy(), instance.datosInfo.copy()]
-# # instance.datos        = backup[0]
-# # instance.raw    = backup[0].copy()
-# # instance.datosInfo   = backup[1]'cython_test', #
-#
-# instance.datos = instance.datos.resample('30s').mean()
-# instance.raw = instance.raw.resample('30s').mean()
-# instance.datosInfo = instance.datosInfo.resample('30s').mean()
+instance.datos = instance.datos.resample('30s').mean()
+instance.raw = instance.raw.resample('30s').mean()
+instance.datosInfo = instance.datosInfo.resample('30s').mean()
 #
 
 
 kwgs = dict(
-    height=4.5,
+    height=14,
     # height=12,
-    path= 'AzimuthTest',
+    path= 'GOES',
     # path= date.strftime('%m-%d'),
-    cla=False #True
+    cla=False, #True
+    user='jhernandezv',
 )
+
+for date in pd.date_range('2018-10-07','2018-10-10',freq='d'):
+    instance.get_output(output='RCS',totalSignal=True)
+    instance.plot(
+        # output='RCS',
+        dates=instance.datos[date.strftime('%Y-%m-%d')].index,
+        # parameters=['analog-s','analog-p','analog-b'],
+        **kwgs
+    )
+# instance.plot(
+#     output='P(r)',
+#     totalSignal=True,
+#
+#     **kwgs
+# )
+# instance.plot(
+#     output='S(r)',
+#     totalSignal=True,
+#     # parameters=['analog-s','analog-p','analog-b'],
+#     **kwgs
+# )
+
+except:
+import traceback
+traceback.print_exc()
+pass
+
+
+
+
 
 instance.plot(output = 'raw',**kwgs )
 

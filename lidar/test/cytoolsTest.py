@@ -42,7 +42,7 @@ x = np.ones((100,800000),dtype=np.float64)
 y = np.arange(800000,dtype=np.float64)
 # z = cytools.cy_range_corrected(x,y)
 
-%timeit -n100 cytools.cy_range_corrected(x,y)
+# %timeit -n100 cytools.cy_range_corrected(x,y)
 zz=cytools.cy_range_corrected(x,y)
 
 def range_corrected(  matrix, rang, step=1 ):
@@ -55,7 +55,7 @@ def range_corrected(  matrix, rang, step=1 ):
         # result [:,i] = matrix[:,i] * rang[i]
     return result
 
-%timeit range_corrected(x,y,1)
+# %timeit range_corrected(x,y,1)
 
 def mHz ( matrix,
             binWidth,
@@ -159,8 +159,8 @@ shot = np.ones(4,dtype=np.float64)*601
 
 c = cytools.cy_mVolts( tmp, input, adcbits, shot)
 
-%load_ext Cython
-%%cython
+# %load_ext Cython
+# %%cython
 import numpy as np
 cimport numpy as np
 def test( int c):

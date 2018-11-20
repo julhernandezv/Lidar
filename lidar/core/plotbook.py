@@ -94,7 +94,7 @@ class PlotBook(MPLPlot):
             if kw in kwargs.keys():
                 self.kwargs[kw] = kwargs.pop(kw)
 
-        data.replace([np.inf,-np.inf],np.nan)
+        # data.replace([np.inf,-np.inf],np.nan)
         super(PlotBook, self).__init__(data,*args,**kwargs)
         self.x = x
         self.y = y

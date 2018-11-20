@@ -329,11 +329,9 @@ class Lidar(PlotBook):
         dataInfo   = []
         data        = {}
         ix =0
-        files = sorted(filenames)
-        pbar = tqdm(total=len(files),desc="Unpacking: ")
 
 
-        for filename in files:
+        for filename in sorted(filenames):
             # print "{} \n  {}\n".format("="*50,file)
 
             offset  = None if ix == 0 else  df2[self.degreeFixed].values[0]
@@ -342,13 +340,10 @@ class Lidar(PlotBook):
             # print df2.index.strftime('%Y-%m-%d %H:%M:%S')
             # print '\n index= {}'.format(df2['Zenith' if self.scan in ['FixedPoint','3D'] else self.scan].values[0])
             # data[ df2.index[0].strftime('%Y-%m-%d %H:%M:%S') ] = df1
-
-            # update the bar
             data[ df2[self.degreeVariable].values[0] ] = df1
             dataInfo.append(df2)
             ix+=1
-            pbar.update(1)
-        pbar.close()
+
 
         data        = pd.concat(data,axis=1,names=[self.degreeVariable,'Parameters'])
         dataInfo    = pd.concat(dataInfo)
@@ -436,7 +431,7 @@ class Lidar(PlotBook):
             print "{}\n{}".format('-'*50,d.strftime('%Y-%m-%d'))
             if kwargs.get('source','gomita') == 'miel':
                 os.system('rm -r Datos/*')
-                os.system('scp -rq {}@192.168.1.62:/mnt/ALMACENAMIENTO/LIDAR/{}/{}/* Datos/'.format(self.plotBookArgs['user'], 'Scanning_Measurements' if self.scan != 'FixedPoint' else 'Fixed_Point', d.strftime('%Y%m%d')))
+                os.system('scp -rq {}@192.168.1.62:/mnt/ALMACENAMIENTO/LIDAR/{}/{}/* Datos/'.format(kwargs.get('user',self.plotBookArgs['user']), 'Scanning_Measurements' if self.scan != 'FixedPoint' else 'Fixed_Point', d.strftime('%Y%m%d')))
                 folders = glob.glob('Datos/{}*'.format( kindFolder[self.scan]))
             else:
                 folders = glob.glob('/media/jhernandezv/disco1/Lidar/{}/{}/{}*'.format(
@@ -447,6 +442,7 @@ class Lidar(PlotBook):
                 )
             if len(folders) > 0 :
                 # os.system('ssh jhernandezv@siata.gov.co "mkdir /var/www/jhernandezv/Lidar/{}/{}/"'.format(self.scan, d.strftime('%Y%m%d')))
+                pbar = tqdm(total=len(folders),desc="Unpacking: ")
 
                 for folder in folders:
                     archivos   = glob.glob('{}{}*'.format(folder, '/RM' if self.scan != 'FixedPoint' else ''))
@@ -456,6 +452,8 @@ class Lidar(PlotBook):
 
                     df4.loc[df4.index[0], 'Fecha_fin'] = df4.index[-1]
                     self.datosInfo = self.datosInfo.append(df4.iloc[0])
+                    pbar.update(1)
+                pbar.close()
 
         try:
             self.datos          = pd.concat(self.datos,axis=1).T.astype(np.float64)
@@ -731,11 +729,12 @@ class Lidar(PlotBook):
             self.datos = kwargs.pop('df')
 
         else:
-            self.get_output(
-                output=kwargs.pop('output',self.output),
-                totalSignal=kwargs.pop('totalSignal',False),
-                **kwargs
-            )
+            if 'output' in kwargs.keys():
+                self.get_output(
+                    output=kwargs.pop('output'),
+                    totalSignal=kwargs.pop('totalSignal',False),
+                    **kwargs
+                    )
             self.datos = self.datos.loc[
                 kwargs.pop('dates',
                     self.datos.index[-1:]
@@ -846,8 +845,8 @@ class Lidar(PlotBook):
             _path += '/'
 
         os.system(
-            'ssh {}@siata.gov.co "mkdir /var/www/{}"'.format(
-                self.plotBookArgs['user'],
+            'ssh {}@siata.gov.co "mkdir -p -m 777 /var/www/{}"'.format(
+                kwargs.get('user',self.plotBookArgs['user']),
                 _path )
         )
         return _path
@@ -1002,8 +1001,8 @@ class Lidar(PlotBook):
     def background(self):
         bkg   = self.datos.loc(axis=1) [
                 self.datos.columns.levels[0] [
-                    (self.datos.columns.levels[0] > 18) &
-                    (self.datos.columns.levels[0] < 21)
+                    (self.datos.columns.levels[0] > 16) &
+                    (self.datos.columns.levels[0] < 18)
                 ]
             ].groupby(level=(1,2), axis=1).median()
         bkg [bkg.isnull()] = 0
@@ -1014,6 +1013,7 @@ class Lidar(PlotBook):
             self.datos.columns.labels[2].values().astype(np.int16),
             self.datos.columns.levels[2].size
         )
+
         #return  pd.DataFrame(
                 #     cy_brackground(self.datos.values, bkg.values),
                 #     index = self.datos.index,
@@ -1062,7 +1062,9 @@ class Lidar(PlotBook):
                     ) / self.datos.xs('analog-p',axis=1,level=2)  * self.vAn
         pc =    self.datos.xs('photon-s',axis=1,level=2
                     ) / self.datos.xs('photon-p',axis=1,level=2)  * self.vPc
-        pc [(pc==np.inf) | (pc==-np.inf)] = np.NaN
+        # pc [(pc==np.inf) | (pc==-np.inf)] = np.NaN
+        pc=pc.replace([np.inf, -np.inf], np.NaN)
+        an=an.replace([np.inf, -np.inf], np.NaN)
         return pd.concat({'analog':an,'photon':pc},names=['Parameters','Dates']).unstack(0)
 
     @property
