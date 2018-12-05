@@ -1006,8 +1006,8 @@ class Lidar(PlotBook):
     def background(self):
         bkg   = self.datos.loc(axis=1) [
                 self.datos.columns.levels[0] [
-                    (self.datos.columns.levels[0] > 16) &
-                    (self.datos.columns.levels[0] < 18)
+                    (self.datos.columns.levels[0] < 0.02) #&
+                    # (self.datos.columns.levels[0]# 16 < x < 18)
                 ]
             ].groupby(level=(1,2), axis=1).median()
         bkg [bkg.isnull()] = 0

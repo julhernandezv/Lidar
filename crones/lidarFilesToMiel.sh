@@ -13,12 +13,36 @@ check_folder () {
 
 rsync_wrapper () {
     # printf "Args number: $#\n"
-    if [ "$#" -eq 2 ]; then
-        printf "Rsync \nsource=$1 \npath=$2\n"
-        rsync -trmzvP --chmod=755 "$1" "$2"
-    elif [ "$#" -eq 3 ]; then
-        printf "Rsync \nsource=$1 \npath=$2 \nfiles-from=$3\n"
-        rsync -tmzvP --chmod=755 --no-relative --no-dirs --delete --files-from="$3" "$1" "$2"
+    local POSITIONAL=()
+
+    while [[ $# -gt 0 ]]; do
+    local key="$1"
+
+    case $key in
+        -lp|--local-path)
+        local SOURCE="$2"; shift; shift;; # past argument, # past value
+        -rp|--path)
+        local REMOTEPATH="$2"; shift; shift;;
+        -f|--files-from)
+        local FILES="$2"; shift; shift;;
+        -t|--type)
+        local TYPE="$2"; shift; shift;;
+        *)    # unknown option
+        POSITIONAL+=("$1")  shift ;; #save it in an array for later
+    esac
+    done
+    set -- "${POSITIONAL[@]}" # restore positional parameters
+    # local SOURCE="$1"
+    # local REMOTEPATH="$2"
+    # local TYPE="$3"
+    # local FILES="$4"
+
+    if [ "$TYPE" = "d" ]; then
+        printf "Rsync folders \nsource=$SOURCE \npath=$REMOTEPATH \ninclude-from=$FILES\n"
+        rsync -tzvP --chmod=755 --include-from="$FILES" "$SOURCE" "$REMOTEPATH" 
+    elif [ "$TYPE" = "f" ]; then
+        printf "Rsync files \nsource=$SOURCE \npath=$PATH \nfiles-from=$FILES\n"
+        rsync -tzvP --chmod=755 --files-from="$FILES" --no-relative --no-dirs "$SOURCE" "$REMOTEPATH" #
     else
         printf "Error on parameters, check it: $@\n"
     fi
@@ -50,10 +74,11 @@ verify_ssh_connection () {
 rsync_between_dates () {
 
     local POSITIONAL=()
+    local START=$(date -d "30 min ago" '+%Y%m%d %H%M')
     local END=$(date '+%Y%m%d %H%M')
-    local START=$(date -d "$END - 30 min" '+%Y%m%d %H%M')
     local TYPE="f"
     local NAME="*"
+    local MINDEPTH=2
 
     while [[ $# -gt 0 ]]; do
     local key="$1"
@@ -73,21 +98,26 @@ rsync_between_dates () {
         TYPE="$2"; shift; shift;;
         -n|--name)
         NAME="$2"; shift; shift;;
+        -mindepth)
+        MINDEPTH="$2"; shift; shift;;
         *)    # unknown option
-        POSITIONAL+=("$1") # save it in an array for later
-        shift ;;
+        POSITIONAL+=("$1")  shift ;; #save it in an array for later
     esac
     done
     set -- "${POSITIONAL[@]}" # restore positional parameters
 
-    printf "local path: %s\nstart: %s\nend: %s\nremote path: %s\nuser@domain: %s\ntype: %s\nname: %s\n" "$LOCALPATH" "$START" "$END" "$REMOTEPATH" "$DOMAIN" "$TYPE" "$NAME";
-    find $LOCALPATH -name $NAME -newermt "$START" ! -newermt "$END" -type $TYPE -printf '%P\n' > files.txt
+    local date_folder=$(date "-d $START + 9 min" '+%Y%m%d' )
+    if [ "$TYPE" = "d" ]; then
+        date_folder="$date_folder/"
+    fi
+    printf "start: %s\nend: %s\nlocal path: %s\nremote path: %s\nuser@domain: %s\ntype: %s\nname: %s\n"  "$START" "$END" "$LOCALPATH" "$REMOTEPATH$date_folder" "$DOMAIN" "$TYPE" "$NAME";
+    find "$LOCALPATH" -mindepth $MINDEPTH -name "$NAME" -newermt "$START" ! -newermt "$END" -type "$TYPE" -printf '%P\n'  > files.txt
+
     files=$(cat files.txt)
     # printf "$files"
-    local date_folder=$(date "-d $START" '+%Y%m%d' )
     if [ -n "$files" ]; then
-        verify_ssh_connection check_folder $DOMAIN $REMOTEPATH$date_folder
-        verify_ssh_connection rsync_wrapper $LOCALPATH $DOMAIN:$REMOTEPATH$date_folder files.txt
+        verify_ssh_connection check_folder "$DOMAIN" "$REMOTEPATH$date_folder"
+        verify_ssh_connection rsync_wrapper -lp "$LOCALPATH" -rp "$DOMAIN:$REMOTEPATH$date_folder" -t "$TYPE" -f files.txt
     else
         printf "\nNo files avalible, check other dates\n"
     fi
@@ -104,48 +134,72 @@ dir_miel_sm=/mnt/ALMACENAMIENTO/LIDAR/Scanning_Measurements/
 dir_gomita_fp=/media/jhernandezv/disco1/Lidar/Fixed_Point/
 dir_gomita_sm=/media/jhernandezv/disco1/Lidar/Scanning_Measurements/
 
-# echo $dir_data_local_fp
-# echo $dir_miel_fp
-# echo $dir_data_local_sm
-# echo $dir_miel_sm
-#`date -d '5 hour ago' '+%Y-%m-%d -%H:%M'`
-# if [ "`date -d '+5 hour' '+%H:%M'`" = '00:00' ]; then
-#     today=`date -d '+4 hour' '+%Y%m%d'`
-#     echo "Files to previous day"
-# else
-#     today=`date -d '+5 hour' '+%Y%m%d'`
-# fi
+########################################
 
-
-rsync_between_dates -lp $dir_data_local_fp -rp $dir_miel_fp -d $miel -n "RM*"
-rsync_between_dates -lp $dir_data_local_fp -rp $dir_gomita_fp -d $gomita -n "RM*"
-
-#Scanning
-rsync_between_dates -lp $dir_data_local_sm -rp $dir_miel_sm -d $miel -t d
-rsync_between_dates -lp $dir_data_local_sm -rp $dir_gomita_sm -d $gomita -t d
-#
-# today=$(date '+%Y%m%d')
-# d="2018-02-01"
-# d=$(date "-d $d - 9 min" '+%Y%m%d %H%M')
-# # today="20181107"
-# # d="20181107"
-# until [[ "$d" > "$today" ]];
-# do
-#
-#     df=$(date -d "$d + 1 day" '+%Y%m%d %H%M')
-#     printf "\nSync files from $d to $df\n \n"
+# if [ $(date '+%Y%m%d') -gt $(date -d "30 min ago" '+%Y%m%d') ]; then
+#     start1=$(date -d "30 min ago" '+%Y%m%d 2330')
+#     end1=$(date '-d 9 min ago' '+%Y%m%d 0000')
+#     start2=$end1
+#     end2=$(date '+%Y%m%d 0030')
+#     printf "Sync on day change\n"
 #     #FixedPoint
-#     rsync_between_dates -lp $dir_data_local_fp -s $d -e $df -rp $dir_miel_fp -d$miel -t f -n "RM*"
-#     rsync_between_dates -lp $dir_data_local_fp -s $d -e $df -rp $dir_gomita_fp -d $gomita -t f -n "RM*"
+#     rsync_between_dates -lp $dir_data_local_fp -rp $dir_miel_fp -d $miel -n "RM*" -s "$start1" -e "$end1"
+#     rsync_between_dates -lp $dir_data_local_fp -rp $dir_gomita_fp -d $gomita -n "RM*" -s "$start1" -e "$end1"
+#
+#     rsync_between_dates -lp $dir_data_local_fp -rp $dir_miel_fp -d $miel -n "RM*" -s "$start2" -e "$end2"
+#     rsync_between_dates -lp $dir_data_local_fp -rp $dir_gomita_fp -d $gomita -n "RM*" -s "$start2" -e "$end2"
 #
 #     #Scanning
-#     rsync_between_dates -lp $dir_data_local_sm -s $d -e $df -rp $dir_miel_sm -d $miel -t d
-#     rsync_between_dates -lp $dir_data_local_sm -s $d -e $df -rp $dir_gomita_sm -d $gomita -t d
+#     rsync_between_dates -lp $dir_data_local_sm -rp $dir_miel_sm -d $miel -t d -s "$start1" -e "$end1"
+#     rsync_between_dates -lp $dir_data_local_sm -rp $dir_gomita_sm -d $gomita -t d -s "$start1" -e "$end1"
 #
-#     d=$df
-# done
+#     rsync_between_dates -lp $dir_data_local_sm -rp $dir_miel_sm -d $miel -t d -s "$start2" -e "$end2"
+#     rsync_between_dates -lp $dir_data_local_sm -rp $dir_gomita_sm -d $gomita -t d -s "$start2" -e "$end2"
+# else
+#     printf "Sync Files\n"
+#     #FixedPoint
+#     rsync_between_dates -lp $dir_data_local_fp -rp $dir_miel_fp -d $miel -n "RM*"
+#     rsync_between_dates -lp $dir_data_local_fp -rp $dir_gomita_fp -d $gomita -n "RM*"
+#
+#     #Scanning
+#     rsync_between_dates -lp $dir_data_local_sm -rp $dir_miel_sm -d $miel -t d
+#     rsync_between_dates -lp $dir_data_local_sm -rp $dir_gomita_sm -d $gomita -t d
+# fi
+#
 
+###############################################################################
+# Rsync daily
+# today="20181204"
+# rsync_wrapper "$dir_data_local_fp" "$gomita:$dir_gomita_fp$today" f files.txt
+# echo "Direct:\n"
+# rsync -tzvP --chmod=755 --no-relative --no-dirs --files-from=files.txt "$dir_data_local_fp" "$gomita:$dir_gomita_fp$today"
+
+today=$(date '+%Y%m%d %H%M')
+today="20181129"
+# d="20180201 0000"
+d="20181128 0000"
+d=$(date "-d $d - 9 min" '+%Y%m%d %H%M')
+# today="20181107"
+until [[ "$d" > "$today" ]];
+do
+
+    df=$(date -d "$d + 1 day" '+%Y%m%d %H%M')
+    printf "\nSync files from $d to $df\n \n"
+    #FixedPoint
+    # rsync_between_dates -lp $dir_data_local_fp -s "$d" -e "$df" -rp $dir_miel_fp -d$miel -t f -n "RM*"
+    # rsync_between_dates -lp $dir_data_local_fp -s "$d" -e "$df" -rp $dir_gomita_fp -d $gomita -t f -n "RM*"
+
+    # Scanning
+    echo $(find $dir_data_local_sm -mindepth 2 -name "*" -newermt "$d" ! -newermt "$df" -type d -printf '%P\n')
+    # rsync_between_dates -lp $dir_data_local_sm -s "$d" -e "$df" -rp $dir_miel_sm -d $miel -t d
+    rsync_between_dates -lp $dir_data_local_sm -s "$d" -e "$df" -rp $dir_gomita_sm -d $gomita -t d
+
+    d=$df
+done
 #
+
+###############################################################################
+# #
 #
 #
 # last_fp=`ls -t1 $dir_data_local_fp | head -n1`

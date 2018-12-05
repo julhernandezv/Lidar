@@ -136,7 +136,7 @@ def main(scan):
     result.wait(timeout=300)
 
     if result.ready():
-        print result.get(timeout=1)
+        print result.get()
     print  "Time: {} minutos".format( (dt.datetime.now()-now).total_seconds() /60. )
     print 'Close() succeeded\n'
     pool.join()

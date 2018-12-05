@@ -835,18 +835,6 @@ for date in pd.date_range('2018-06-15','2018-11-19',freq='d'): #'2018-06-27','20
 instance.plot(output = 'raw',**kwgs )
 
 
-instance.plot(output = 'P(r)',
-    totalSignal=True,
-    vlim=[0,135],
-    parameters=['photon-s','photon-p'],
-    **kwgs )
-#
-instance.plot(output = 'P(r)',
-    totalSignal=True,
-    vlim=[5,34],
-    parameters=['analog-s','analog-p'],
-    **kwgs )
-
 instance.plot(output = 'S(r)',totalSignal=True,**kwgs )
 
 instance.plot(
@@ -1008,13 +996,13 @@ locale.setlocale(locale.LC_TIME, ('en_GB','utf-8'))
 # for date in pd.date_range('2018-06-01','2018-10-11',freq='d'): #'2018-06-27','2018-07-14',freq='d'):
 #     try:
 # date = pd.date_range('2018-08-17','2018-08-17',freq='d')[0]
-date = pd.date_range('2018-06-30','2018-06-30',freq='d')[0] #'2018-06-27','2018-07-14',freq='d'):
+date = pd.date_range('2018-11-30','2018-12-01',freq='d') #'2018-06-27','2018-07-14',freq='d'):
         #
 instance =   Lidar(
-    fechaI=date.strftime('%Y-%m-%d'),
-    fechaF=date.strftime('%Y-%m-%d'),
-    # scan='FixedPoint',
-    scan='3D',
+    fechaI=date[0].strftime('%Y-%m-%d'),
+    fechaF=date[-1].strftime('%Y-%m-%d'),
+    scan='FixedPoint',
+    # scan='3D',
     output='raw'
 )
 
@@ -1026,21 +1014,47 @@ instance =   Lidar(
 # # instance.raw    = backup[0].copy()
 # # instance.datosInfo   = backup[1]'cython_test', #
 #
-# instance.datos = instance.datos.resample('30s').mean()
-# instance.raw = instance.raw.resample('30s').mean()
-# instance.datosInfo = instance.datosInfo.resample('30s').mean()
+instance.datos = instance.datos.resample('30s').mean()
+instance.raw = instance.raw.resample('30s').mean()
+instance.datosInfo = instance.datosInfo.resample('30s').mean()
 #
 
 
+
+# kwgs = dict(
+#     height=.05,
+#     # height=12,
+#     path= 'bkgtest/',
+#     # path= date.strftime('%m-%d'),
+#     cla=False, #True
+#     # user='jhernandezv',
+# )
+#
+# instance.plot(output = 'P(r)',
+#     # totalSignal=True,
+#     vlim=[20,70], #[0,135],
+#     parameters=['photon-s','photon-p'],
+#     **kwgs )
+# #
+# instance.plot(output = 'P(r)',
+#     # totalSignal=True,
+#     vlim=[5,7], #[5,34],
+#     parameters=['analog-s','analog-p'],
+#     **kwgs )
+
 kwgs = dict(
-    height=5.5,
+    height=18,
     # height=12,
-    path= 'claTest',
+    path= 'bkgtest',
     # path= date.strftime('%m-%d'),
     cla=True
 )
 instance.plot(
     output='RCS',
+    **kwgs
+)
+instance.plot(
+    output='LVD',
     **kwgs
 )
 # instance.plot(output = 'raw',**kwgs )
