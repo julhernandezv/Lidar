@@ -32,6 +32,9 @@ shrunkCmap3.set_under(cm.jet(0))
 shrunkCmap3.set_over(cm.jet(1000))
 # shrunkCmap.set_under(cm.jet(0))
 # shrunkCmap.set_over(cm.jet(1000))
+import pkg_resources
+# pkg_resources
+DATA_PATH = pkg_resources.resource_filename('lidar', 'staticfiles')
 
 class Lidar(PlotBook):
     """
@@ -116,6 +119,7 @@ class Lidar(PlotBook):
     ceilCmap = shrunkCmap2
 
     # bkg = {'analog-p':5.29, 'analog-s':4.984, 'photon-p':0.13289, 'photon-s':0.13289} #0.26578
+
     latitud = 6.201585
     longitud = -75.578584
     altitud = 1.540
@@ -142,6 +146,14 @@ class Lidar(PlotBook):
             if kw in kwargs.keys():
                 self.plotBookArgs[kw] = kwargs.pop(kw)
         # self.kwargs             = kwargs
+
+        self.darkMeasurament = pd.read_csv(
+                                '{}/DarkMeasurament_FixedPoint.csv'.format(
+                                    DATA_PATH ),
+                                index_col=[0,1])
+        self.darkMeasurament.columns.name = 'Parameters'
+        self.darkMeasurament = self.darkMeasurament.stack()
+
 
         self.read(output=self.output,**kwargs)
         if not os.path.exists('Figuras/'):
@@ -503,10 +515,16 @@ class Lidar(PlotBook):
                 if self.output not in ['P(r)']:
                     print '{}\n Removing Background \n{}'.format('-'*50,'-'*50)
                     # self.datos      =
+                    self.datos -= self.darkMeasurament.loc[
+                                        self.datos.columns.levels[0]
+                                    ]
                     self.background
 
+            if self.output == 'LVD':
+                print '{}\n Getting Linear Volume Depolarization Ratio \n{}'.format('-'*50,'-'*50)
+                self.datos = self.LVD
 
-            if self.output in ['RCS','LVD', 'Ln(RCS)', 'fLn(RCS)',
+            if self.output in ['RCS','Ln(RCS)', 'fLn(RCS)',
                         'dLn(RCS)', 'fdLn(RCS)', 'dfLn(RCS)', 'fdfLn(RCS)']:
 
                 print '{}\n Getting RCS \n{}'.format('-'*50,'-'*50)
@@ -515,10 +533,6 @@ class Lidar(PlotBook):
 
                 if self.output == 'AB':
                     self.datos  = self.AB
-
-                if self.output == 'LVD':
-                    print '{}\n Getting Linear Volume Depolarization Ratio \n{}'.format('-'*50,'-'*50)
-                    self.datos = self.LVD
 
                 if self.output not in ['RCS','LVD']:
                     print '{}\n Getting Ln(RCS) \n{}'.format('-'*50,'-'*50)
@@ -1006,10 +1020,11 @@ class Lidar(PlotBook):
     def background(self):
         bkg   = self.datos.loc(axis=1) [
                 self.datos.columns.levels[0] [
-                    (self.datos.columns.levels[0] < 0.02) #&
-                    # (self.datos.columns.levels[0]# 16 < x < 18)
+                    # (self.datos.columns.levels[0] < 0.02)
+                    (self.datos.columns.levels[0] > 16) &
+                    (self.datos.columns.levels[0] < 18)
                 ]
-            ].groupby(level=(1,2), axis=1).median()
+            ].groupby(level=(1,2), axis=1).max()
         bkg [bkg.isnull()] = 0
 
         cy_brackground(self.datos.values,

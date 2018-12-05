@@ -759,7 +759,7 @@ locale.setlocale(locale.LC_TIME, ('en_GB','utf-8'))
 # vlim = {'analog-s':[0.2,16],'analog-p':[0.2,16],'analog':[0,0.7] }
 
 
-for date in pd.date_range('2018-06-15','2018-11-19',freq='d'): #'2018-06-27','2018-07-14',freq='d'):
+for date in pd.date_range('2018-10-10','2018-11-30',freq='d'): #'2018-06-27','2018-07-14',freq='d'):
 # for date in pd.date_range('2018-10-07','2018-10-10',freq='d'): #'2018-06-27','2018-07-14',freq='d'):
     try:
 # date = pd.date_range('2018-10-07','2018-10-10',freq='d')
@@ -773,11 +773,12 @@ for date in pd.date_range('2018-06-15','2018-11-19',freq='d'): #'2018-06-27','20
                 fechaF=date.strftime('%Y-%m-%d'),
                 # fechaI=date[0].strftime('%Y-%m-%d'),
                 # fechaF=date[-1].strftime('%Y-%m-%d'),
-                scan='3D',
+                # scan='3D',
+                scan='FixedPoint',
                 output='raw',
-                user='torresiata',
+                # user='torresiata',
                 # path='CalidadAire/Lidar/'
-                source='miel',
+                # source='miel',
             )
         #
         # instance.datos = instance.datos.resample('30s').mean()
@@ -787,9 +788,9 @@ for date in pd.date_range('2018-06-15','2018-11-19',freq='d'): #'2018-06-27','20
 
 
         kwgs = dict(
-            height=7,
+            height=14,
             # height=12,
-            path= 'Poster/Scannings/',
+            # path= 'Poster/RCS/',
             # path= date.strftime('%m-%d'),
             cla=False, #True
             user='jhernandezv',
@@ -800,12 +801,14 @@ for date in pd.date_range('2018-06-15','2018-11-19',freq='d'): #'2018-06-27','20
         instance.plot(
             output='RCS',
             dates=instance.datos[date.strftime('%Y-%m-%d')].index,
+            path= 'Poster/RCS/',
             # parameters=['analog-s','analog-p','analog-b'],
             **kwgs
         )
         instance.plot(
             output='LVD',
             dates=instance.datos[date.strftime('%Y-%m-%d')].index,
+            path= 'Poster/LVD/',
             # parameters=['analog-s','analog-p','analog-b'],
             **kwgs
         )
@@ -996,7 +999,19 @@ locale.setlocale(locale.LC_TIME, ('en_GB','utf-8'))
 # for date in pd.date_range('2018-06-01','2018-10-11',freq='d'): #'2018-06-27','2018-07-14',freq='d'):
 #     try:
 # date = pd.date_range('2018-08-17','2018-08-17',freq='d')[0]
-date = pd.date_range('2018-11-30','2018-12-01',freq='d') #'2018-06-27','2018-07-14',freq='d'):
+#Dark Measurement
+date = pd.date_range('2018-11-29','2018-11-29',freq='d') #'2018-06-27','2018-07-14',freq='d'):
+        #
+bkg =   Lidar(
+    fechaI=date[0].strftime('%Y-%m-%d'),
+    fechaF=date[-1].strftime('%Y-%m-%d'),
+    scan='FixedPoint',
+    # scan='3D',
+    output='P(r)'
+)
+
+#
+date = pd.date_range('2018-11-17','2018-11-17',freq='d') #'2018-06-27','2018-07-14',freq='d'):
         #
 instance =   Lidar(
     fechaI=date[0].strftime('%Y-%m-%d'),
@@ -1007,6 +1022,97 @@ instance =   Lidar(
 )
 
 
+
+instance.datos = instance.datos.resample('30s').mean()
+instance.raw = instance.raw.resample('30s').mean()
+instance.datosInfo = instance.datosInfo.resample('30s').mean()
+
+
+instance.get_output(output='P(r)')
+instance.datos = instance.datos - bkg.datos.mean().loc[instance.datos.columns.levels[0]]
+instance.background
+instance.RCS
+instance.datos[instance.datos<=0] = .01
+
+kwgs = dict(
+    height=20,
+    # height=12,
+    path= 'bkgtest/blackM-far',
+    # path= date.strftime('%m-%d'),
+    # cla=True
+    # operational=True,
+    parameters=['analog-s','analog-p'],
+    textSave='-dark-bkgFar_Max_corrected',
+    colorbarKind='Log',
+)
+instance.output='RCS'
+instance.plot(
+    df=instance.datos,
+    **kwgs
+)
+
+
+##################################################
+
+from matplotlib import use
+use('PDF')
+
+import matplotlib.pyplot as plt
+from matplotlib.colors import Normalize, LogNorm
+from matplotlib.font_manager import FontProperties
+from matplotlib.ticker import LogFormatterMathtext, LogLocator
+
+DATA_PATH = '/home/jhernandezv/Lidar/lidar/lidar/staticfiles/'
+
+plt.rc(    'font',
+    size = 20,
+    family = FontProperties(
+        fname = '{}/AvenirLTStd-Book.ttf'.format(DATA_PATH)
+        ).get_name()
+)
+
+typColor = '#%02x%02x%02x' % (115,115,115)
+plt.rc('axes',labelcolor=typColor, edgecolor=typColor,)#facecolor=typColor)
+plt.rc('axes.spines',right=False, top=False, )#left=False, bottom=False)
+plt.rc('text',color= typColor)
+plt.rc('xtick',color=typColor)
+plt.rc('ytick',color=typColor)
+plt.rc('figure.subplot', left=0, right=1, bottom=0, top=1)
+
+var='analog-s'
+date='2018-10-07 09:30'
+
+def plot_X(var,date):
+    plt.close('all')
+    fig = plt.figure(figsize=(10,6))
+    ax       = fig.add_subplot(1, 1, 1)
+    x = instance.datos[date].loc(axis=1)[:,:,var]
+    ax.plot(x.columns.levels[0].values,x.values[0,:],label='P(r)',color='k',alpha=.8)
+
+    x1 = bkg.datos.loc(axis=1)[:,:,var]
+    ax.plot(x1.columns.levels[0].values,x1.values[0,:],label='Dark Measurement 1',color='b',ls='--',alpha=.8)
+    ax.plot(x1.columns.levels[0].values,x1.values[1,:],label='Dark Measurement 2',color='c',ls='-.',alpha=.8)
+
+    ax.axhline(x.values[0,:5].mean(),label='bkg-Near',color='r',alpha=.8)
+    ax.axhline( x.loc(axis=1)[16:18,:,:].values[0,:].mean(),label='bkg-Far',color='g',alpha=.8)
+    ax.axhline( x.loc(axis=1)[16:18,:,:].values[0,:].max(),label='bkg-Far_max',color='orange',alpha=.8)
+    ax.axhline( x.loc(axis=1)[16:18,:,:].values[0,:].min(),label='bkg-Far_min',color='y',alpha=.8)
+    ax.legend()
+    ax.set_xlabel(r'Range $[km]$',weight='bold')
+    ax.set_ylabel(r'$[mV]$',weight='bold') #r'RCS $[mV*km^2]$'
+    ax.set_xlim(0,20)
+    ax.set_ylim(4.75,6.25)
+    ax.set_title('%s_%s' %(date,var))
+
+    # ax.set_xscale('log')
+    # plt.gca().xaxis.set_major_formatter(LogFormatterMathtext(10))
+    instance._save_fig(localPath='Figuras/',textSave='Perfil_%s_%s' %(date,var),path='jhernandezv/Lidar/FixedPoint/bkgtest/')
+
+
+plot_X(var='analog-s', date='2018-10-07 09:30')
+plot_X(var='analog-s', date='2018-10-07 19:30')
+plot_X(var='analog-p', date='2018-10-07 09:30')
+plot_X(var='analog-p', date='2018-10-07 19:30')
 # instance.get_output(output='RCS')
 # instance.datos.loc(axis=1)[:,:,'photon-p'] * instance.datosInfo.loc[0,'BinWidth_photon-p']
 # backup = [instance.datos.copy(), instance.datosInfo.copy()]
@@ -1014,40 +1120,45 @@ instance =   Lidar(
 # # instance.raw    = backup[0].copy()
 # # instance.datosInfo   = backup[1]'cython_test', #
 #
-instance.datos = instance.datos.resample('30s').mean()
-instance.raw = instance.raw.resample('30s').mean()
-instance.datosInfo = instance.datosInfo.resample('30s').mean()
+
 #
 
-
-
-# kwgs = dict(
-#     height=.05,
-#     # height=12,
-#     path= 'bkgtest/',
-#     # path= date.strftime('%m-%d'),
-#     cla=False, #True
-#     # user='jhernandezv',
-# )
-#
-# instance.plot(output = 'P(r)',
-#     # totalSignal=True,
-#     vlim=[20,70], #[0,135],
-#     parameters=['photon-s','photon-p'],
-#     **kwgs )
-# #
-# instance.plot(output = 'P(r)',
-#     # totalSignal=True,
-#     vlim=[5,7], #[5,34],
-#     parameters=['analog-s','analog-p'],
-#     **kwgs )
+# instance.get_output('P(r)')
 
 kwgs = dict(
-    height=18,
+    height=.05,
+    # height=12,
+    path= 'bkgtest/',
+    # path= date.strftime('%m-%d'),
+    cla=False, #True
+    # user='jhernandezv',
+    # textSave='_Black_Measurement',
+)
+
+instance.plot(output = 'P(r)',
+    # totalSignal=True,
+    # vlim=[20,70], #[0,135],
+    parameters=['photon-s','photon-p'],
+    **kwgs )
+#
+instance.plot(output = 'P(r)',
+    # totalSignal=True,
+    # vlim=[5,7], #[5,34],
+    parameters=['analog-s','analog-p'],
+    **kwgs )
+
+kwgs = dict(
+    height=4.5,
     # height=12,
     path= 'bkgtest',
     # path= date.strftime('%m-%d'),
-    cla=True
+    # cla=True
+    # operational=True,
+    textSave='_Identifier-2',
+)
+instance.plot(
+    output='S(r)',
+    **kwgs
 )
 instance.plot(
     output='RCS',
@@ -1132,7 +1243,7 @@ instance.plot(
                     textSave='Ceilometro_'+location,
                     colorbarKind='Log',
                     vlim=[10,13000],
-                    cbarlabel=r'Intensidad Backscatter $[10^{-9}m^{-1}sr^{-1}]$',
+                    cbarlabel=r'Attenuated Backscatter $[10^{-9}m^{-1}sr^{-1}]$',
                     path='jhernandezv/Lidar/FixedPoint/' +kwgs['path'],
                     colormap = instance.ceilCmap
                 )
