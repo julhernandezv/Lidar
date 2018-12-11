@@ -5,7 +5,7 @@ import numpy as np
 import datetime as dt
 import os, locale
 # os.system('rm lidar/lidar/*.pyc')
-from lidar.lidar import Lidar
+from eda.rs.lidar import Lidar
 locale.setlocale(locale.LC_TIME, ('en_GB','utf-8'))
 
 # vlim = {'analog-s':[0.2,16],'analog-p':[0.2,16],'analog':[0,0.7] }
@@ -161,8 +161,8 @@ c = cytools.cy_mVolts( tmp, input, adcbits, shot)
 
 # %load_ext Cython
 # %%cython
-import numpy as np
-cimport numpy as np
-def test( int c):
-    cdef np.ndarray[np.float64_t,ndim=2] test = np.ones((3,5),dtype=np.float64)
-    print test [c,c]
+# import numpy as np
+# cimport numpy as np
+# def test( int c):
+#     cdef np.ndarray[np.float64_t,ndim=2] test = np.ones((3,5),dtype=np.float64)
+#     print test [c,c]

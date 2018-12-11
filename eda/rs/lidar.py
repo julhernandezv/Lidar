@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from matplotlib import use, cm, markers
+from matplotlib import use, cm, markers, colors
 use('PDF')
 
 import datetime as dt
@@ -9,8 +9,9 @@ import struct
 import sys, os, glob, locale, logging
 
 
-from .core.plotbook import PlotBook
-from .utils.utils import shiftedColorMap, listener_configurer
+from eda.core.plotbook import PlotBook
+from eda.utils.utils import shiftedColorMap, listener_configurer
+
 from cytools import (cy_range_corrected, cy_mVolts, cy_mHz, cy_brackground)
 
 from tqdm import tqdm
@@ -30,11 +31,27 @@ shrunkCmap3 = shiftedColorMap(cm.jet, start=0.15,midpoint=0.45, stop=.85, name='
 shrunkCmap3 = get_cmap('shrunk_LDV', 25)
 shrunkCmap3.set_under(cm.jet(0))
 shrunkCmap3.set_over(cm.jet(1000))
+
+colores = [(  6/255., 48/255.,167/255.),
+           ( 22/255.,131/255.,251/255.),
+           ( 22/255.,131/255.,251/255.),
+           ( 17/255.,127/255.,126/255.),
+           (255/255.,253/255., 56/255.),
+           (252/255., 13/255., 27/255.),
+           (253/255.,129/255.,170/255.),
+           ( 70/255., 70/255., 70/255.),
+           (180/255.,180/255.,180/255.),
+           (255/255.,255/255.,255/255.),
+           (255/255.,255/255.,255/255.),
+           (255/255.,255/255.,255/255.)]
+
+Melanie = colors.LinearSegmentedColormap.from_list('Melanie',colores)
+Melanie.set_under(colores[0])
 # shrunkCmap.set_under(cm.jet(0))
 # shrunkCmap.set_over(cm.jet(1000))
 import pkg_resources
 # pkg_resources
-DATA_PATH = pkg_resources.resource_filename('lidar', 'staticfiles')
+DATA_PATH = pkg_resources.resource_filename('eda', 'staticfiles')
 
 class Lidar(PlotBook):
     """
@@ -62,7 +79,7 @@ class Lidar(PlotBook):
                     'colorbarKind':'Linear'},
                 'LVD': {'analog':r'LVD $(\delta^v)$',
                     'photon':r'LVD $(\delta^v)$',
-                    'cmap':shrunkCmap3,
+                    'cmap':shrunkCmap,
                     'colorbarKind':'Linear',
                     'vlim': {
                         'analog':[0.25,1],
@@ -75,7 +92,7 @@ class Lidar(PlotBook):
                     'colorbarKind':'Linear'},
                 'RCS': {'analog':r'RCS $[mV*km^2]$',
                     'photon':r'RCS $[MHz*km^2]$',
-                    'cmap':shrunkCmap,
+                    'cmap':shrunkCmap,#Melanie,#
                     'colorbarKind':'Log',
                     'vlim':{
                         'analog-b':[0.15,20],
@@ -363,7 +380,7 @@ class Lidar(PlotBook):
         # data.columns.set_levels( pd.to_datetime(data.columns.levels[0].values), level=0, inplace=True) #range(data.columns.levels[0].size), level=0, inplace=True)
 
         if self.scan == '3D':
-            print "{}\n Deleting duplicates\n{}".format('-'*50,'-'*50)
+            # print "{}\n Deleting duplicates\n{}".format('-'*50,'-'*50)
             data = data[data.columns.drop_duplicates(keep='last')]
             dataInfo.drop_duplicates('Zenith',keep='last',inplace=True)
             # if np.abs(dataInfo.Zenith.iloc[1] - dataInfo.Zenith.iloc[0]) > 10:
@@ -514,7 +531,7 @@ class Lidar(PlotBook):
 
                 if self.output not in ['P(r)']:
                     print '{}\n Removing Background \n{}'.format('-'*50,'-'*50)
-                    # self.datos      =
+
                     self.datos -= self.darkMeasurament.loc[
                                         self.datos.columns.levels[0]
                                     ]
@@ -522,6 +539,7 @@ class Lidar(PlotBook):
 
             if self.output == 'LVD':
                 print '{}\n Getting Linear Volume Depolarization Ratio \n{}'.format('-'*50,'-'*50)
+                self.datos[self.datos <=0] = np.NaN
                 self.datos = self.LVD
 
             if self.output in ['RCS','Ln(RCS)', 'fLn(RCS)',
@@ -530,6 +548,7 @@ class Lidar(PlotBook):
                 print '{}\n Getting RCS \n{}'.format('-'*50,'-'*50)
                 # self.datos      = self.RCS
                 self.RCS
+                self.datos[self.datos <=0] = .00001
 
                 if self.output == 'AB':
                     self.datos  = self.AB
@@ -642,10 +661,10 @@ class Lidar(PlotBook):
 
         if kwargs.get('saveFig',True):
             self._save_fig(**kwargs)
-        else:
-            self.X =X
-            self.Y =Y
-            self.Z =Z
+        # else:
+        #     self.X =X
+        #     self.Y =Y
+        #     self.Z =Z
 
 
     def profiler(self,df,cla=None, **kwargs):
@@ -1024,7 +1043,11 @@ class Lidar(PlotBook):
                     (self.datos.columns.levels[0] > 16) &
                     (self.datos.columns.levels[0] < 18)
                 ]
-            ].groupby(level=(1,2), axis=1).max()
+            ].groupby(level=(1,2), axis=1).max() #.median() #
+        # if self.output =='LVD':
+        #     bkg = bkg.median()
+        # else:
+        #     bkg = bkg.max()
         bkg [bkg.isnull()] = 0
 
         cy_brackground(self.datos.values,

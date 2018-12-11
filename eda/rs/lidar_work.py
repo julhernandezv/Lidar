@@ -14,8 +14,8 @@ from matplotlib.ticker import LogFormatterMathtext, LogLocator
 import matplotlib.font_manager as fm
 import matplotlib.pyplot as plt
 import matplotlib as mpl
-plt.rc('font', family=fm.FontProperties(fname='/home/jhernandezv/Tools/AvenirLTStd-Book.ttf',).get_name(), size = 16)
-plt.rc('font', family=fm.FontProperties(fname='/home/jhernandezv/Tools/AvenirLTStd-Book.ttf',).get_name(), size = 16)
+plt.rc('font', family=fm.FontProperties(fname='/home/jhernandezv/Tools/AvenirLTStd-Book.ttf',).get_name(), size = 20)
+plt.rc('font', family=fm.FontProperties(fname='/home/jhernandezv/Tools/AvenirLTStd-Book.ttf',).get_name(), size = 20)
 typColor = '#%02x%02x%02x' % (115,115,115)
 plt.rc('axes',labelcolor=typColor,edgecolor=typColor,)
 plt.rc('axes.spines',right=False,top=False,left=True)
@@ -46,7 +46,7 @@ from pandas.plotting._core import MPLPlot
 # # # ################################################################################
 # # # # ASCII
 # files = glob.glob('InfoLidar/ASCII/20180310/*')
-# ascii = Lidar(ascii=True,scan=False,output='raw')
+# ascii = eda.Lidar(ascii=True,scan=False,output='raw')
 # ascii.read(files,inplace=False)
 # # #
 # #
@@ -59,8 +59,8 @@ import glob
 # files = glob.glob('InfoLidar/ZS0_180709-151714/RM*')      # test
 files = sorted(glob.glob('/home/jhernandezv/Lidar/InfoLidar/3Ds_180703-135028/RM*') )       # test2
 # files = glob.glob('InfoLidar/3Ds_180704-105519/RM*')        # test3
-from lidar.lidar import Lidar
-instance = Lidar(scan='Zenith',output='raw')
+import eda
+instance = eda.Lidar(scan='Zenith',output='raw')
 df1,df2 = instance.read_folder(files)
 t1,t2 = instance.read_file(files[0])
 t3,t4 = instance.read_file(files[1])
@@ -78,7 +78,7 @@ a=6+5
 
 
 
-# instance = Lidar(fechaI='2018-07-04',Fechaf='2018-07-04',scan='3D')
+# instance = eda.Lidar(fechaI='2018-07-04',Fechaf='2018-07-04',scan='3D')
 # ()
 
 # backup = [instance.data, instance.dataInfo]
@@ -108,7 +108,7 @@ a=6+5
 ################################################################################
 # date = pd.date_range('2018-08-06','2018-08-06',freq='d')[0] #'2018-06-27','2018-07-14',freq='d'):
 # altura = 4.5
-# instance = Lidar(fechaI=date.strftime('%Y-%m-%d'),Fechaf=date.strftime('%Y-%m-%d'),scan='FixedPoint')
+# instance = eda.Lidar(fechaI=date.strftime('%Y-%m-%d'),Fechaf=date.strftime('%Y-%m-%d'),scan='FixedPoint')
 # instance.read()
 # instance.data = instance.data.stack([1,2]).resample('30s', axis=1, level=0 ).mean().unstack([1,2])
 # instance.raw = instance.data
@@ -128,7 +128,7 @@ import numpy as np
 import datetime as dt
 import os, locale
 # os.system('rm lidar/lidar/*.pyc')
-from lidar.lidar import Lidar
+import eda
 locale.setlocale(locale.LC_TIME, ('en_GB','utf-8'))
 
 
@@ -143,7 +143,7 @@ from matplotlib.ticker import LogFormatterMathtext, LogLocator
 DATA_PATH = '/home/jhernandezv/Lidar/lidar/lidar/staticfiles/'
 
 plt.rc(    'font',
-    size = 20,
+    size = 24,
     family = FontProperties(
         fname = '{}/AvenirLTStd-Book.ttf'.format(DATA_PATH)
         ).get_name()
@@ -175,7 +175,7 @@ plt.rc('figure.subplot', left=0, right=1, bottom=0, top=1)
 date = pd.date_range('2018-10-18','2018-10-28',freq='d')
 # date = pd.date_range('2018-10-01','2018-10-30',freq='d')
         #
-instance =   Lidar(
+instance =   eda.Lidar(
     fechaI=date.strftime('%Y-%m-%d')[0],
     fechaF=date.strftime('%Y-%m-%d')[-1],
     scan='FixedPoint',
@@ -579,6 +579,7 @@ scatter = [
 ]
 station = ['I.E. Concejo de Itagüí', 'AMVA', 'Torre Siata']
 self.Plot_Mapa2(
+    fontsize=28,
 	textsave='_Lidar',
 	path='jhernandezv@siata.gov.co:/var/www/jhernandezv/Lidar/FixedPoint/Poster/',
 	hillshade=True,
@@ -597,6 +598,9 @@ self.m.scatter(self.X,self.Y,s=700,facecolor='b',edgecolor=(0.0078,0.227,0.26),z
 
 self.X,self.Y		= self.m( -75.5887, 6.2593)
 self.m.scatter(self.X,self.Y,s=700,facecolor='k',marker='x',edgecolor=(0.0078,0.227,0.26),zorder=12)
+
+self.X,self.Y		= self.m( -75.58990, 6.22931)
+self.m.scatter(self.X,self.Y,s=700,facecolor='orange',marker='o',edgecolor=(0.0078,0.227,0.26),zorder=13)
 
 leg={}
 leg['Ceilometers'] = plt.Line2D( #\nPyranometers
@@ -619,6 +623,16 @@ leg['Scanning Lidar'] = plt.Line2D(
 		lw=2,
 		fillstyle='full'
 	)
+leg['RWP'] = plt.Line2D(
+		(0,1),(0,0),
+		ls='',
+		marker='o',
+		markersize=18,
+		mfc='orange',
+		mec=(0.0078,0.227,0.26),
+		lw=2,
+		fillstyle='full'
+	)
 leg['Radiometer'] = plt.Line2D(
 		(0,1),(0,0),
 		ls='',
@@ -633,13 +647,13 @@ legend =self.ax[0].legend(
 	leg.values(),
 	leg.keys(),
 	bbox_to_anchor=(1,.15),
-	fontsize=22,
+	fontsize=26,
 	loc='lower right',
 	title='Remote Sensors',
 	labelspacing=.8)
 # self.leg.get_frame().set_edgecolor('w')
 # for text in self.leg.get_texts(): plt.setp(text, color = (0.45, 0.45, 0.45))
-legend.get_title().set_fontsize(22)
+legend.get_title().set_fontsize(26)
 # plt.setp(self.leg.get_title(),fontsize=self.fontsize,weight='bold',color=(0.45, 0.45, 0.45))
 
 textsave='_Lidar'
@@ -753,7 +767,7 @@ import numpy as np
 import datetime as dt
 import os, locale
 # os.system('rm lidar/lidar/*.pyc')
-from lidar.lidar import Lidar
+import eda
 locale.setlocale(locale.LC_TIME, ('en_GB','utf-8'))
 
 # vlim = {'analog-s':[0.2,16],'analog-p':[0.2,16],'analog':[0,0.7] }
@@ -768,7 +782,7 @@ for date in pd.date_range('2018-10-10','2018-11-30',freq='d'): #'2018-06-27','20
 
 
         # now = dt.datetime.now()
-        instance =   Lidar(
+        instance =   eda.Lidar(
                 fechaI=date.strftime('%Y-%m-%d'),
                 fechaF=date.strftime('%Y-%m-%d'),
                 # fechaI=date[0].strftime('%Y-%m-%d'),
@@ -813,18 +827,7 @@ for date in pd.date_range('2018-10-10','2018-11-30',freq='d'): #'2018-06-27','20
             **kwgs
         )
         del instance
-# instance.plot(
-#     output='P(r)',
-#     totalSignal=True,
-#
-#     **kwgs
-# )
-# instance.plot(
-#     output='S(r)',
-#     totalSignal=True,
-#     # parameters=['analog-s','analog-p','analog-b'],
-#     **kwgs
-# )
+
 
     except:
         import traceback
@@ -835,19 +838,6 @@ for date in pd.date_range('2018-10-10','2018-11-30',freq='d'): #'2018-06-27','20
 
 
 
-instance.plot(output = 'raw',**kwgs )
-
-
-instance.plot(output = 'S(r)',totalSignal=True,**kwgs )
-
-instance.plot(
-    output='RCS',
-    **kwgs
-)
-instance.plot(
-    output='LVD',
-    **kwgs
-)
 
 
 
@@ -856,7 +846,7 @@ import numpy as np
 import datetime as dt
 import os, locale
 # os.system('rm lidar/lidar/*.pyc')
-from lidar.lidar import Lidar
+import eda
 locale.setlocale(locale.LC_TIME, ('en_GB','utf-8'))
 
 # vlim = {'analog-s':[0.2,16],'analog-p':[0.2,16],'analog':[0,0.7] }
@@ -870,46 +860,56 @@ date = pd.date_range('2018-06-29','2018-06-29',freq='d')
 # '11-12 06:00' '20'
 # date = pd.date_range('2018-06-30','2018-06-30',freq='d')[0] #'2018-06-27','2018-07-14',freq='d'):
         #
-instance =   Lidar(
+instance =   eda.Lidar(
     fechaI=date[0].strftime('%Y-%m-%d'),
     fechaF=date[-1].strftime('%Y-%m-%d'),
     # scan='FixedPoint',
     scan='3D',
     output='raw',
-    user='torresiata',
-    source='miel'
+    # user='torresiata',
+    # source='miel'
 )
 
+
+instance.darkMeasurament = instance.darkMeasurament.loc[instance.datos.columns.levels[0]]
+dm = instance.darkMeasurament.unstack(1)
+for deg in instance.datos.columns.levels[1]:
+    dm[deg] = instance.darkMeasurament.values
+dm = dm.unstack().stack([0,1])
+
+instance.darkMeasurament = dm
 
 # instance.get_output(output='RCS')
-# instance.datos.loc(axis=1)[:,:,'photon-p'] * instance.datosInfo.loc[0,'BinWidth_photon-p']
-# backup = [instance.datos.copy(), instance.datosInfo.copy()]
-# # instance.datos        = backup[0]
-# # instance.raw    = backup[0].copy()
-# # instance.datosInfo   = backup[1]'cython_test', #
-#
-# instance.datos = instance.datos.resample('30s').mean()
-# instance.raw = instance.raw.resample('30s').mean()
-# instance.datosInfo = instance.datosInfo.resample('30s').mean()
-
-
-# '2018-07-29 09:58'
 kwgs = dict(
-    height=1.5,
+    height=6,
     # height=12,
     # path= 'Poster/LVD/',
-    path= 'Poster/Scanning/',
+    path= 'Poster/Scannings/',
     # path= date.strftime('%m-%d'),
-    # dates=instance.datos['2018-06-29 09:58'].index,
-    textSave='_1.5km',
+    dates=instance.datosInfo['2018-06-29 10:07'].index,
+    textSave='_7km_jet',
     cla=False,
-    user='jhernandezv',
-    saveFig=False,
+    # user='jhernandezv',
+    # saveFig=False,
 )
+# kwgs['textSave'] = '_4km'
+# instance.plot(
+#     output = 'RCS',
+#     parameters=['analog-s','analog-p'],
+#     # xlim=[],
+#     # ylim=[0,4],
+#     **kwgs )
+
+kwgs['textSave'] = '_Zoom'
 instance.plot(
-    output = 'RCS',
+    output = 'LVD',
+    # parameters=['analog-s','analog-p'],
+    xlim=[-2,2],
+    ylim=[0,1.2],
     **kwgs )
-xx,yy,zz = instance.X, instance.Y, instance.Z
+
+
+xx,yy,zz = instance.x, instance.y, instance.data
 dx = xx[0,1]-xx[0,0]
 xx += dx
 xx = xx[:-1,:-1]
@@ -985,14 +985,45 @@ instance.plot(
     vlim = [10,200],
     **kwgs
 )
+
+
+# instance.get_output(output='P(r)')
+# instance.datos = instance.datos - bkg.datos.mean().loc[instance.datos.columns.levels[0]]
+# instance.background
+# instance.RCS
+# instance.datos[instance.datos<=0] = .01
+
+# kwgs = dict(
+#     height=20,
+#     # height=12,
+#     path= 'bkgtest/blackM-far',
+#     # path= date.strftime('%m-%d'),
+#     # cla=True
+#     # operational=True,
+#     parameters=['analog-s','analog-p'],
+#     textSave='-dark-bkgFar_Max_corrected',
+#     colorbarKind='Log',
+# )
+# instance.output='RCS'
+# instance.plot(
+#     df=instance.datos,
+#     **kwgs
+# )
+
+
 import pandas as pd
 import numpy as np
 import datetime as dt
 import os, locale
 # os.system('rm lidar/lidar/*.pyc')
-from lidar.lidar import Lidar
+import eda
+
+from Funciones_Lectura import lee_Ceil,lee_data_ceil
 locale.setlocale(locale.LC_TIME, ('en_GB','utf-8'))
 
+# os.chdir('/home/jhernandezv/Tools/')
+# import Air
+# reload(Air)
 # vlim = {'analog-s':[0.2,16],'analog-p':[0.2,16],'analog':[0,0.7] }
 
 
@@ -1000,236 +1031,74 @@ locale.setlocale(locale.LC_TIME, ('en_GB','utf-8'))
 #     try:
 # date = pd.date_range('2018-08-17','2018-08-17',freq='d')[0]
 #Dark Measurement
-date = pd.date_range('2018-11-29','2018-11-29',freq='d') #'2018-06-27','2018-07-14',freq='d'):
+#
+# date = pd.date_range('2018-11-17','2018-11-17',freq='d') #'2018-06-27','2018-07-14',freq='d'):
         #
-bkg =   Lidar(
-    fechaI=date[0].strftime('%Y-%m-%d'),
-    fechaF=date[-1].strftime('%Y-%m-%d'),
-    scan='FixedPoint',
-    # scan='3D',
-    output='P(r)'
-)
-
-#
-date = pd.date_range('2018-11-17','2018-11-17',freq='d') #'2018-06-27','2018-07-14',freq='d'):
+dates = ['2018-08-14','2018-08-17','2018-08-30','2018-09-02','2018-10-07','2018-11-11','2018-11-17','2018-11-30',]
+for date in dates:
+# date=dates[]
+    # try:
+        instance =   eda.Lidar(
+            # fechaI=date[0].strftime('%Y-%m-%d'),
+            # fechaF=date[-1].strftime('%Y-%m-%d'),
+            fechaI=date,
+            fechaF=date,
+            scan='FixedPoint',
+            # scan='3D',
+            output='raw'
+        )
         #
-instance =   Lidar(
-    fechaI=date[0].strftime('%Y-%m-%d'),
-    fechaF=date[-1].strftime('%Y-%m-%d'),
-    scan='FixedPoint',
-    # scan='3D',
-    output='raw'
-)
+        instance.datos = instance.datos.resample('30s').mean()
+        instance.raw = instance.raw.resample('30s').mean()
+        instance.datosInfo = instance.datosInfo.resample('30s').mean()
+
+        kwgs = dict(
+            height=18,
+            # height=12,
+            # path= date.strftime('%m-%d'),
+            # cla=True
+            # operational=True,
+            # textSave='_-dark-bkg',
+        )
+        #
+        # instance.get_output(output='LVD')
+        #instance.datos.loc(axis=1)[7.4:7.6,:,'analog']=instance.datos.loc(axis=1)[7.7:7.9,:,'analog'].values
+        instance.plot(
+            output='RCS',
+            path= 'Poster/RCS/',
+            # parameters=['analog'],
+            **kwgs
+        )
 
 
-
-instance.datos = instance.datos.resample('30s').mean()
-instance.raw = instance.raw.resample('30s').mean()
-instance.datosInfo = instance.datosInfo.resample('30s').mean()
-
-
-instance.get_output(output='P(r)')
-instance.datos = instance.datos - bkg.datos.mean().loc[instance.datos.columns.levels[0]]
-instance.background
-instance.RCS
-instance.datos[instance.datos<=0] = .01
-
-kwgs = dict(
-    height=20,
-    # height=12,
-    path= 'bkgtest/blackM-far',
-    # path= date.strftime('%m-%d'),
-    # cla=True
-    # operational=True,
-    parameters=['analog-s','analog-p'],
-    textSave='-dark-bkgFar_Max_corrected',
-    colorbarKind='Log',
-)
-instance.output='RCS'
-instance.plot(
-    df=instance.datos,
-    **kwgs
-)
-
-
-##################################################
-
-from matplotlib import use
-use('PDF')
-
-import matplotlib.pyplot as plt
-from matplotlib.colors import Normalize, LogNorm
-from matplotlib.font_manager import FontProperties
-from matplotlib.ticker import LogFormatterMathtext, LogLocator
-
-DATA_PATH = '/home/jhernandezv/Lidar/lidar/lidar/staticfiles/'
-
-plt.rc(    'font',
-    size = 20,
-    family = FontProperties(
-        fname = '{}/AvenirLTStd-Book.ttf'.format(DATA_PATH)
-        ).get_name()
-)
-
-typColor = '#%02x%02x%02x' % (115,115,115)
-plt.rc('axes',labelcolor=typColor, edgecolor=typColor,)#facecolor=typColor)
-plt.rc('axes.spines',right=False, top=False, )#left=False, bottom=False)
-plt.rc('text',color= typColor)
-plt.rc('xtick',color=typColor)
-plt.rc('ytick',color=typColor)
-plt.rc('figure.subplot', left=0, right=1, bottom=0, top=1)
-
-var='analog-s'
-date='2018-10-07 09:30'
-
-def plot_X(var,date):
-    plt.close('all')
-    fig = plt.figure(figsize=(10,6))
-    ax       = fig.add_subplot(1, 1, 1)
-    x = instance.datos[date].loc(axis=1)[:,:,var]
-    ax.plot(x.columns.levels[0].values,x.values[0,:],label='P(r)',color='k',alpha=.8)
-
-    x1 = bkg.datos.loc(axis=1)[:,:,var]
-    ax.plot(x1.columns.levels[0].values,x1.values[0,:],label='Dark Measurement 1',color='b',ls='--',alpha=.8)
-    ax.plot(x1.columns.levels[0].values,x1.values[1,:],label='Dark Measurement 2',color='c',ls='-.',alpha=.8)
-
-    ax.axhline(x.values[0,:5].mean(),label='bkg-Near',color='r',alpha=.8)
-    ax.axhline( x.loc(axis=1)[16:18,:,:].values[0,:].mean(),label='bkg-Far',color='g',alpha=.8)
-    ax.axhline( x.loc(axis=1)[16:18,:,:].values[0,:].max(),label='bkg-Far_max',color='orange',alpha=.8)
-    ax.axhline( x.loc(axis=1)[16:18,:,:].values[0,:].min(),label='bkg-Far_min',color='y',alpha=.8)
-    ax.legend()
-    ax.set_xlabel(r'Range $[km]$',weight='bold')
-    ax.set_ylabel(r'$[mV]$',weight='bold') #r'RCS $[mV*km^2]$'
-    ax.set_xlim(0,20)
-    ax.set_ylim(4.75,6.25)
-    ax.set_title('%s_%s' %(date,var))
-
-    # ax.set_xscale('log')
-    # plt.gca().xaxis.set_major_formatter(LogFormatterMathtext(10))
-    instance._save_fig(localPath='Figuras/',textSave='Perfil_%s_%s' %(date,var),path='jhernandezv/Lidar/FixedPoint/bkgtest/')
-
-
-plot_X(var='analog-s', date='2018-10-07 09:30')
-plot_X(var='analog-s', date='2018-10-07 19:30')
-plot_X(var='analog-p', date='2018-10-07 09:30')
-plot_X(var='analog-p', date='2018-10-07 19:30')
-# instance.get_output(output='RCS')
-# instance.datos.loc(axis=1)[:,:,'photon-p'] * instance.datosInfo.loc[0,'BinWidth_photon-p']
-# backup = [instance.datos.copy(), instance.datosInfo.copy()]
-# # instance.datos        = backup[0]
-# # instance.raw    = backup[0].copy()
-# # instance.datosInfo   = backup[1]'cython_test', #
-#
-
-#
-
-# instance.get_output('P(r)')
-
-kwgs = dict(
-    height=.05,
-    # height=12,
-    path= 'bkgtest/',
-    # path= date.strftime('%m-%d'),
-    cla=False, #True
-    # user='jhernandezv',
-    # textSave='_Black_Measurement',
-)
-
-instance.plot(output = 'P(r)',
-    # totalSignal=True,
-    # vlim=[20,70], #[0,135],
-    parameters=['photon-s','photon-p'],
-    **kwgs )
-#
-instance.plot(output = 'P(r)',
-    # totalSignal=True,
-    # vlim=[5,7], #[5,34],
-    parameters=['analog-s','analog-p'],
-    **kwgs )
-
-kwgs = dict(
-    height=4.5,
-    # height=12,
-    path= 'bkgtest',
-    # path= date.strftime('%m-%d'),
-    # cla=True
-    # operational=True,
-    textSave='_Identifier-2',
-)
-instance.plot(
-    output='S(r)',
-    **kwgs
-)
-instance.plot(
-    output='RCS',
-    **kwgs
-)
-instance.plot(
-    output='LVD',
-    **kwgs
-)
-# instance.plot(output = 'raw',**kwgs )
-# instance.plot(output = 'S(r)',totalSignal=True,**kwgs )
-
-# instance.plot(output = 'P(r)',
-#     totalSignal=True,
-#     vlim=[0,135],
-#     parameters=['photon-s','photon-p'],
-#     **kwgs )
-#
-# instance.plot(output = 'P(r)',
-#     totalSignal=True,
-#     vlim=[5,34],
-#     parameters=['analog-s','analog-p'],
-#     **kwgs )
-#
-# instance.plot(output = 'LVD',
-#     totalSignal=True,
-#     vlim=[0.25,1],
-#     **kwgs )
-
-instance.plot(
-    output='RCS',
-    parameters=['analog-b'],
-    vlim = [.15,20],#[1,20],
-    **kwgs
-)
-
-instance.plot(
-    parameters=['analog-s','analog-p'],
-    vlim=[.1,16], #[1,16]
-    output='RCS',
-    **kwgs
-)
-
-instance.plot(
-    parameters=['photon-s','photon-p'],
-    vlim=[9,200], #[15,350]
-    output='RCS',
-    **kwgs
-)
-
-instance.plot(
-    output='RCS',
-    parameters=['photon-b'],
-    vlim = [10,200],
-    **kwgs
-)
-
-        instance.plot( output='Ln(RCS)', **kwgs )
-
-        instance.plot(output='dLn(RCS)',  **kwgs)
-
-        instance.plot(output='fLn(RCS)', **kwgs)
-
-        instance.plot(output='fdLn(RCS)',  **kwgs)
-
-        instance.plot(output='dfLn(RCS)', **kwgs)
-
-        instance.plot(output='fdfLn(RCS)' , **kwgs)
-
+        # instance.plot( output='Ln(RCS)', **kwgs )
+        #
+        # instance.plot(output='dLn(RCS)',  **kwgs)
+        #
+        # instance.plot(output='fLn(RCS)', **kwgs)
+        #
+        # instance.plot(output='fdLn(RCS)',  **kwgs)
+        #
+        # instance.plot(output='dfLn(RCS)', **kwgs)
+        #
+        # instance.plot(output='fdfLn(RCS)' , **kwgs)
+        #RWP
+        # self = Air.Air(
+        #             Fechai=instance.datosInfo.index[0].strftime('%Y-%m-%d %H:%M'),
+        #             Fechaf=instance.datosInfo.index[-1].strftime('%Y-%m-%d %H:%M') )
+        # self.Read_RWP()
+        # self.ht                                 = self.RWP.columns.levels[1].values
+        #
+        # #48 Horas
+        # self.Plot_Barbs(
+        #     Barbas=True,
+        #     textsave=date,
+        #     path='jhernandezv/Lidar/FixedPoint/Poster/RWP/',
+        #     format='png'
+        # )
+        #Ceilomoetro
         for location in ['amva','siata','itagui']:
-            # instance = Lidar(fechaI='20180801',Fechaf='20180801',scan='FixedPoint',output='raw')
+            # instance = eda.Lidar(fechaI='20180801',Fechaf='20180801',scan='FixedPoint',output='raw')
             ceil = lee_Ceil(
                 ceilometro=location,
                 Fecha_Inicio=instance.datosInfo.index[0].strftime('%Y%m%d %H:%M'), Fecha_Fin=instance.datosInfo.index[-1].strftime('%Y%m%d %H:%M') ) #'%Y-%m-%d %H:%M:%S'
@@ -1240,18 +1109,207 @@ instance.plot(
             if ceil.size > 0:
                 instance.plot_lidar(
                     ceil.index,ceil.columns,ceil.T,
-                    textSave='Ceilometro_'+location,
+                    textSave='Ceilometro_%s_%s' %(location,date),
                     colorbarKind='Log',
                     vlim=[10,13000],
-                    cbarlabel=r'Attenuated Backscatter $[10^{-9}m^{-1}sr^{-1}]$',
-                    path='jhernandezv/Lidar/FixedPoint/' +kwgs['path'],
+                    cbarLabel=r'Attenuated Backscatter $[10^{-9}m^{-1}sr^{-1}]$',
+                    path='jhernandezv/Lidar/FixedPoint/Poster/Ceilometers/',
                     colormap = instance.ceilCmap
                 )
-    except:
-        import traceback
-        traceback.print_exc()
-        pass
+
+
+import pandas as pd
+import numpy as np
+import datetime as dt
+import os, locale
+# os.system('rm lidar/lidar/*.pyc')
+import eda
+
+# from Funciones_Lectura import lee_Ceil,lee_data_ceil
+locale.setlocale(locale.LC_TIME, ('en_GB','utf-8'))
+
+instance =   eda.Lidar(
+    # fechaI=date[0].strftime('%Y-%m-%d'),
+    # fechaF=date[-1].strftime('%Y-%m-%d'),
+    # fechaI='2018-08-28', #date,
+    # fechaF='2018-08-29', #date,
+    fechaI='2018-10-07', #date,
+    fechaF='2018-10-07', #date,
+    scan='FixedPoint',
+    # scan='3D',
+    output='raw'
+)
+instance.datos = instance.datos.resample('30s').mean()
+instance.raw = instance.raw.resample('30s').mean()
+instance.datosInfo = instance.datosInfo.resample('30s').mean()
+instance.plot(
+    height=14,
+    output='LVD',
+    path= 'Poster/LVD/',
+    textSave='_14km',
+    # parameters=['analog'],
+    # **kwgs
+)
+instance.plot(
+    height=4.5,
+    output='RCS',
+    path= 'Poster/RCS/',
+    textSave='_29_4.5km',
+    # parameters=['analog'],
+    # **kwgs
+)
+
+for location in ['amva','siata','itagui']:
+    # instance = eda.Lidar(fechaI='20180801',Fechaf='20180801',scan='FixedPoint',output='raw')
+    ceil = lee_Ceil(
+    ceilometro=location,
+    Fecha_Inicio='20180828 00:00',
+    Fecha_Fin='20180829 12:00') #'%Y-%m-%d %H:%M:%S'
+    # ceil         = lee_Ceil(ceilometro=location,  Fecha_Inicio='20180801 10:45', Fecha_Fin='20180801 13:25' )
+    ceil.columns            = (ceil.columns+1)/100.
+    ceil[ceil < 100]        = 100
+    ceil[ceil.isnull()]     = 100
+    if ceil.size > 0:
+        instance.plot_lidar(
+        ceil.index,ceil.columns,ceil.T,
+        textSave='Ceilometro_%s_%s' %(location,'2018-08-28_29'),
+        colorbarKind='Log',
+        vlim=[10,13000],
+        cbarLabel=r'Attenuated Backscatter $[10^{-9}m^{-1}sr^{-1}]$',
+        path='jhernandezv/Lidar/FixedPoint/Poster/Ceilometers/',
+        colormap = instance.ceilCmap
+        )
+
+import Air
+reload(Air)
+
+self=Air.Air(Fechai='2018-08-28 00:00',Fechaf='2018-08-29 12:00')
+self.Read_RWP()
+self.ht                                 = self.RWP.columns.levels[1].values
+
+#48 Horas
+self.Plot_Barbs(
+    Barbas=True,
+    textsave='2018-08-28_29',
+    path='jhernandezv/Lidar/FixedPoint/Poster/RWP/',
+    format='png',
+    fontsize=22,
+    height=4.5)
+
+    # except:
+    #     import traceback
+    #     traceback.print_exc()
+    #     pass
 # #
+import pandas as pd
+import numpy as np
+import datetime as dt
+import os, locale
+# os.system('rm lidar/lidar/*.pyc')
+import eda
+
+# from Funciones_Lectura import lee_Ceil,lee_data_ceil
+locale.setlocale(locale.LC_TIME, ('en_GB','utf-8'))
+
+key = {'2018-11-17':[' 01:48',' 01:54'],
+        '2018-08-17':[' 01:46',' 01:52'],
+        '2018-08-30':[' 13:40',' 13:46']}
+X=[]
+for date in key:
+# date='2018-11-17'
+# hora=[' 01:48',' 01:54']
+    instance =   eda.Lidar(
+        # fechaI=date[0].strftime('%Y-%m-%d'),
+        # fechaF=date[-1].strftime('%Y-%m-%d'),
+        fechaI=date,
+        fechaF=date,
+        # fechaI='2018-10-07', #date,
+        # fechaF='2018-10-07', #date,
+        scan='FixedPoint',
+        # scan='3D',
+        output='RCS'
+    )
+    x = instance.datos[date+key[date][0]:date+key[date][1]].loc(axis=1)[:,:,'analog-s'].mean()
+    x = x.reset_index()
+    x.columns = [u'Height', u'Zenith', u'Parameters', date]
+    x = x.set_index('Height')
+    x.drop([u'Zenith', u'Parameters'],axis=1,inplace=True)
+    X.append(x)
+    # del instance
+y = pd.concat(X,axis=1)
+y.to_csv('Perfiles.csv')
+#
+#
+# ##################################################
+# Plot Profile with multiple background subtraccion test
+# from matplotlib import use
+# use('PDF')
+#
+# import matplotlib.pyplot as plt
+# from matplotlib.colors import Normalize, LogNorm
+# from matplotlib.font_manager import FontProperties
+# from matplotlib.ticker import LogFormatterMathtext, LogLocator
+#
+# DATA_PATH = '/home/jhernandezv/Lidar/lidar/lidar/staticfiles/'
+#
+# plt.rc(    'font',
+#     size = 20,
+#     family = FontProperties(
+#         fname = '{}/AvenirLTStd-Book.ttf'.format(DATA_PATH)
+#         ).get_name()
+# )
+#
+# typColor = '#%02x%02x%02x' % (115,115,115)
+# plt.rc('axes',labelcolor=typColor, edgecolor=typColor,)#facecolor=typColor)
+# plt.rc('axes.spines',right=False, top=False, )#left=False, bottom=False)
+# plt.rc('text',color= typColor)
+# plt.rc('xtick',color=typColor)
+# plt.rc('ytick',color=typColor)
+# plt.rc('figure.subplot', left=0, right=1, bottom=0, top=1)
+#
+# var='analog-s'
+# date='2018-10-07 09:30'
+#
+# def plot_X(var,date):
+#     plt.close('all')
+#     fig = plt.figure(figsize=(10,6))
+#     ax       = fig.add_subplot(1, 1, 1)
+#     x = instance.datos[date].loc(axis=1)[:,:,var]
+#     ax.plot(x.columns.levels[0].values,x.values[0,:],label='P(r)',color='k',alpha=.8)
+#
+#     x1 = bkg.datos.loc(axis=1)[:,:,var]
+#     ax.plot(x1.columns.levels[0].values,x1.values[0,:],label='Dark Measurement 1',color='b',ls='--',alpha=.8)
+#     ax.plot(x1.columns.levels[0].values,x1.values[1,:],label='Dark Measurement 2',color='c',ls='-.',alpha=.8)
+#
+#     ax.axhline(x.values[0,:5].mean(),label='bkg-Near',color='r',alpha=.8)
+#     ax.axhline( x.loc(axis=1)[16:18,:,:].values[0,:].mean(),label='bkg-Far',color='g',alpha=.8)
+#     ax.axhline( x.loc(axis=1)[16:18,:,:].values[0,:].max(),label='bkg-Far_max',color='orange',alpha=.8)
+#     ax.axhline( x.loc(axis=1)[16:18,:,:].values[0,:].min(),label='bkg-Far_min',color='y',alpha=.8)
+#     ax.legend()
+#     ax.set_xlabel(r'Range $[km]$',weight='bold')
+#     ax.set_ylabel(r'$[mV]$',weight='bold') #r'RCS $[mV*km^2]$'
+#     ax.set_xlim(0,20)
+#     ax.set_ylim(4.75,6.25)
+#     ax.set_title('%s_%s' %(date,var))
+#
+#     # ax.set_xscale('log')
+#     # plt.gca().xaxis.set_major_formatter(LogFormatterMathtext(10))
+#     instance._save_fig(localPath='Figuras/',textSave='Perfil_%s_%s' %(date,var),path='jhernandezv/Lidar/FixedPoint/bkgtest/')
+#
+#
+# plot_X(var='analog-s', date='2018-10-07 09:30')
+# plot_X(var='analog-s', date='2018-10-07 19:30')
+# plot_X(var='analog-p', date='2018-10-07 09:30')
+# plot_X(var='analog-p', date='2018-10-07 19:30')
+# # instance.get_output(output='RCS')
+# # instance.datos.loc(axis=1)[:,:,'photon-p'] * instance.datosInfo.loc[0,'BinWidth_photon-p']
+# # backup = [instance.datos.copy(), instance.datosInfo.copy()]
+# # # instance.datos        = backup[0]
+# # # instance.raw    = backup[0].copy()
+# # # instance.datosInfo   = backup[1]'cython_test', #
+# #
+
+#
 
 # instance.plot( output='Ln(RCS)', **kwgs )
 ################################################################################
@@ -1331,7 +1389,7 @@ import numpy as np
 import datetime as dt
 import os, locale
 # os.system('rm lidar/lidar/*.pyc')
-from lidar.lidar import Lidar
+import eda
 locale.setlocale(locale.LC_TIME, ('en_GB','utf-8'))
 
 
@@ -1339,7 +1397,7 @@ locale.setlocale(locale.LC_TIME, ('en_GB','utf-8'))
 #     try:
 date = pd.date_range('2018-10-11','2018-10-11',freq='d')[0] #'2018-06-27','2018-07-14',freq='d'):
 
-instance = Lidar(
+instance = eda.Lidar(
 fechaI=date.strftime('%Y-%m-%d'),
 fechaF=date.strftime('%Y-%m-%d'),
 scan='Azimuth',
@@ -1603,7 +1661,7 @@ instance.plot(output='fdfLn(RCS)', **kwgs)
 #         os.system('ssh jhernandezv@siata.gov.co "mkdir /var/www/jhernandezv/Lidar/Zenith/{}/"'.format( d.strftime('%Y%m%d')))
 #         for folder in folders:
 #             files   = glob.glob('{}/RM*'.format(folder))
-#             self    = Lidar(output='RCS')
+#             self    = eda.Lidar(output='RCS')
 #             self.read(files,)
 #
 #             try:
@@ -1618,7 +1676,7 @@ instance.plot(output='fdfLn(RCS)', **kwgs)
 #         os.system('ssh jhernandezv@siata.gov.co "mkdir /var/www/jhernandezv/Lidar/Azimuth/{}/"'.format( d.strftime('%Y%m%d')))
 #         for folder in folders:
 #             files   = glob.glob('{}/RM*'.format(folder))
-#             self    = Lidar(output='RCS')
+#             self    = eda.Lidar(output='RCS')
 #             self.read(files)
 #             try:
 #                 self.plot(zenith=False, colorbarKind='Log', \
@@ -1642,7 +1700,7 @@ instance.plot(output='fdfLn(RCS)', **kwgs)
 #     files = glob.glob('Datos/RM*')
 #     if len(files) > 0:
 #         os.system('ssh jhernandezv@siata.gov.co "mkdir /var/www/jhernandezv/Lidar/FixedPoint/{}/"'.format( d.strftime('%Y%m%d')))
-#         self = Lidar(scan=False,output='RCS')
+#         self = eda.Lidar(scan=False,output='RCS')
 #         self.read(files)
 #
 #         try:
@@ -1671,7 +1729,7 @@ instance.plot(output='fdfLn(RCS)', **kwgs)
 #         os.system('ssh jhernandezv@siata.gov.co "mkdir /var/www/jhernandezv/Lidar/3D/{}/"'.format( d.strftime('%Y%m%d')))
 #         for folder in folders:
 #             files   = glob.glob('{}/RM*'.format(folder))
-#             self    = Lidar(output='RCS',ascii=d.strftime('%Y-%m-%d') in ['2018-06-24','2018-06-25','2018-06-26'] )
+#             self    = eda.Lidar(output='RCS',ascii=d.strftime('%Y-%m-%d') in ['2018-06-24','2018-06-25','2018-06-26'] )
 #             print folder
 #             self.read(files,tresd=True)
 #             try:

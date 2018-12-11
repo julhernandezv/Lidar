@@ -6,7 +6,7 @@ import psycopg2
 from pymongo import MongoClient
 
 
-class Db:
+class Database:
     '''Class for manipulating databases'''
 
     dbArgs = dict(
@@ -55,10 +55,11 @@ class Db:
                 )
 
         if where is not None:
-            query   += "WHERE {} in ('{}')".format( where[0],where[1] )
-                        if isinstance(where, tuple) else
-                        ' '.join(
-                            ["%s in ('%s') AND " %(w[0],w[1]) for w in where ]
+            if isinstance(where, tuple):
+                query   += "WHERE {} in ('{}')".format( where[0],where[1] )
+
+            else:
+                query   += ' '.join(["%s in ('%s') AND " %(w[0],w[1]) for w in where ]
                         ) [:-5]
 
         return self.connect(query)

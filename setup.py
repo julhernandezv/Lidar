@@ -6,25 +6,30 @@ import numpy as np
 #requirements = read requirements.txt
 
 ext_module = [  Extension(name="cytools",
-        sources=["lidar/_libs/cytools.pyx"],
+        sources=["eda/_libs/cytools.pyx"],
         include_dirs=[np.get_include()],
         # libraries=["m"]  # Unix-like specific
         ),
 ]
-
+# ext_module.append(
+#     Extension(name="eda.lidar",
+#         sources=["eda/rs/lidar.py"],
+#         # include_dirs=[np.get_include()],
+#     )
+# )
 
 
 setup(
-    name='lidar',
+    name='EDA',
     version='0.0.1',
     author='Julian Hernandez Velasquez',
     author_email='jhernandezv@unal.edu.co',
-    packages=find_packages(include=['lidar','lidar.*']),
-    package_dir={'lidar':'lidar'},
-    package_data={'lidar':['staticfiles/*']},
+    packages=find_packages(include=['eda','eda.*']),
+    # package_dir={'lidar':'eda.rs.lidar','plotbook':'eda.core.plotbook'},
+    package_data={'eda':['staticfiles/*']},
     url='https://github.com/julhernandezv/Lidar.git',
     license='LICENSE.txt',
-    description="Class for manipulating SIATA's Scanning Lidar",
+    description="Package for manipulating SIATA's Scanning Lidar",
     long_description=open('README.md').read(),
     ext_modules=cythonize(ext_module),
     #install_requires=requirements,

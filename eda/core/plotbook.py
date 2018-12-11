@@ -18,7 +18,7 @@ import pkg_resources
 DATA_PATH = pkg_resources.resource_filename('lidar', 'staticfiles')
 
 plt.rc(    'font',
-    size = 18,
+    size = 22,
     family = FontProperties(
         fname = '{}/AvenirLTStd-Book.ttf'.format(DATA_PATH)
         ).get_name()
@@ -108,6 +108,7 @@ class PlotBook(MPLPlot):
         kwg.update(kwargs)
         plt.savefig(
             '{localPath}{textSave}.{formato}'.format(**kwg) ,
+            transparent=True,
             bbox_inches="tight"
         )
         if kwg['scp']:
