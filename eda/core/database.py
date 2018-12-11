@@ -3,7 +3,7 @@
 import pandas as pd
 import MySQLdb
 import psycopg2
-from pymongo import MongoClient
+# from pymongo import MongoClient
 
 
 class Database:

@@ -25,8 +25,8 @@ if not os.path.exists( baseDir ):
 
 os.chdir ( baseDir )
 
-from lidar.lidar import Lidar
-from lidar.utils.utils import LoggingPool, listener_configurer
+import eda #from lidar.lidar import Lidar
+from eda.utils.utils import LoggingPool, listener_configurer
 locale.setlocale(locale.LC_TIME, ('en_GB','utf-8'))
 
 
@@ -75,12 +75,12 @@ def main(scan):
 
     print 'cpu_count() = %d\n' % mp.cpu_count()
 
-    instance =   Lidar(
-    fechaI=(now-dt.timedelta(hours=48 if scan == 'FixedPoint' else 12)).strftime('%Y-%m-%d %H:%M'),
-    fechaF=now.strftime('%Y-%m-%d %H:%M'),
-    scan=scan,
-    output='raw',
-    path='CalidadAire/Lidar/'
+    instance =   eda.Lidar(
+        fechaI=(now-dt.timedelta(hours=48 if scan == 'FixedPoint' else 12)).strftime('%Y-%m-%d %H:%M'),
+        fechaF=now.strftime('%Y-%m-%d %H:%M'),
+        scan=scan,
+        output='raw',
+        path='CalidadAire/Lidar/'
     )
 
     PROCESSES = 5
