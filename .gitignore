@@ -1,9 +1,9 @@
 #Folder for Crons
-crones/FixedPoint/
-crones/3D/
-crones/Azimuth/
-crones/Zenith
-crones/lidarCron_LOG.txt
+scripts/FixedPoint/
+scripts/3D/
+scripts/Azimuth/
+scripts/Zenith
+scripts/lidarCron_LOG.txt
 files.txt
 lidar/_libs/cytools.c
 lidar/_libs/cytools.html

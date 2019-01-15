@@ -1,52 +1,52 @@
 #!/bin/bash
 
-check_folder () {
-    printf "user@domain = $1 \npath = $2\n"
-    if ssh $1 "test -d $2"; then
-        printf "That directory exists\n"
-    else
-        printf "That directory doesn't exists, creating... \n"
-        ssh $1 "mkdir -p -m 755 '$2'" #2> stderr
-        # cat
-    fi
-}
-
-rsync_wrapper () {
-    # printf "Args number: $#\n"
-    local POSITIONAL=()
-
-    while [[ $# -gt 0 ]]; do
-    local key="$1"
-
-    case $key in
-        -lp|--local-path)
-        local SOURCE="$2"; shift; shift;; # past argument, # past value
-        -rp|--path)
-        local REMOTEPATH="$2"; shift; shift;;
-        -f|--files-from)
-        local FILES="$2"; shift; shift;;
-        -t|--type)
-        local TYPE="$2"; shift; shift;;
-        *)    # unknown option
-        POSITIONAL+=("$1")  shift ;; #save it in an array for later
-    esac
-    done
-    set -- "${POSITIONAL[@]}" # restore positional parameters
-    # local SOURCE="$1"
-    # local REMOTEPATH="$2"
-    # local TYPE="$3"
-    # local FILES="$4"
-
-    if [ "$TYPE" = "d" ]; then
-        printf "Rsync folders \nsource=$SOURCE \npath=$REMOTEPATH \ninclude-from=$FILES\n"
-        rsync -tzvP --chmod=755 --include-from="$FILES" "$SOURCE" "$REMOTEPATH" 
-    elif [ "$TYPE" = "f" ]; then
-        printf "Rsync files \nsource=$SOURCE \npath=$PATH \nfiles-from=$FILES\n"
-        rsync -tzvP --chmod=755 --files-from="$FILES" --no-relative --no-dirs "$SOURCE" "$REMOTEPATH" #
-    else
-        printf "Error on parameters, check it: $@\n"
-    fi
-}
+# check_folder () {
+#     printf "user@domain = $1 \npath = $2\n"
+#     if ssh $1 "test -d $2"; then
+#         printf "That directory exists\n"
+#     else
+#         printf "That directory doesn't exists, creating... \n"
+#         ssh $1 "mkdir -p -m 755 '$2'" #2> stderr
+#         # cat
+#     fi
+# }
+#
+# rsync_wrapper () {
+#     # printf "Args number: $#\n"
+#     local POSITIONAL=()
+#
+#     while [[ $# -gt 0 ]]; do
+#     local key="$1"
+#
+#     case $key in
+#         -lp|--local-path)
+#         local SOURCE="$2"; shift; shift;; # past argument, # past value
+#         -rp|--path)
+#         local REMOTEPATH="$2"; shift; shift;;
+#         -f|--files-from)
+#         local FILES="$2"; shift; shift;;
+#         -t|--type)
+#         local TYPE="$2"; shift; shift;;
+#         *)    # unknown option
+#         POSITIONAL+=("$1")  shift ;; #save it in an array for later
+#     esac
+#     done
+#     set -- "${POSITIONAL[@]}" # restore positional parameters
+#     # local SOURCE="$1"
+#     # local REMOTEPATH="$2"
+#     # local TYPE="$3"
+#     # local FILES="$4"
+#
+#     if [ "$TYPE" = "d" ]; then
+#         printf "Rsync folders \nsource=$SOURCE \npath=$REMOTEPATH \ninclude-from=$FILES\n"
+#         rsync -tzvP --chmod=755 "$SOURCE" "$REMOTEPATH"
+#     elif [ "$TYPE" = "f" ]; then
+#         printf "Rsync files \nsource=$SOURCE \npath=$REMOTEPATH \nfiles-from=$FILES\n"
+#         rsync -tzvP --chmod=755 --files-from="$FILES" --no-relative --no-dirs "$SOURCE" "$REMOTEPATH" #
+#     # else
+#         # printf "Error on parameters, check it: $@\n"
+#     fi
+# }
 
 verify_ssh_connection () {
     printf "\nFunction: $@\n"
@@ -74,57 +74,80 @@ verify_ssh_connection () {
 rsync_between_dates () {
 
     local POSITIONAL=()
-    local START=$(date -d "30 min ago" '+%Y%m%d %H%M')
-    local END=$(date '+%Y%m%d %H%M')
+    local START=$(date -d "39 min ago" '+%Y%m%d %H%M')
+    local END=$(date -d "9 min ago" '+%Y%m%d %H%M')
     local TYPE="f"
     local NAME="*"
     local MINDEPTH=2
 
     while [[ $# -gt 0 ]]; do
-    local key="$1"
+        local key="$1"
 
-    case $key in
-        -lp|--local-path)
-        local LOCALPATH="$2"; shift; shift;; # past argument, # past value
-        -rp|--remote-path)
-        local REMOTEPATH="$2"; shift; shift;;
-        -d|--domain)
-        local DOMAIN="$2"; shift; shift;;
-        -s|--start)
-        START="$2"; shift; shift;;
-        -e|--end)
-        END="$2"; shift; shift;;
-        -t|--type)
-        TYPE="$2"; shift; shift;;
-        -n|--name)
-        NAME="$2"; shift; shift;;
-        -mindepth)
-        MINDEPTH="$2"; shift; shift;;
-        *)    # unknown option
-        POSITIONAL+=("$1")  shift ;; #save it in an array for later
-    esac
+        case $key in
+            -lp|--local-path)
+            local LOCALPATH="$2"; shift; shift;; # past argument, # past value
+            -rp|--remote-path)
+            local REMOTEPATH="$2"; shift; shift;;
+            -d|--domain)
+            local DOMAIN="$2"; shift; shift;;
+            -s|--start)
+            START="$2"; shift; shift;;
+            -e|--end)
+            END="$2"; shift; shift;;
+            -t|--type)
+            TYPE="$2"; shift; shift;;
+            -n|--name)
+            NAME="$2"; shift; shift;;
+            -mindepth)
+            MINDEPTH="$2"; shift; shift;;
+            *)    # unknown option
+            POSITIONAL+=("$1")  shift ;; #save it in an array for later
+        esac
     done
     set -- "${POSITIONAL[@]}" # restore positional parameters
 
-    local date_folder=$(date "-d $START + 9 min" '+%Y%m%d' )
-    if [ "$TYPE" = "d" ]; then
-        date_folder="$date_folder/"
-    fi
-    printf "start: %s\nend: %s\nlocal path: %s\nremote path: %s\nuser@domain: %s\ntype: %s\nname: %s\n"  "$START" "$END" "$LOCALPATH" "$REMOTEPATH$date_folder" "$DOMAIN" "$TYPE" "$NAME";
+
     find "$LOCALPATH" -mindepth $MINDEPTH -name "$NAME" -newermt "$START" ! -newermt "$END" -type "$TYPE" -printf '%P\n'  > files.txt
 
     files=$(cat files.txt)
     # printf "$files"
+
     if [ -n "$files" ]; then
-        verify_ssh_connection check_folder "$DOMAIN" "$REMOTEPATH$date_folder"
-        verify_ssh_connection rsync_wrapper -lp "$LOCALPATH" -rp "$DOMAIN:$REMOTEPATH$date_folder" -t "$TYPE" -f files.txt
+
+        local date_folder=$(date "-d $START + 9 min" '+%Y%m%d' )
+        printf "start: %s\nend: %s\nlocal path: %s\nremote path: %s\nuser@domain: %s\ntype: %s\nname: %s\n"  "$START" "$END" "$LOCALPATH" "$REMOTEPATH$date_folder" "$DOMAIN" "$TYPE" "$NAME";
+
+        #Create Folder
+        verify_ssh_connection ssh $DOMAIN "mkdir -p -m 755 '$REMOTEPATH$date_folder'"
+        # verify_ssh_connection check_folder  "$DOMAIN "$REMOTEPATH$date_folder"
+
+        if [ "$TYPE" = "f" ]; then
+            printf "Rsync files \nsource=$LOCALPATH \npath=$DOMAIN:$REMOTEPATH$date_folder\nfiles-from=files.txt\n"
+            # verify_ssh_connection rsync_wrapper -lp "$LOCALPATH" -rp "$DOMAIN:$REMOTEPATH$date_folder" -t "$TYPE" -f files.txt
+            verify_ssh_connection "rsync -tzvvP --chmod=755 --files-from=files.txt --no-relative --no-dirs $LOCALPATH $DOMAIN:$REMOTEPATH$date_folder"
+
+        elif [ "$TYPE" = "d" ]; then
+            # date_folder="$date_folder/"
+            # verify_ssh_connection rsync -tzvP --chmod=755 "$LOCALPATH" "$DOMAIN:$REMOTEPATH"
+
+            for folder in $files
+            do
+                printf "Rsync folder \nsource=$LOCALPATH$folder/ \npath=$DOMAIN:$REMOTEPATH$date_folder\n"
+                # printf "Folder: $folder"
+                verify_ssh_connection "rsync -tzvvP --chmod=755 $LOCALPATH$folder/ $DOMAIN:$REMOTEPATH$date_folder/"
+
+            done
+
+        fi
+
+
     else
         printf "\nNo files avalible, check other dates\n"
     fi
 }
 ########################################
 
-miel=torresiata@192.168.1.62
+miel=jhernandezv@192.168.1.165
 gomita=jhernandezv@192.168.1.9
 
 dir_data_local_fp=/cygdrive/c/Raymetrics/Lidar_Data/Fixed_Point/
@@ -135,13 +158,15 @@ dir_gomita_fp=/media/jhernandezv/disco1/Lidar/Fixed_Point/
 dir_gomita_sm=/media/jhernandezv/disco1/Lidar/Scanning_Measurements/
 
 ########################################
-
-# if [ $(date '+%Y%m%d') -gt $(date -d "30 min ago" '+%Y%m%d') ]; then
-#     start1=$(date -d "30 min ago" '+%Y%m%d 2330')
-#     end1=$(date '-d 9 min ago' '+%Y%m%d 0000')
+#
+# hoy=$(date '+%Y%m%d')
+# if [ "$hoy" -gt $(date -d "30 min ago" '+%Y%m%d') ]; then
+#     start1=$(date "-d 30 min ago" '+%Y%m%d 2325')
+#     end1=$(date '-d 30 min ago' '+%Y%m%d 2351')
 #     start2=$end1
-#     end2=$(date '+%Y%m%d 0030')
+#     end2=$hoy
 #     printf "Sync on day change\n"
+#
 #     #FixedPoint
 #     rsync_between_dates -lp $dir_data_local_fp -rp $dir_miel_fp -d $miel -n "RM*" -s "$start1" -e "$end1"
 #     rsync_between_dates -lp $dir_data_local_fp -rp $dir_gomita_fp -d $gomita -n "RM*" -s "$start1" -e "$end1"
@@ -155,6 +180,7 @@ dir_gomita_sm=/media/jhernandezv/disco1/Lidar/Scanning_Measurements/
 #
 #     rsync_between_dates -lp $dir_data_local_sm -rp $dir_miel_sm -d $miel -t d -s "$start2" -e "$end2"
 #     rsync_between_dates -lp $dir_data_local_sm -rp $dir_gomita_sm -d $gomita -t d -s "$start2" -e "$end2"
+#
 # else
 #     printf "Sync Files\n"
 #     #FixedPoint
@@ -187,7 +213,7 @@ do
     printf "\nSync files from $d to $df\n \n"
     #FixedPoint
     # rsync_between_dates -lp $dir_data_local_fp -s "$d" -e "$df" -rp $dir_miel_fp -d$miel -t f -n "RM*"
-    # rsync_between_dates -lp $dir_data_local_fp -s "$d" -e "$df" -rp $dir_gomita_fp -d $gomita -t f -n "RM*"
+    rsync_between_dates -lp $dir_data_local_fp -s "$d" -e "$df" -rp $dir_gomita_fp -d $gomita -t f -n "RM*"
 
     # Scanning
     echo $(find $dir_data_local_sm -mindepth 2 -name "*" -newermt "$d" ! -newermt "$df" -type d -printf '%P\n')
